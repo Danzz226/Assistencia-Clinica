@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">
+  <rect width="300" height="300" fill="#ffffff" />
+  
+  <!-- Fundo Circular Decorativo Suave -->
+  <circle cx="150" cy="110" r="75" fill="#f2f5f3" />
+  
+  <!-- Folha Geométrica / Escudo de Saúde (Elegante) -->
+  <path d="M 150 35 C 195 35, 230 80, 150 170 C 70 80, 105 35, 150 35 Z" fill="#7f9c84" />
+  <path d="M 150 170 C 120 120, 135 70, 150 35 C 165 70, 180 120, 150 170 Z" fill="#58795c" />
+  
+  <!-- Texto Principal com Fonte Serifada Clássica -->
+  <text x="50%" y="225" font-family="'Playfair Display', 'Times New Roman', serif" font-size="46" fill="#253526" text-anchor="middle" font-weight="bold">Lifium</text>
+  
+  <!-- Subtítulo -->
+  <text x="50%" y="255" font-family="'Georgia', serif" font-size="12" fill="#58795c" text-anchor="middle" letter-spacing="4" font-style="italic">SAÚDE &amp; BEM-ESTAR</text>
+</svg>
