@@ -1,0 +1,51 @@
+.top-header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 1.5rem 3rem;
+  background-color: transparent;
+  width: 100%;
+
+  .user-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .user-details {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+
+      .user-name {
+        font-weight: 700;
+        font-size: 1rem;
+        color: #000;
+        margin-bottom: 4px;
+        line-height: 1;
+      }
+
+      .role-badge {
+        background-color: #CBDCD4; /* Verde clarinho baseado no design */
+        color: #688E80;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        line-height: 1;
+      }
+    }
+
+    .dropdown-icon {
+      color: #000;
+      margin-left: 4px;
+    }
+  }
+}
