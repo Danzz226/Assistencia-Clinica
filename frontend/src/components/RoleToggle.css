@@ -19,6 +19,9 @@
   border-radius: calc(var(--border-radius-sm) - 2px);
   position: relative;
   z-index: 10;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
   transition: color 0.3s ease;
 }
 

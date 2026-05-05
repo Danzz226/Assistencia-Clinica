@@ -3,31 +3,7 @@
   height: 100vh;
   width: 100%;
   background-color: var(--bg-color);
-}
-
-.login-left {
-  flex: 1;
-  display: flex;
-  position: relative;
   overflow: hidden;
-  background-color: #E0E7FF; 
-}
-
-.login-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-}
-
-.login-image-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient( rgba(82, 109, 84, 0.18));
-  background-color: color-overlay;
 }
 
 .login-right {
@@ -36,13 +12,18 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 2rem;
+  padding: 4vh 2vw; /* Use relative units for padding */
   background-color: white;
+  box-sizing: border-box;
+  height: 100%;
+  overflow: hidden;
 }
 
 .login-box {
   width: 100%;
   max-width: 440px;
+  max-height: 100%;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -51,11 +32,20 @@
   box-shadow: var(--shadow-soft);
   padding: 2rem;
   background-color: white;
+  box-sizing: border-box;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.login-box::-webkit-scrollbar {
+  display: none;
 }
 
 .login-logo {
-  max-width: 150px;
-  height: 150px
+  max-width: 100%;
+  max-height: 80px;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 
 .login-box h1 {
@@ -87,10 +77,8 @@
   border-color: var(--primary-color);
 }
 
-
-
-@media (max-width: 768px) {
-  .login-left {
-    display: none;
+@media (max-width: 1024px) {
+  .login-presentation {
+    display: none !important;
   }
 }
