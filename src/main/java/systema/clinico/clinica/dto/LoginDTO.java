@@ -1,6 +1,14 @@
 package systema.clinico.clinica.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+
 public class LoginDTO {
-    public String cpf;
-    public String password;
+
+    @Email
+    @NotBlank
+    public String email;
+
+    @NotBlank
+    public String senha;
 }
