@@ -1,5 +1,11 @@
 HELP.md
 target/
+.env
+.env.local
+frontend-5173.err
+frontend-5173.log
+backend-*.log
+backend-*.err
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/

@@ -1,29 +1,32 @@
 package systema.clinico.clinica.controller;
 
-import systema.clinico.clinica.model.Usuario;
+import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import systema.clinico.clinica.dto.AuthResponseDTO;
+import systema.clinico.clinica.dto.CadastroUsuarioDTO;
+import systema.clinico.clinica.dto.LoginDTO;
 import systema.clinico.clinica.service.UsuarioService;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin("*")
 public class AuthController {
 
-    private final UsuarioService service;
+    private final UsuarioService usuarioService;
 
-    public AuthController(UsuarioService service) {
-        this.service = service;
+    public AuthController(UsuarioService usuarioService) {
+        this.usuarioService = usuarioService;
     }
 
     @PostMapping("/register")
-    public Usuario registrar(@RequestBody Usuario usuario) {
-        return service.salvar(usuario);
+    public AuthResponseDTO cadastrar(@RequestBody @Valid CadastroUsuarioDTO dto) {
+        return usuarioService.registrar(dto);
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody Usuario usuario) {
-        boolean valido = service.validarLogin(usuario.getUsername(), usuario.getPassword());
-
-        return valido ? "Login realizado com sucesso" : "Senha inválida";
+    public AuthResponseDTO login(@RequestBody @Valid LoginDTO dto) {
+        return usuarioService.login(dto);
     }
 }
