@@ -8,8 +8,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "medicos")
-public class Medico {
+@Table(name = "funcionarios")
+public class Funcionario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,9 +19,6 @@ public class Medico {
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
 
-    @Column(nullable = false, length = 50)
-    private String crm;
-
     @Column(length = 100)
-    private String especialidade;
+    private String cargo;
 }

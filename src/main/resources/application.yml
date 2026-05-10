@@ -1,0 +1,46 @@
+# --- Como subir ---
+# 1) MySQL rodando (Serviços Windows / Workbench / XAMPP etc.), porta normalmente 3306.
+# 2) Banco `clinica` criado (ex.: script Clinica.sql).
+# 3) Usuário e senha abaixo devem bater com o seu MySQL (por padrão root sem senha em algumas instalações).
+#
+# API HTTP (Tomcat usa server.port + context-path):
+#   Teste rápido: http://localhost:8080/api/teste
+#   Swagger:      http://localhost:8080/api/swagger-ui/index.html
+#
+# Se ver "Connection refused" na porta 3306 → MySQL não está ligado ou a porta está errada.
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+spring:
+  config:
+    import: optional:file:.env[.properties]
+  application:
+    name: clinica
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/clinica?characterEncoding=UTF-8&serverTimezone=America/Sao_Paulo&allowPublicKeyRetrieval=true&useSSL=false}
+    username: ${DB_USER:root}
+    password: ${DB_PASSWORD:}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      connection-timeout: 20000
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    open-in-view: false
+
+jwt:
+  secret: "assistencia-clinica-jwt-chave-local-minimo-32-caracteres-para-hs256"
+  expiration-ms: 86400000
+
+springdoc:
+  swagger-ui:
+    tags-sorter: alpha
+    operations-sorter: alpha
+
+logging:
+  level:
+    org.hibernate.orm.jdbc: WARN
