@@ -2,7 +2,6 @@ import React, { useState, useEffect, useContext } from 'react';
 import api from '../../services/api';
 import GenericTable from '../GenericTable';
 import { AuthContext } from '../../context/AuthContext';
-import Badge from '../Badge/Badge';
 
 const AppointmentsView = ({ viewRole }) => {
   const [agendamentos, setAgendamentos] = useState([]);
@@ -22,7 +21,7 @@ const AppointmentsView = ({ viewRole }) => {
       } catch (error) {
         console.error("Erro ao buscar agendamentos:", error);
         
-        // --- MOCK DE DADOS PARA TESTE VISUAL (Caso o Java esteja offline) ---
+       
         setAgendamentos([
           { id: 1, pacienteCpf: '111.222.333-44', medicoNome: 'dr_roberto', dataHora: '2026-05-15T14:30:00', status: 'AGENDADA', motivo: 'Checkup Anual' },
           { id: 2, pacienteCpf: '555.666.777-88', medicoNome: 'dr_roberto', dataHora: '2026-05-16T09:00:00', status: 'CONCLUIDA', motivo: 'Retorno de Exames' },
@@ -33,20 +32,20 @@ const AppointmentsView = ({ viewRole }) => {
     };
     fetchAgendamentos();
   }, [viewRole, user]);
-  // Limpa o erro
+
   useEffect(() => {
     if (errorMsg) {
       const timer = setTimeout(() => setErrorMsg(''), 3000);
       return () => clearTimeout(timer);
     }
   }, [errorMsg]);
-  // Função para formatar a data que vem do Java (Ex: 2026-05-15T14:30:00 -> 15/05/2026 às 14:30)
+  
   const formatData = (dataString) => {
     if (!dataString) return '-';
     const date = new Date(dataString);
     return date.toLocaleDateString('pt-BR') + ' às ' + date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
   };
-  // Configuração das Colunas da Tabela
+ 
   const columns = [
     { 
       header: 'Data e Hora', 
@@ -61,21 +60,22 @@ const AppointmentsView = ({ viewRole }) => {
         </div>
       )
     },
-    // Opcional: Só mostrar a coluna "Médico" se for o Admin olhando
+  
     ...(viewRole === 'admin' ? [{ header: 'Médico', accessor: 'medicoNome' }] : []),
     { 
       header: 'Motivo', 
-      render: (row) => <Badge variant="primary">{row.motivo || 'Consulta Geral'}</Badge> 
+      // Nota: A API Java atual não tem o campo "motivo", então usamos fallback visual
+      render: (row) => <span>{row.motivo || 'Consulta Geral'}</span> 
     },
     { 
       header: 'Status', 
       render: (row) => {
-        let variant = 'default';
-        if (row.status === 'AGENDADA') variant = 'info'; 
-        if (row.status === 'CONCLUIDA') variant = 'success';
-        if (row.status === 'CANCELADA') variant = 'danger';
+        let cor = '#666';
+        if (row.status === 'AGENDADA') cor = '#3b82f6'; // Azul
+        if (row.status === 'CONCLUIDA') cor = '#10b981'; // Verde
+        if (row.status === 'CANCELADA') cor = '#ef4444'; // Vermelho
         
-        return <Badge variant={variant}>{row.status}</Badge>;
+        return <span style={{ color: cor, fontWeight: 'bold' }}>{row.status}</span>;
       }
     }
   ];
