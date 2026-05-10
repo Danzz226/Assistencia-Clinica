@@ -7,6 +7,9 @@ import Login from './pages/Login';
 import AdminHome from './pages/Admin/AdminHome';
 import DoctorHome from './pages/Doctor/DoctorHome';
 import PatientHome from './pages/Patient/PatientHome';
+import ManageUsers from './pages/Admin/ManageUsers';
+import AdminAppointments from './pages/Admin/AdminAppointments';
+import Reports from './pages/Admin/Reports';
 
 const AppRoutes = () => {
   return (
@@ -26,8 +29,15 @@ const AppRoutes = () => {
         }
       >
         <Route path="home" element={<AdminHome />} />
+        
+        <Route path="usuarios" element={<ManageUsers />} />
+        
+        <Route path="controle/agendamentos" element={<AdminAppointments />} />
+        
+        {/* Relatorios */}
+        <Route path="controle/relatorios" element={<Reports />} />
+        
         <Route path="" element={<Navigate to="home" replace />} />
-        {/* Outras rotas entrarão aqui */}
       </Route>
 
       {/* Rotas Protegidas - Médico */}

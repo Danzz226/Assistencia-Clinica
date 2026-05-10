@@ -5,7 +5,7 @@ import Header from './Header';
 
 const MainLayout = () => {
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#ffffff' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#F2F5F4' }}>
       <Sidebar />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <Header />

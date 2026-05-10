@@ -1,20 +1,19 @@
-import { useState } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 import api from '../services/api';
-import AuthContext from './auth-context';
 
-export { AuthContext };
+export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
     const storedUser = localStorage.getItem('usuario');
-    try {
-      return storedUser ? JSON.parse(storedUser) : null;
-    } catch {
-      localStorage.removeItem('usuario');
-      return null;
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
     }
-  });
-  const loading = false;
+    setLoading(false);
+  }, []);
 
   const login = async (username, password, selectedRole) => {
     try {

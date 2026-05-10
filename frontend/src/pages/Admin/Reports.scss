@@ -1,0 +1,100 @@
+.reports-container {
+  max-width: 1200px;
+  margin-top: 1rem;
+  padding-bottom: 2rem;
+
+  .reports-title {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+  
+  .reports-desc {
+    margin-bottom: 2rem;
+    color: #666;
+  }
+
+  .reports-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+
+    .kpi-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+      }
+
+      .kpi-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &.blue { background: #e0f2fe; color: #0284c7; }
+        &.green { background: #d1fae5; color: #059669; }
+        &.red { background: #fee2e2; color: #dc2626; }
+      }
+
+      .kpi-info {
+        h3 {
+          margin: 0;
+          font-size: 0.875rem;
+          color: #6b7280;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          font-weight: 700;
+        }
+        p {
+          margin: 0;
+          font-size: 1.75rem;
+          font-weight: bold;
+          color: #1f2937;
+        }
+      }
+    }
+  }
+
+  .reports-charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+
+    @media (max-width: 900px) {
+      grid-template-columns: 1fr;
+    }
+
+    .chart-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+
+      h3 {
+        margin-top: 0;
+        margin-bottom: 1.5rem;
+        font-size: 1.125rem;
+        color: #374151;
+        font-weight: 700;
+      }
+
+      .chart-wrapper {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+      }
+    }
+  }
+}
