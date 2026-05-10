@@ -55,7 +55,7 @@ const LoginPresentation = () => {
         
         <div className="text-content">
           <span className="small-label">LIFIUM — CLÍNICA INTELIGENTE</span>
-          <h1>A plataforma que cuida da sua <span>clínica</span> e dos seus <span>pacientes</span>.</h1>
+          <h1>A plataforma que cuida da sua <span>clínica</span> e dos seus <span>pacientes.</span></h1>
           <p>
             Prontuários, agendamentos e relatórios reunidos em um sistema seguro,
             eficiente e feito para profissionais de saúde.
