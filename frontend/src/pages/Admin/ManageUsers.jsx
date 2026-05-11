@@ -1,143 +1,180 @@
-import React, { useState, useEffect } from 'react';
-import { Eye, EyeOff, Pencil, Trash2, FileText, User } from 'lucide-react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
+import { Pencil, Trash2, FileText, User, ChevronDown, Lock, Plus } from 'lucide-react';
 import api from '../../services/api';
 import GenericTable from '../../components/GenericTable';
 import { AuthContext } from '../../context/AuthContext';
-import { useContext } from 'react';
 import Badge from '../../components/Badge/Badge';
+import CreateUserModal from '../../components/Modal/CreateUserModal';
+import ResetPasswordModal from '../../components/Modal/ResetPasswordModal';
+import UserProfileModal from '../../components/Modal/UserProfileModal';
+import '../../components/Modal/Modal.scss';
 import './ManageUsers.scss';
 
 const ManageUsers = () => {
   const [usuarios, setUsuarios] = useState([]);
-  const [senhasVisiveis, setSenhasVisiveis] = useState({}); // Controla quais senhas estão abertas
-  const [errorMsg, setErrorMsg] = useState(''); // Estado para o toast de erro
-  
+  const [errorMsg, setErrorMsg] = useState('');
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [resetPasswordUser, setResetPasswordUser] = useState(null);
+  const [profileUser, setProfileUser] = useState(null);
+  const [openDropdownId, setOpenDropdownId] = useState(null);
+  const [dropdownPos, setDropdownPos] = useState({ top: 0, right: 0 });
+
   const { user } = useContext(AuthContext);
   const isAdmin = user?.role === 'admin';
-  
-  useEffect(() => {
-    const fetchUsuarios = async () => {
-      try {
-        const response = await api.get('/usuarios');
-        setUsuarios(response.data);
-      } catch (error) {
-        console.error("Erro ao buscar usuários:", error);
 
-        // --- MOCK DE DADOS PARA TESTE VISUAL ---
-        // Preenche a tabela com dados falsos se a API falhar
-        setUsuarios([
-          { id: 1, username: 'admin_master', role: 'ADMIN', password: 'senhaSuperSecreta123' },
-          { id: 2, username: 'dr_roberto', role: 'MEDICO', password: 'robertoDoc2023' },
-          { id: 3, username: 'maria_silva', role: 'PACIENTE', password: 'mariazinha99' },
-          { id: 4, username: 'joao_souza', role: 'PACIENTE', password: 'joaosouza!@#' }
-        ]);
-
-        if (error.response) {
-          setErrorMsg(`Erro do servidor (${error.response.status}): Não foi possível carregar os usuários.`);
-        } else if (error.request) {
-          setErrorMsg('Erro de conexão: Não foi possível conectar ao servidor Java.');
-        } else {
-          setErrorMsg(`Erro: ${error.message}`);
-        }
+  const fetchUsuarios = useCallback(async () => {
+    try {
+      const response = await api.get('/usuarios');
+      setUsuarios(response.data);
+    } catch (error) {
+      console.error('Erro ao buscar usuários:', error);
+      setUsuarios([
+        { id: 1, nome: 'Admin Master', email: 'admin@clinica.com', tipo: 'admin' },
+        { id: 2, nome: 'Dr. Roberto Silva', email: 'roberto@clinica.com', tipo: 'medico' },
+        { id: 3, nome: 'Maria Silva', email: 'maria@clinica.com', tipo: 'paciente' },
+        { id: 4, nome: 'João Souza', email: 'joao@clinica.com', tipo: 'paciente' },
+      ]);
+      if (error.response) {
+        setErrorMsg(`Erro do servidor (${error.response.status}): Não foi possível carregar os usuários.`);
+      } else if (error.request) {
+        setErrorMsg('Erro de conexão: Não foi possível conectar ao servidor Java.');
+      } else {
+        setErrorMsg(`Erro: ${error.message}`);
       }
-    };
-    fetchUsuarios();
+    }
   }, []);
 
-  // Limpa o toast de erro após 3 segundos
+  useEffect(() => {
+    fetchUsuarios();
+  }, [fetchUsuarios]);
+
   useEffect(() => {
     if (errorMsg) {
-      const timer = setTimeout(() => {
-        setErrorMsg('');
-      }, 3000);
+      const timer = setTimeout(() => setErrorMsg(''), 3000);
       return () => clearTimeout(timer);
     }
   }, [errorMsg]);
 
-  const togglePassword = (userId) => {
-    setSenhasVisiveis(prev => ({
-      ...prev,
-      [userId]: !prev[userId]
-    }));
+  const openResetPassword = (row) => {
+    setOpenDropdownId(null);
+    setResetPasswordUser(row);
   };
-  
+
+  const openProfile = (row) => {
+    setOpenDropdownId(null);
+    setProfileUser(row);
+  };
+
   const columns = [
     { header: 'ID', accessor: 'id' },
-    { header: 'Usuário (Username)', accessor: 'username' },
-    { 
-      header: 'Papel (Role)', 
+    { header: 'Nome', accessor: 'nome' },
+    { header: 'E-mail', accessor: 'email' },
+    {
+      header: 'Tipo',
       render: (row) => {
-        const role = row.role?.toUpperCase() || 'N/A';
-        let badgeType = 'default';
-        
-        if (role === 'ADMIN') badgeType = 'admin';
-        else if (role === 'PACIENTE') badgeType = 'paciente';
-        else if (role === 'MEDICO' || role === 'DOCTOR') badgeType = 'medico';
-
-        return <Badge variant={badgeType}>{role}</Badge>;
-      }
-    },
-    { 
-      header: 'Senha', 
-      
-      render: (row) => {
-
-        if (!isAdmin) {
-          return <span>••••••••</span>;
-        }
-        
-        const isVisible = senhasVisiveis[row.id];
-        return (
-          <div className="manage-users-password-wrapper">
-            <span>{isVisible ? row.password : '••••••••'}</span>
-            
-            <button 
-              onClick={() => togglePassword(row.id)}
-              className="manage-users-password-btn"
-              title={isVisible ? "Esconder senha" : "Ver senha"}
-            >
-              {isVisible ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
-          </div>
-        );
-      } 
+        const tipo = row.tipo?.toLowerCase() || '';
+        const variantMap = { admin: 'admin', medico: 'medico', paciente: 'paciente', funcionario: 'default' };
+        return <Badge variant={variantMap[tipo] || 'default'}>{row.tipo?.toUpperCase() || 'N/A'}</Badge>;
+      },
     },
     {
       header: 'Ações',
       render: (row) => {
-        const role = row.role?.toUpperCase() || '';
-        
+        const tipo = row.tipo?.toLowerCase() || '';
+        const isOpen = openDropdownId === row.id;
+
         return (
           <div className="manage-users-actions">
             <button className="action-btn edit" title="Editar">
               <Pencil size={20} />
             </button>
-            <button className="action-btn delete" title="Excluir">
-              <Trash2 size={20} />
-            </button>
-            
-            {role === 'PACIENTE' && (
+            {isAdmin && (
+              <button className="action-btn delete" title="Excluir">
+                <Trash2 size={20} />
+              </button>
+            )}
+            {tipo === 'paciente' && (
               <button className="action-btn prontuario" title="Ver Prontuário">
                 <FileText size={20} />
               </button>
             )}
-
-            {(role === 'MEDICO' || role === 'DOCTOR' || role === 'ADMIN') && (
-              <button className="action-btn perfil" title="Ver Perfil">
-                <User size={20} />
-              </button>
+            {(tipo === 'medico' || tipo === 'admin' || tipo === 'funcionario') && (
+              <div className="profile-dropdown-wrapper">
+                <button
+                  className={`action-btn perfil profile-dropdown-trigger${isOpen ? ' active' : ''}`}
+                  title="Perfil"
+                  onClick={(e) => {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    setDropdownPos({ top: rect.bottom + 4, right: window.innerWidth - rect.right });
+                    setOpenDropdownId(isOpen ? null : row.id);
+                  }}
+                >
+                  <User size={20} />
+                  <ChevronDown
+                    size={12}
+                    style={{
+                      transition: 'transform 0.2s',
+                      transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                    }}
+                  />
+                </button>
+              </div>
             )}
           </div>
         );
-      }
-    }
+      },
+    },
   ];
+
   return (
     <div className="manage-users-container">
-      <h1 className="manage-users-title">Gerenciar Usuários</h1>
-      <p className="manage-users-desc">Visualize e gerencie os acessos do sistema.</p>
-    
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+        <div>
+          <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.35rem' }}>Gerenciar Usuários</h1>
+          <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1.25rem' }}>Visualize e gerencie os acessos do sistema.</p>
+        </div>
+        {isAdmin && (
+          <button className="btn-create" style={{ marginTop: '0.35rem', flexShrink: 0 }} onClick={() => setCreateModalOpen(true)}>
+            <Plus size={15} />
+            Novo Usuário
+          </button>
+        )}
+      </div>
+
       <GenericTable columns={columns} data={usuarios} />
+
+      {/* Overlay fecha o dropdown ao clicar fora */}
+      {openDropdownId !== null && (
+        <div
+          style={{ position: 'fixed', inset: 0, zIndex: 150 }}
+          onClick={() => setOpenDropdownId(null)}
+        />
+      )}
+
+      {/* Menu do dropdown renderizado fora do overflow da tabela */}
+      {openDropdownId !== null && (
+        <div
+          className="profile-dropdown-menu"
+          style={{ position: 'fixed', top: dropdownPos.top, right: dropdownPos.right, zIndex: 200 }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {(() => {
+            const row = usuarios.find(u => u.id === openDropdownId);
+            return row ? (
+              <>
+                <button className="profile-dropdown-item" onClick={() => openProfile(row)}>
+                  <User size={14} />
+                  Ver Perfil
+                </button>
+                <button className="profile-dropdown-item danger" onClick={() => openResetPassword(row)}>
+                  <Lock size={14} />
+                  Redefinir Senha
+                </button>
+              </>
+            ) : null;
+          })()}
+        </div>
+      )}
 
       {errorMsg && (
         <div className="manage-users-error">
@@ -145,9 +182,26 @@ const ManageUsers = () => {
           <p>{errorMsg}</p>
         </div>
       )}
+
+      <CreateUserModal
+        isOpen={createModalOpen}
+        onClose={() => setCreateModalOpen(false)}
+        onCreated={fetchUsuarios}
+      />
+
+      <ResetPasswordModal
+        isOpen={!!resetPasswordUser}
+        onClose={() => setResetPasswordUser(null)}
+        usuario={resetPasswordUser}
+      />
+
+      <UserProfileModal
+        isOpen={!!profileUser}
+        onClose={() => setProfileUser(null)}
+        usuario={profileUser}
+      />
     </div>
   );
 };
-
 
 export default ManageUsers;
