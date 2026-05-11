@@ -1,0 +1,307 @@
+.doctor-schedule {
+  max-width: 1200px;
+  margin-top: 1rem;
+  padding-bottom: 2rem;
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+
+  &__title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #000;
+    margin-bottom: 0.5rem;
+  }
+
+  &__desc {
+    font-size: 1rem;
+    color: #555;
+    margin: 0;
+  }
+
+  &__add-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.25rem;
+    background: #3b5f50;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    white-space: nowrap;
+
+    &:hover {
+      background: #2e4c3e;
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  // Formulário de novo horário
+  &__form {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    margin-bottom: 1.5rem;
+    border: 1.5px solid #e8f0ec;
+  }
+
+  &__form-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1a2332;
+    margin-bottom: 1.25rem;
+  }
+
+  &__form-fields {
+    display: flex;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.25rem;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    flex: 1;
+    min-width: 160px;
+
+    label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #7a9c8e;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    select,
+    input[type='time'] {
+      padding: 0.6rem 0.9rem;
+      border: 1.5px solid #e0e8e4;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      color: #1a2332;
+      background: #fff;
+      outline: none;
+      transition: border-color 0.2s;
+
+      &:focus {
+        border-color: #3b5f50;
+      }
+    }
+  }
+
+  &__form-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+  }
+
+  &__btn {
+    padding: 0.6rem 1.25rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: background 0.2s, transform 0.15s;
+
+    &--cancel {
+      background: #f0f4f2;
+      color: #555;
+
+      &:hover { background: #e0e8e4; }
+    }
+
+    &--save {
+      background: #3b5f50;
+      color: #fff;
+
+      &:hover { background: #2e4c3e; }
+      &:disabled { background: #a0b8af; cursor: not-allowed; }
+    }
+  }
+
+  &__empty {
+    padding: 2rem;
+    background: #fff;
+    border-radius: 16px;
+    text-align: center;
+    color: #888;
+    font-size: 0.95rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  }
+
+  // Grade semanal
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.75rem;
+
+    @media (max-width: 900px) {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    @media (max-width: 600px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  &__day {
+    background: #fff;
+    border-radius: 14px;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    border: 2px solid transparent;
+    transition: box-shadow 0.2s;
+
+    &:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    &--today {
+      border-color: #3b5f50;
+      background: #f7faf9;
+    }
+  }
+
+  &__day-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  &__day-name {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #1a2332;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  &__day-today-badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    background: #3b5f50;
+    color: #fff;
+    padding: 0.1rem 0.45rem;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  &__day-empty {
+    font-size: 0.78rem;
+    color: #bbb;
+    text-align: center;
+    padding: 0.75rem 0;
+    border: 1.5px dashed #e0e8e4;
+    border-radius: 8px;
+  }
+
+  &__slot {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: #e8f0ec;
+    border-radius: 8px;
+    padding: 0.45rem 0.6rem;
+    font-size: 0.78rem;
+    color: #3b5f50;
+
+    svg {
+      flex-shrink: 0;
+    }
+  }
+
+  &__slot-time {
+    flex: 1;
+    font-weight: 600;
+  }
+
+  &__slot-remove {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #7a9c8e;
+    display: flex;
+    align-items: center;
+    padding: 0;
+    transition: color 0.15s;
+    flex-shrink: 0;
+
+    &:hover {
+      color: #c0392b;
+    }
+  }
+
+  // Toasts
+  &__toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 9999;
+    padding: 0.75rem 1.25rem;
+    border-radius: 10px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    animation: slideUpToast 0.3s ease-out;
+
+    &--success {
+      background: #e8f0ec;
+      color: #3b5f50;
+      border-left: 4px solid #3b5f50;
+    }
+  }
+
+  &__error {
+    position: fixed;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    padding: 1rem 1.5rem;
+    background-color: #fff3f3;
+    border-left: 4px solid #ff4d4f;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    color: #cf1322;
+    font-size: 0.875rem;
+    animation: slideDownToast 0.4s ease-out forwards;
+    pointer-events: none;
+    min-width: 300px;
+
+    h4 { margin: 0 0 0.5rem; font-weight: 600; }
+    p  { margin: 0; }
+  }
+}
+
+@keyframes slideDownToast {
+  from { top: -50px; opacity: 0; }
+  to   { top: 30px;  opacity: 1; }
+}
+
+@keyframes slideUpToast {
+  from { bottom: 0; opacity: 0; }
+  to   { bottom: 2rem; opacity: 1; }
+}
