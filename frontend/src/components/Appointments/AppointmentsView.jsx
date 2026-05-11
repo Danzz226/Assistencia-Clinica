@@ -1,37 +1,54 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
+import { Plus } from 'lucide-react';
 import api from '../../services/api';
 import GenericTable from '../GenericTable';
 import { AuthContext } from '../../context/AuthContext';
+import Badge from '../Badge/Badge';
+import CreateAppointmentModal from '../Modal/CreateAppointmentModal';
+import '../Modal/Modal.scss';
+
+const STATUS_LABEL = {
+  agendado: 'AGENDADA',
+  realizado: 'REALIZADA',
+  cancelado: 'CANCELADA',
+};
+
+const STATUS_VARIANT = {
+  agendado: 'info',
+  realizado: 'success',
+  cancelado: 'danger',
+};
 
 const AppointmentsView = ({ viewRole }) => {
   const [agendamentos, setAgendamentos] = useState([]);
   const [errorMsg, setErrorMsg] = useState('');
+  const [modalOpen, setModalOpen] = useState(false);
   const { user } = useContext(AuthContext);
-  useEffect(() => {
-    const fetchAgendamentos = async () => {
-      try {
-        const response = await api.get('/consultas');
-        let dados = response.data || [];
-      
-        if (viewRole === 'medico') {
-         
-          dados = dados.filter(consulta => consulta.medicoNome === user?.username);
-        }
-        setAgendamentos(dados);
-      } catch (error) {
-        console.error("Erro ao buscar agendamentos:", error);
-        
-       
-        setAgendamentos([
-          { id: 1, pacienteCpf: '111.222.333-44', medicoNome: 'dr_roberto', dataHora: '2026-05-15T14:30:00', status: 'AGENDADA', motivo: 'Checkup Anual' },
-          { id: 2, pacienteCpf: '555.666.777-88', medicoNome: 'dr_roberto', dataHora: '2026-05-16T09:00:00', status: 'CONCLUIDA', motivo: 'Retorno de Exames' },
-          { id: 3, pacienteCpf: '999.888.777-66', medicoNome: 'dra_ana', dataHora: '2026-05-20T11:00:00', status: 'CANCELADA', motivo: 'Sintomas Gripais' }
-        ]);
-        setErrorMsg('API Offline: Mostrando dados de teste.');
+
+  const fetchAgendamentos = useCallback(async () => {
+    try {
+      const response = await api.get('/agendamentos');
+      let dados = response.data || [];
+
+      if (viewRole === 'medico') {
+        dados = dados.filter(a => a.medicoNome === user?.username);
       }
-    };
-    fetchAgendamentos();
+
+      setAgendamentos(dados);
+    } catch (error) {
+      console.error('Erro ao buscar agendamentos:', error);
+      setAgendamentos([
+        { id: 1, pacienteNome: 'Maria Silva', medicoNome: 'Dr. Roberto', data: '2026-05-15T14:30:00', status: 'agendado' },
+        { id: 2, pacienteNome: 'João Souza', medicoNome: 'Dr. Roberto', data: '2026-05-16T09:00:00', status: 'realizado' },
+        { id: 3, pacienteNome: 'Ana Lima', medicoNome: 'Dra. Ana', data: '2026-05-20T11:00:00', status: 'cancelado' },
+      ]);
+      setErrorMsg('API Offline: Mostrando dados de teste.');
+    }
   }, [viewRole, user]);
+
+  useEffect(() => {
+    fetchAgendamentos();
+  }, [fetchAgendamentos]);
 
   useEffect(() => {
     if (errorMsg) {
@@ -39,62 +56,73 @@ const AppointmentsView = ({ viewRole }) => {
       return () => clearTimeout(timer);
     }
   }, [errorMsg]);
-  
+
   const formatData = (dataString) => {
     if (!dataString) return '-';
     const date = new Date(dataString);
     return date.toLocaleDateString('pt-BR') + ' às ' + date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
   };
- 
+
   const columns = [
-    { 
-      header: 'Data e Hora', 
-      render: (row) => <strong>{formatData(row.dataHora)}</strong> 
+    {
+      header: 'Data e Hora',
+      render: (row) => <strong>{formatData(row.data)}</strong>,
     },
-    { 
-      header: 'Paciente', 
+    {
+      header: 'Paciente',
       render: (row) => (
         <div>
-          <div style={{ fontWeight: '600', color: '#333' }}>CPF: {row.pacienteCpf}</div>
-          <div style={{ fontSize: '0.8rem', color: '#888' }}>Info: Paciente Cadastrado</div>
+          <div style={{ fontWeight: '600', color: '#333' }}>{row.pacienteNome}</div>
         </div>
-      )
+      ),
     },
-  
     ...(viewRole === 'admin' ? [{ header: 'Médico', accessor: 'medicoNome' }] : []),
-    { 
-      header: 'Motivo', 
-      // Nota: A API Java atual não tem o campo "motivo", então usamos fallback visual
-      render: (row) => <span>{row.motivo || 'Consulta Geral'}</span> 
+    {
+      header: 'Status',
+      render: (row) => (
+        <Badge variant={STATUS_VARIANT[row.status] || 'default'}>
+          {STATUS_LABEL[row.status] || row.status}
+        </Badge>
+      ),
     },
-    { 
-      header: 'Status', 
-      render: (row) => {
-        let cor = '#666';
-        if (row.status === 'AGENDADA') cor = '#3b82f6'; // Azul
-        if (row.status === 'CONCLUIDA') cor = '#10b981'; // Verde
-        if (row.status === 'CANCELADA') cor = '#ef4444'; // Vermelho
-        
-        return <span style={{ color: cor, fontWeight: 'bold' }}>{row.status}</span>;
-      }
-    }
   ];
+
   return (
     <div style={{ maxWidth: '1200px', marginTop: '1rem', paddingBottom: '2rem' }}>
-      <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '1.5rem' }}>
-        {viewRole === 'admin' ? 'Controle Geral de Agendamentos' : 'Meus Agendamentos'}
-      </h1>
-      <p style={{ marginBottom: '2rem' }}>
-        Acompanhe e gerencie as consultas marcadas na clínica.
-      </p>
-    
-      <GenericTable columns={columns} data={agendamentos} />
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
+        <div>
+          <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.35rem' }}>
+            {viewRole === 'admin' ? 'Controle Geral de Agendamentos' : 'Meus Agendamentos'}
+          </h1>
+          <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1.25rem' }}>
+            Acompanhe e gerencie as consultas marcadas na clínica.
+          </p>
+        </div>
+        {viewRole === 'admin' && (
+          <button className="btn-create" style={{ marginTop: '0.5rem', flexShrink: 0 }} onClick={() => setModalOpen(true)}>
+            <Plus size={15} />
+            Novo Agendamento
+          </button>
+        )}
+      </div>
+
+      <div style={{ marginTop: '0' }}>
+        <GenericTable columns={columns} data={agendamentos} />
+      </div>
+
       {errorMsg && (
-        <div className="manage-users-error" style={{position: 'fixed', top: '30px', left: '50%', transform: 'translateX(-50%)', zIndex: 9999, padding: '1rem', background: '#fff3f3', borderLeft: '4px solid #ff4d4f', borderRadius: '8px', boxShadow: '0 8px 24px rgba(0,0,0,0.1)', color: '#cf1322'}}>
-          <p style={{margin: 0}}>{errorMsg}</p>
+        <div style={{ position: 'fixed', top: '30px', left: '50%', transform: 'translateX(-50%)', zIndex: 9999, padding: '1rem', background: '#fff3f3', borderLeft: '4px solid #ff4d4f', borderRadius: '8px', boxShadow: '0 8px 24px rgba(0,0,0,0.1)', color: '#cf1322' }}>
+          <p style={{ margin: 0 }}>{errorMsg}</p>
         </div>
       )}
+
+      <CreateAppointmentModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onCreated={fetchAgendamentos}
+      />
     </div>
   );
 };
+
 export default AppointmentsView;
