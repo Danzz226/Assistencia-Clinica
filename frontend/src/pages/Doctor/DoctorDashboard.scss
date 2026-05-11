@@ -1,0 +1,229 @@
+.doctor-dashboard {
+  max-width: 1200px;
+  margin-top: 1rem;
+  padding-bottom: 2rem;
+
+  &__title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #000;
+    margin-bottom: 1.5rem;
+  }
+
+  &__subtitle {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #000;
+    margin-bottom: 0.75rem;
+  }
+
+  &__desc {
+    font-size: 1rem;
+    color: #333;
+    line-height: 1.5;
+    margin-bottom: 2rem;
+  }
+
+  &__section-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #7a9c8e;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+  }
+
+  &__section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #000;
+    margin-bottom: 1.5rem;
+  }
+
+  &__cards {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  &__card {
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    flex: 1;
+    min-width: 250px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+
+    &:hover {
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      transform: translateY(-2px);
+    }
+
+    &-icon-wrapper {
+      width: 48px;
+      height: 48px;
+      background-color: #e8f0ec;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+      color: #3b5f50;
+
+      svg {
+        width: 24px;
+        height: 24px;
+      }
+    }
+
+    &-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #7a9c8e;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.25rem;
+    }
+
+    &-subtitle {
+      font-size: 0.75rem;
+      color: #888;
+      margin-bottom: 1rem;
+    }
+
+    &-number {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #000;
+      margin-bottom: 1rem;
+      line-height: 1;
+    }
+
+    &-pill {
+      align-self: flex-start;
+      padding: 0.25rem 0.75rem;
+      border-radius: 16px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+
+      &--green {
+        background-color: #e8f0ec;
+        color: #3b5f50;
+      }
+
+      &--blue {
+        background-color: #e8eef8;
+        color: #2a4a80;
+      }
+
+      &--neutral {
+        background-color: #f0f0f0;
+        color: #888;
+      }
+    }
+  }
+
+  &__loading,
+  &__empty {
+    padding: 2rem;
+    background: #fff;
+    border-radius: 16px;
+    text-align: center;
+    color: #888;
+    font-size: 0.95rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  }
+
+  &__table-wrapper {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    overflow: hidden;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+
+    thead tr {
+      background-color: #f7faf9;
+      border-bottom: 1px solid #e8f0ec;
+    }
+
+    th {
+      padding: 1rem 1.25rem;
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #7a9c8e;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    td {
+      padding: 1rem 1.25rem;
+      color: #1a2332;
+      border-bottom: 1px solid #f0f4f2;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr:hover {
+      background-color: #f7faf9;
+    }
+  }
+
+  &__table-id {
+    font-weight: 700;
+    color: #7a9c8e !important;
+    font-size: 0.8rem !important;
+  }
+
+  &__table-desc {
+    color: #555 !important;
+    font-style: italic;
+  }
+
+  &__error {
+    position: fixed;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    padding: 1rem 1.5rem;
+    background-color: #fff3f3;
+    border-left: 4px solid #ff4d4f;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    color: #cf1322;
+    font-size: 0.875rem;
+    animation: slideDownToast 0.4s ease-out forwards;
+    pointer-events: none;
+    min-width: 300px;
+    text-align: left;
+
+    h4 {
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    p {
+      margin: 0;
+    }
+  }
+}
+
+@keyframes slideDownToast {
+  from { top: -50px; opacity: 0; }
+  to   { top: 30px;  opacity: 1; }
+}

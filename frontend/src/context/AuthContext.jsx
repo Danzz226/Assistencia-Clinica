@@ -15,33 +15,26 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const login = async (username, password, selectedRole) => {
+  const login = async (email, password, selectedRole) => {
     try {
+      const response = await api.post('/auth/login', { email, senha: password });
+      const { token, nome, tipo } = response.data;
 
-      const response = await api.post('/usuarios/login', { username, password });
+      const loggedUser = { username: nome, email, role: tipo };
+      setUser(loggedUser);
+      localStorage.setItem('usuario', JSON.stringify(loggedUser));
+      localStorage.setItem('token', token);
+      return { success: true, role: tipo };
+    } catch (error) {
+      console.error("Erro ao fazer login", error);
 
-      // A API
-      // retorna apenas a string de sucesso
-      if (response.data === 'Login realizado com sucesso' || response.status === 200) {
-        // Simulação do usuário com o perfil selecionado na tela de login
-        // Quando a API tiver JWT, isso mudará para decodificar o token
-        const loggedUser = { username, role: selectedRole };
+      // FALLBACK PARA TESTE: Permite login sem o backend estar rodando
+      if (email.includes('teste') || email.includes('admin') || email.includes('medico') || email.includes('paciente')) {
+        console.log("⚠️ API OFFLINE: Fazendo login em modo de teste");
+        const loggedUser = { username: email, email, role: selectedRole };
         setUser(loggedUser);
         localStorage.setItem('usuario', JSON.stringify(loggedUser));
         return { success: true, role: selectedRole };
-      } else {
-        return { success: false, message: response.data || 'Erro no login' };
-      }
-    } catch (error) {
-      console.error("Erro ao fazer login", error);
-      
-      // FALLBACK PARA TESTE: Permite login sem o backend estar rodando
-      if (username.includes('teste') || username.includes('admin') || username.includes('medico') || username.includes('paciente')) {
-         console.log("⚠️ API OFFLINE: Fazendo login em modo de teste");
-         const loggedUser = { username, role: selectedRole };
-         setUser(loggedUser);
-         localStorage.setItem('usuario', JSON.stringify(loggedUser));
-         return { success: true, role: selectedRole };
       }
 
       return { success: false, message: 'Erro ao conectar ao servidor. Tente usar "admin" no e-mail para forçar o acesso offline.' };
@@ -51,6 +44,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setUser(null);
     localStorage.removeItem('usuario');
+    localStorage.removeItem('token');
   };
 
   return (

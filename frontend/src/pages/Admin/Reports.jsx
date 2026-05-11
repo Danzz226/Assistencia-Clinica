@@ -14,22 +14,22 @@ const Reports = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await api.get('/consultas');
+        const response = await api.get('/agendamentos');
         setData(response.data);
       } catch (error) {
         console.error("Erro na API. Usando mock data.", error);
         // Fallback visual para caso o Java esteja desligado
         setData([
-          { id: 1, medicoNome: 'dr_roberto', status: 'CONCLUIDA' },
-          { id: 2, medicoNome: 'dr_roberto', status: 'AGENDADA' },
-          { id: 3, medicoNome: 'dr_roberto', status: 'AGENDADA' },
-          { id: 4, medicoNome: 'dr_roberto', status: 'CANCELADA' },
-          { id: 5, medicoNome: 'dra_ana', status: 'CONCLUIDA' },
-          { id: 6, medicoNome: 'dra_ana', status: 'CONCLUIDA' },
-          { id: 7, medicoNome: 'dra_ana', status: 'AGENDADA' },
-          { id: 8, medicoNome: 'dr_lucas', status: 'CANCELADA' },
-          { id: 9, medicoNome: 'dr_lucas', status: 'CANCELADA' },
-          { id: 10, medicoNome: 'dr_lucas', status: 'AGENDADA' },
+          { id: 1, medicoNome: 'Dr. Roberto', status: 'realizado' },
+          { id: 2, medicoNome: 'Dr. Roberto', status: 'agendado' },
+          { id: 3, medicoNome: 'Dr. Roberto', status: 'agendado' },
+          { id: 4, medicoNome: 'Dr. Roberto', status: 'cancelado' },
+          { id: 5, medicoNome: 'Dra. Ana', status: 'realizado' },
+          { id: 6, medicoNome: 'Dra. Ana', status: 'realizado' },
+          { id: 7, medicoNome: 'Dra. Ana', status: 'agendado' },
+          { id: 8, medicoNome: 'Dr. Lucas', status: 'cancelado' },
+          { id: 9, medicoNome: 'Dr. Lucas', status: 'cancelado' },
+          { id: 10, medicoNome: 'Dr. Lucas', status: 'agendado' },
         ]);
       } finally {
         setLoading(false);
@@ -40,9 +40,9 @@ const Reports = () => {
 
   // --- MATEMÁTICA / CÁLCULOS FEITOS PELO REACT ---
   const total = data.length;
-  const concluidas = data.filter(c => c.status === 'CONCLUIDA').length;
-  const canceladas = data.filter(c => c.status === 'CANCELADA').length;
-  const agendadas = data.filter(c => c.status === 'AGENDADA').length;
+  const concluidas = data.filter(c => c.status === 'realizado').length;
+  const canceladas = data.filter(c => c.status === 'cancelado').length;
+  const agendadas = data.filter(c => c.status === 'agendado').length;
 
   const taxaCancelamento = total > 0 ? Math.round((canceladas / total) * 100) : 0;
 
@@ -61,16 +61,16 @@ const Reports = () => {
       medicosMap[nome] = { nome, Concluídas: 0, Agendadas: 0, Canceladas: 0 };
     }
     
-    if (c.status === 'CONCLUIDA') medicosMap[nome].Concluídas++;
-    else if (c.status === 'AGENDADA') medicosMap[nome].Agendadas++;
-    else if (c.status === 'CANCELADA') medicosMap[nome].Canceladas++;
+    if (c.status === 'realizado') medicosMap[nome].Concluídas++;
+    else if (c.status === 'agendado') medicosMap[nome].Agendadas++;
+    else if (c.status === 'cancelado') medicosMap[nome].Canceladas++;
   });
   const barData = Object.values(medicosMap);
 
   return (
     <div className="reports-container">
-      <h1 className="reports-title">Dashboard Analítico</h1>
-      <p className="reports-desc">Visão geral do desempenho e métricas da clínica.</p>
+      <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.35rem' }}>Dashboard Analítico</h1>
+      <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1.25rem' }}>Visão geral do desempenho e métricas da clínica.</p>
 
       {/* Cards Superiores (KPIs) */}
       <div className="reports-kpi-grid">

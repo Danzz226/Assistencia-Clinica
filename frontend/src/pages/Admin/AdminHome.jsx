@@ -14,27 +14,18 @@ const AdminHome = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const [usuariosRes, consultasRes] = await Promise.all([
+        const [usuariosRes, agendamentosRes] = await Promise.all([
           api.get('/usuarios'),
-          api.get('/consultas')
+          api.get('/agendamentos')
         ]);
 
         const usuarios = usuariosRes.data || [];
-        const consultas = consultasRes.data || [];
+        const agendamentos = agendamentosRes.data || [];
 
-        // 1. Contagem de Pacientes
-        let pacientesList = usuarios.filter(u => !u.role || u.role.toUpperCase() === 'PACIENTE');
-        let totalPacientes = pacientesList.length;
+        let totalPacientes = usuarios.filter(u => u.tipo === 'paciente').length;
+        let totalDoutores = usuarios.filter(u => u.tipo === 'medico').length;
 
-        let doutoresList = usuarios.filter(u => u.role && (u.role.toUpperCase() === 'MEDICO' || u.role.toUpperCase() === 'DOCTOR' || u.role.toUpperCase() === 'DOUTOR'));
-        let totalDoutores = doutoresList.length;
-
-        if (totalPacientes === 0 && totalDoutores === 0 && usuarios.length > 0) {
-          totalPacientes = usuarios.length;
-        }
-
-        // 3. Contagem de Prontuários (Consultas)
-        let totalProntuarios = consultas.length;
+        let totalProntuarios = agendamentos.length;
 
         // Simulando um crescimento em relação ao mês passado (já que o back ainda não tem histórico)
         setStats({
@@ -52,7 +43,7 @@ const AdminHome = () => {
         });
 
         if (error.response) {
-          setErrorMsg(`Erro do servidor (${error.response.status}): Não foi possível obter os dados. Verifique se os endpoints /usuarios e /consultas estão acessíveis.`);
+          setErrorMsg(`Erro do servidor (${error.response.status}): Não foi possível obter os dados. Verifique se os endpoints /usuarios e /agendamentos estão acessíveis.`);
         } else if (error.request) {
           setErrorMsg('Erro de conexão: Não foi possível conectar ao servidor Java. O backend está rodando na porta correta?');
         } else {
@@ -96,20 +87,11 @@ const AdminHome = () => {
 
   return (
     <div className="admin-dashboard">
-      <h1 className="admin-dashboard__title">
+      <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.35rem' }}>
         Dashboard Administrativo
       </h1>
-
-      <h2 className="admin-dashboard__subtitle">
-        Acompanhe exames e prontuários dos pacientes
-      </h2>
-
-      <p className="admin-dashboard__desc">
-        Aqui você poderá gerenciar usuários, funcionários, visualizar
-        <br />
-        todas as consultas marcadas na clínica e acessar relatórios
-        <br />
-        gerenciais.
+      <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1.25rem' }}>
+        Gerencie usuários, visualize consultas e acesse relatórios gerenciais da clínica.
       </p>
 
       <div className="admin-dashboard__section-label">LIFIUM · VISÃO GERAL</div>
