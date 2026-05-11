@@ -29,6 +29,9 @@ public class Agendamento {
     @Column(nullable = false)
     private LocalDateTime data;
 
+    @Column(name = "motivo_consulta", columnDefinition = "TEXT")
+    private String motivoConsulta;
+
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
     private StatusAgendamento status = StatusAgendamento.agendado;
