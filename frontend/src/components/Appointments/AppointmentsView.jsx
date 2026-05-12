@@ -36,13 +36,10 @@ const AppointmentsView = ({ viewRole }) => {
 
       setAgendamentos(dados);
     } catch (error) {
-      console.error('Erro ao buscar agendamentos:', error);
-      setAgendamentos([
-        { id: 1, pacienteNome: 'Maria Silva', medicoNome: 'Dr. Roberto', data: '2026-05-15T14:30:00', status: 'agendado' },
-        { id: 2, pacienteNome: 'João Souza', medicoNome: 'Dr. Roberto', data: '2026-05-16T09:00:00', status: 'realizado' },
-        { id: 3, pacienteNome: 'Ana Lima', medicoNome: 'Dra. Ana', data: '2026-05-20T11:00:00', status: 'cancelado' },
-      ]);
-      setErrorMsg('API Offline: Mostrando dados de teste.');
+      setAgendamentos([]);
+      const msg = error.response?.data?.message
+        || (error.response ? `Erro ${error.response.status} ao carregar agendamentos.` : 'Sem conexão com o servidor.');
+      setErrorMsg(msg);
     }
   }, [viewRole, user]);
 

@@ -27,20 +27,10 @@ const ManageUsers = () => {
       const response = await api.get('/usuarios');
       setUsuarios(response.data);
     } catch (error) {
-      console.error('Erro ao buscar usuários:', error);
-      setUsuarios([
-        { id: 1, nome: 'Admin Master', email: 'admin@clinica.com', tipo: 'admin' },
-        { id: 2, nome: 'Dr. Roberto Silva', email: 'roberto@clinica.com', tipo: 'medico' },
-        { id: 3, nome: 'Maria Silva', email: 'maria@clinica.com', tipo: 'paciente' },
-        { id: 4, nome: 'João Souza', email: 'joao@clinica.com', tipo: 'paciente' },
-      ]);
-      if (error.response) {
-        setErrorMsg(`Erro do servidor (${error.response.status}): Não foi possível carregar os usuários.`);
-      } else if (error.request) {
-        setErrorMsg('Erro de conexão: Não foi possível conectar ao servidor Java.');
-      } else {
-        setErrorMsg(`Erro: ${error.message}`);
-      }
+      setUsuarios([]);
+      const msg = error.response?.data?.message
+        || (error.response ? `Erro ${error.response.status} ao carregar usuários.` : 'Sem conexão com o servidor.');
+      setErrorMsg(msg);
     }
   }, []);
 

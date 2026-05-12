@@ -1,8 +1,10 @@
 import React, { useContext, useState } from 'react';
 import { AuthContext } from '../../context/AuthContext';
-import { ChevronDown, User, Lock, LogOut } from 'lucide-react';
+import { ChevronDown, User, Lock, LogOut, ShieldCheck, ShieldOff } from 'lucide-react';
 import UserProfileModal from '../Modal/UserProfileModal';
 import ResetPasswordModal from '../Modal/ResetPasswordModal';
+import MfaSetupModal from '../Modal/MfaSetupModal';
+import api from '../../services/api';
 import './Header.scss';
 
 const Header = () => {
@@ -10,6 +12,19 @@ const Header = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [resetModalOpen, setResetModalOpen] = useState(false);
+  const [mfaModalOpen, setMfaModalOpen] = useState(false);
+  const [mfaEnabled, setMfaEnabled] = useState(user?.mfaEnabled ?? false);
+
+  const handleDisableMfa = async () => {
+    if (!window.confirm('Desativar o MFA tornará sua conta menos segura. Confirmar?')) return;
+    try {
+      await api.post('/auth/mfa/disable');
+      setMfaEnabled(false);
+    } catch {
+      alert('Erro ao desativar MFA. Tente novamente.');
+    }
+    setDropdownOpen(false);
+  };
 
   // Nome fixo conforme solicitado para o protótipo
   const username = user?.username || 'Visitante';
@@ -89,9 +104,26 @@ const Header = () => {
                 <Lock size={16} />
                 Redefinir Senha
               </button>
+              {mfaEnabled ? (
+                <button
+                  className="dropdown-item"
+                  onClick={handleDisableMfa}
+                >
+                  <ShieldOff size={16} />
+                  Desativar MFA
+                </button>
+              ) : (
+                <button
+                  className="dropdown-item"
+                  onClick={() => { setMfaModalOpen(true); setDropdownOpen(false); }}
+                >
+                  <ShieldCheck size={16} />
+                  Ativar MFA
+                </button>
+              )}
               <div className="dropdown-divider" />
-              <button 
-                className="dropdown-item logout" 
+              <button
+                className="dropdown-item logout"
                 onClick={() => {
                   logout();
                   setDropdownOpen(false);
@@ -115,6 +147,12 @@ const Header = () => {
         isOpen={resetModalOpen}
         onClose={() => setResetModalOpen(false)}
         usuario={mappedUser}
+      />
+
+      <MfaSetupModal
+        isOpen={mfaModalOpen}
+        onClose={() => setMfaModalOpen(false)}
+        onEnabled={() => setMfaEnabled(true)}
       />
     </header>
   );
