@@ -41,12 +41,16 @@ public class TotpService {
         }
 
         long contadorAtual = Instant.now().getEpochSecond() / TIME_STEP_SECONDS;
-        for (long offset = -1; offset <= 1; offset++) {
+        for (long offset = -3; offset <= 3; offset++) {
             if (gerarCodigo(secret, contadorAtual + offset).equals(code)) {
                 return true;
             }
         }
         return false;
+    }
+
+    public String gerarCodigoPublico(String secret, long contador) {
+        return gerarCodigo(secret, contador);
     }
 
     private String gerarCodigo(String secret, long contador) {

@@ -8,4 +8,6 @@ import java.util.Optional;
 public interface MedicoRepository extends JpaRepository<Medico, Integer> {
 
     Optional<Medico> findByUsuario_Email(String email);
+
+    boolean existsByCrm(String crm);
 }

@@ -4,7 +4,6 @@ import { ChevronDown, User, Lock, LogOut, ShieldCheck, ShieldOff } from 'lucide-
 import UserProfileModal from '../Modal/UserProfileModal';
 import ResetPasswordModal from '../Modal/ResetPasswordModal';
 import MfaSetupModal from '../Modal/MfaSetupModal';
-import api from '../../services/api';
 import './Header.scss';
 
 const Header = () => {
@@ -15,14 +14,8 @@ const Header = () => {
   const [mfaModalOpen, setMfaModalOpen] = useState(false);
   const [mfaEnabled, setMfaEnabled] = useState(user?.mfaEnabled ?? false);
 
-  const handleDisableMfa = async () => {
-    if (!window.confirm('Desativar o MFA tornará sua conta menos segura. Confirmar?')) return;
-    try {
-      await api.post('/auth/mfa/disable');
-      setMfaEnabled(false);
-    } catch {
-      alert('Erro ao desativar MFA. Tente novamente.');
-    }
+  const handleDisableMfa = () => {
+    setMfaModalOpen(true);
     setDropdownOpen(false);
   };
 
@@ -147,12 +140,13 @@ const Header = () => {
         isOpen={resetModalOpen}
         onClose={() => setResetModalOpen(false)}
         usuario={mappedUser}
+        isSelf={true}
       />
 
       <MfaSetupModal
         isOpen={mfaModalOpen}
         onClose={() => setMfaModalOpen(false)}
-        onEnabled={() => setMfaEnabled(true)}
+        onEnabled={(enabled) => setMfaEnabled(enabled)}
       />
     </header>
   );

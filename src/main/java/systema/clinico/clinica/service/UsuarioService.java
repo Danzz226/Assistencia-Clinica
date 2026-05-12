@@ -117,6 +117,23 @@ public class UsuarioService {
         usuarioRepository.save(usuario);
     }
 
+    @Transactional(readOnly = true)
+    public UsuarioResumoDTO buscarResumoPorEmail(String email) {
+        Usuario usuario = buscarPorEmailAutenticado(email);
+        return new UsuarioResumoDTO(
+                usuario.getId(),
+                usuario.getNome(),
+                usuario.getEmail(),
+                usuario.getTipo());
+    }
+
+    @Transactional
+    public void redefinirSenhaPorEmail(String email, String novaSenha) {
+        Usuario usuario = buscarPorEmailAutenticado(email);
+        usuario.setSenha(passwordEncoder.encode(novaSenha));
+        usuarioRepository.save(usuario);
+    }
+
     @Transactional
     public MfaSetupResponseDTO iniciarMfa(String email) {
         Usuario usuario = buscarPorEmailAutenticado(email);
@@ -169,6 +186,9 @@ public class UsuarioService {
         if (dto.tipo == TipoUsuario.medico) {
             if (dto.crm == null || dto.crm.isBlank()) {
                 throw new IllegalArgumentException("CRM é obrigatório para cadastro de médico");
+            }
+            if (medicoRepository.existsByCrm(dto.crm.trim())) {
+                throw new IllegalArgumentException("CRM já cadastrado");
             }
         }
         if (dto.tipo == TipoUsuario.funcionario) {
