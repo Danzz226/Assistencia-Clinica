@@ -15,29 +15,59 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const login = async (email, password, selectedRole) => {
+  const login = async (email, password, mfaCode) => {
     try {
-      const response = await api.post('/auth/login', { email, senha: password });
-      const { token, nome, tipo } = response.data;
+      const payload = { email, senha: password };
+      if (mfaCode) payload.mfaCode = mfaCode;
 
+      const response = await api.post('/auth/login', payload);
+
+      if (response.data.mfaRequired) {
+        return { success: false, mfaRequired: true };
+      }
+
+      const { token, nome, tipo } = response.data;
       const loggedUser = { username: nome, email, role: tipo };
       setUser(loggedUser);
       localStorage.setItem('usuario', JSON.stringify(loggedUser));
       localStorage.setItem('token', token);
       return { success: true, role: tipo };
     } catch (error) {
-      console.error("Erro ao fazer login", error);
+      const message = error.response?.data?.message || 'Usuário ou senha inválidos';
+      return { success: false, message };
+    }
+  };
 
-      // FALLBACK PARA TESTE: Permite login sem o backend estar rodando
-      if (email.includes('teste') || email.includes('admin') || email.includes('medico') || email.includes('paciente')) {
-        console.log("⚠️ API OFFLINE: Fazendo login em modo de teste");
-        const loggedUser = { username: email, email, role: selectedRole };
-        setUser(loggedUser);
-        localStorage.setItem('usuario', JSON.stringify(loggedUser));
-        return { success: true, role: selectedRole };
-      }
+  const register = async (payload) => {
+    try {
+      await api.post('/auth/register', payload);
+      return { success: true };
+    } catch (error) {
+      const message = error.response?.data?.message || 'Erro ao criar conta';
+      return { success: false, message };
+    }
+  };
 
-      return { success: false, message: 'Erro ao conectar ao servidor. Tente usar "admin" no e-mail para forçar o acesso offline.' };
+  const fetchProfile = async () => {
+    try {
+      const response = await api.get('/auth/profile');
+      const updatedUser = { ...user, ...response.data };
+      setUser(updatedUser);
+      localStorage.setItem('usuario', JSON.stringify(updatedUser));
+      return { success: true, data: updatedUser };
+    } catch (error) {
+      const message = error.response?.data?.message || 'Erro ao buscar perfil';
+      return { success: false, message };
+    }
+  };
+
+  const resetPassword = async (email) => {
+    try {
+      await api.post('/auth/reset-password', { email });
+      return { success: true };
+    } catch (error) {
+      const message = error.response?.data?.message || 'Erro ao redefinir senha';
+      return { success: false, message };
     }
   };
 
@@ -48,7 +78,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ authenticated: !!user, user, login, logout, loading }}>
+    <AuthContext.Provider value={{ authenticated: !!user, user, login, register, fetchProfile, resetPassword, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

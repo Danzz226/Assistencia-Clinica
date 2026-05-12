@@ -27,7 +27,7 @@
 
 
 .role-toggle-btn.active {
-  color: var(--text-main);
+  color: var(--text-light);
   font-weight: 600;
 }
 
@@ -36,7 +36,7 @@
   top: 4px;
   bottom: 4px;
   width: calc(50% - 4px);
-  background-color: var(--accent-color);
+  background-color: var(--primary-color);
   border-radius: calc(var(--border-radius-sm) - 2px);
   box-shadow: var(--shadow-sm);
   z-index: 1;
