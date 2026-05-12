@@ -89,7 +89,7 @@ const AppointmentsView = ({ viewRole }) => {
 
   return (
     <div style={{ maxWidth: '1200px', marginTop: '1rem', paddingBottom: '2rem' }}>
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
         <div>
           <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.35rem' }}>
             {viewRole === 'admin' ? 'Controle Geral de Agendamentos' : 'Meus Agendamentos'}
@@ -99,7 +99,7 @@ const AppointmentsView = ({ viewRole }) => {
           </p>
         </div>
         {viewRole === 'admin' && (
-          <button className="btn-create" style={{ marginTop: '0.5rem', flexShrink: 0 }} onClick={() => setModalOpen(true)}>
+          <button className="btn-create" style={{ flexShrink: 0 }} onClick={() => setModalOpen(true)}>
             <Plus size={15} />
             Novo Agendamento
           </button>

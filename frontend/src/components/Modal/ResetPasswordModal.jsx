@@ -67,7 +67,7 @@ const ResetPasswordModal = ({ isOpen, onClose, usuario }) => {
             required
             minLength={6}
             maxLength={255}
-            placeholder="Repita a nova senha"
+            placeholder="Confirme sua nova senha"
           />
         </div>
 

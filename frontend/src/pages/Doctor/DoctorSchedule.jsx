@@ -140,15 +140,14 @@ const DoctorSchedule = () => {
 
   return (
     <div className="doctor-schedule">
-      <div className="doctor-schedule__header">
+      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
         <div>
-          <h1 className="doctor-schedule__title">Meus Horários</h1>
-          <p className="doctor-schedule__desc">
-            Configure sua grade semanal de atendimento.
-          </p>
+          <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.35rem' }}>Meus Horários</h1>
+          <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1.25rem' }}>Configure sua grade semanal de atendimento.</p>
         </div>
         <button
           className="doctor-schedule__add-btn"
+          style={{ flexShrink: 0 }}
           onClick={() => setShowForm(!showForm)}
         >
           <Plus size={18} />
@@ -227,25 +226,27 @@ const DoctorSchedule = () => {
                   )}
                 </div>
 
-                {slots.length === 0 ? (
-                  <div className="doctor-schedule__day-empty">Livre</div>
-                ) : (
-                  slots.map((h) => (
-                    <div key={h.id} className="doctor-schedule__slot">
-                      <Clock size={13} />
-                      <span className="doctor-schedule__slot-time">
-                        {h.horaInicio?.substring(0, 5)} – {h.horaFim?.substring(0, 5)}
-                      </span>
-                      <button
-                        className="doctor-schedule__slot-remove"
-                        onClick={() => handleRemover(h.id)}
-                        title="Remover horário"
-                      >
-                        <Trash2 size={13} />
-                      </button>
-                    </div>
-                  ))
-                )}
+                <div className="doctor-schedule__day-content">
+                  {slots.length === 0 ? (
+                    <div className="doctor-schedule__day-empty">Livre</div>
+                  ) : (
+                    slots.map((h) => (
+                      <div key={h.id} className="doctor-schedule__slot">
+                        <Clock size={13} />
+                        <span className="doctor-schedule__slot-time">
+                          {h.horaInicio?.substring(0, 5)} – {h.horaFim?.substring(0, 5)}
+                        </span>
+                        <button
+                          className="doctor-schedule__slot-remove"
+                          onClick={() => handleRemover(h.id)}
+                          title="Remover horário"
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      </div>
+                    ))
+                  )}
+                </div>
               </div>
             );
           })}

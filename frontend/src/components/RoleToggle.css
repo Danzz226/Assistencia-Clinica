@@ -1,6 +1,6 @@
 .role-toggle-container {
   display: flex;
-  background-color: #f0e9e9e8  ;
+  background-color: var(--light-color)  ;
   border-radius: 8px;
   padding: 4px;
   width: 100%;
@@ -25,6 +25,7 @@
   transition: color 0.3s ease;
 }
 
+
 .role-toggle-btn.active {
   color: var(--text-main);
   font-weight: 600;
@@ -35,7 +36,7 @@
   top: 4px;
   bottom: 4px;
   width: calc(50% - 4px);
-  background-color: var(--white);
+  background-color: var(--accent-color);
   border-radius: calc(var(--border-radius-sm) - 2px);
   box-shadow: var(--shadow-sm);
   z-index: 1;

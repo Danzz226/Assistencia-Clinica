@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
 import MainLayout from './components/layout/MainLayout';
 import Login from './pages/Login';
+import Signup from './pages/Signup';
 
 // Admin
 import AdminHome from './pages/Admin/AdminHome';
@@ -24,6 +25,7 @@ const AppRoutes = () => {
     <Routes>
       {/* Rotas Públicas */}
       <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
       <Route path="/" element={<Navigate to="/login" replace />} />
 
       {/* ─── Admin ─── */}

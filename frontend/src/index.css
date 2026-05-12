@@ -1,16 +1,76 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
+  /* ── Brand ── */
   --primary-color: #688E80;
   --primary-hover: #5a7c6f;
+  --primary-rgb: 104, 142, 128;
   --secondary-color: #94AC82;
   --accent-color: #CCE3DE;
+  --accent-hover: #b6d4cc;
   --light-color: #EAF4F4;
   --background-color: #F1F7F6;
+  --bg-color: #F1F7F6;
+
+  /* ── CTA (teal vivo) ── */
+  --teal-color: #30e3a7;
+  --teal-hover: #22c993;
+  --teal-rgb: 48, 227, 167;
+
+  /* ── Text & Surface ── */
   --text-dark: #2f3e3a;
+  --text-main: #2f3e3a;
+  --text-muted: #7a9490;
   --text-light: #ffffff;
+  --white: #ffffff;
   --border-color: #dceae7;
-    --shadow-soft: 0 4px 12px rgba(104, 142, 128, 0.15);
+  --surface-hover: #f0f4f2;
+  --surface-subtle: #f7faf9;
+
+  /* ── Shadows ── */
+  --shadow-soft: 0 4px 12px rgba(104, 142, 128, 0.15);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 8px 28px rgba(0, 0, 0, 0.13);
+  --border-radius-sm: 8px;
+
+  /* ── Status ── */
+  --color-success: #047857;
+  --color-success-bg: #d1fae5;
+  --color-warning: #b45309;
+  --color-warning-bg: #fef3c7;
+  --color-danger: #b91c1c;
+  --color-danger-bg: #fee2e2;
+  --color-info: #0369a1;
+  --color-info-bg: #e0f2fe;
+  --color-error: #cf1322;
+  --color-error-bg: #fff3f3;
+  --color-error-border: #ff4d4f;
+
+  /* ── Badges ── */
+  --badge-admin-bg: #e8f0ec;
+  --badge-admin-color: #3b5f50;
+  --badge-paciente-bg: #e6f3ff;
+  --badge-paciente-color: #0056b3;
+  --badge-medico-bg: #f3e8ff;
+  --badge-medico-color: #6b21a8;
+  --badge-success-bg: #d1fae5;
+  --badge-success-color: #047857;
+  --badge-warning-bg: #fef3c7;
+  --badge-warning-color: #b45309;
+  --badge-danger-bg: #fee2e2;
+  --badge-danger-color: #b91c1c;
+  --badge-info-bg: #e0f2fe;
+  --badge-info-color: #0369a1;
+  --badge-default-bg: #f3f4f6;
+  --badge-default-color: #4b5563;
+
+  /* ── Icon backgrounds ── */
+  --icon-bg-green: #e8f0ec;
+  --icon-bg-blue: #e6f3ff;
+  --icon-bg-purple: #f3e8ff;
+  --icon-bg-yellow: #fef3c7;
+  --icon-bg-red: #fee2e2;
+  --icon-bg-teal: rgba(48, 227, 167, 0.15);
 }
 
 * {

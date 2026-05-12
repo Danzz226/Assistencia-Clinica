@@ -81,10 +81,12 @@ const DoctorExams = () => {
 
   return (
     <div className="doctor-exams">
-      <h1 className="doctor-exams__title">Exames e Prontuários</h1>
-      <p className="doctor-exams__desc">
-        Registros médicos e exames dos seus pacientes.
-      </p>
+      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+        <div>
+          <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.35rem' }}>Exames e Prontuários</h1>
+          <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1.25rem' }}>Registros médicos e exames dos seus pacientes.</p>
+        </div>
+      </div>
 
       {/* Abas */}
       <div className="doctor-exams__tabs">
