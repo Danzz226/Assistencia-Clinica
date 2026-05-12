@@ -1,6 +1,5 @@
 package systema.clinico.clinica.dto;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import systema.clinico.clinica.model.enums.StatusAgendamento;
@@ -18,7 +17,6 @@ public class AgendamentoRequestDTO {
     @NotNull
     public LocalDateTime data;
 
-    @NotBlank
     @Size(max = 2000)
     public String motivoConsulta;
 

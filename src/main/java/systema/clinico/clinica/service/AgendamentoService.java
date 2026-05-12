@@ -161,7 +161,7 @@ public class AgendamentoService {
 
     private String normalizarMotivo(String motivoConsulta) {
         if (motivoConsulta == null || motivoConsulta.isBlank()) {
-            throw new IllegalArgumentException("Motivo da consulta e obrigatorio");
+            return "Consulta agendada pelo sistema";
         }
         return motivoConsulta.trim();
     }

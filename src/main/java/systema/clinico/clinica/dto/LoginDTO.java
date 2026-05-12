@@ -11,4 +11,6 @@ public class LoginDTO {
 
     @NotBlank
     public String senha;
+
+    public String mfaCode;
 }
