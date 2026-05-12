@@ -1,6 +1,6 @@
 // components/Auth/AuthForm.jsx
 
-import React, { useState, useRef, useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import './Auth.scss';
@@ -13,16 +13,17 @@ const AuthForm = ({ mode = 'login', role = 'doctor' }) => {
     identifier: '',
     phone: '',
     crm: '',
+    cpf: '',
     password: '',
     confirmPassword: '',
-    mfaCode: '',
   });
 
   const [errorMsg, setErrorMsg] = useState('');
   const [mfaRequired, setMfaRequired] = useState(false);
-  const pendingCredentials = useRef(null);
+  const [mfaCode, setMfaCode] = useState('');
 
   const { login, register } = useContext(AuthContext);
+
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -32,14 +33,9 @@ const AuthForm = ({ mode = 'login', role = 'doctor' }) => {
     }));
   };
 
-  const redirectByRole = (role) => {
-    if (role === 'admin') navigate('/admin/home');
-    else if (role === 'medico') navigate('/medico/home');
-    else navigate('/paciente/home');
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     setErrorMsg('');
 
     if (isSignup) {
@@ -48,14 +44,23 @@ const AuthForm = ({ mode = 'login', role = 'doctor' }) => {
       }
 
       try {
+        // Mapear campos para os nomes do backend (CadastroUsuarioDTO)
+        const tipo = role === 'doctor' ? 'medico' : 'paciente';
         const payload = {
           nome: formData.name,
           email: formData.identifier,
-          telefone: formData.phone,
           senha: formData.password,
-          tipo: role === 'doctor' ? 'medico' : 'paciente',
-          crm: formData.crm,
+          tipo: tipo,
         };
+
+        // Campos específicos por tipo
+        if (tipo === 'medico') {
+          payload.crm = formData.crm;
+        }
+
+        if (tipo === 'paciente') {
+          if (formData.phone) payload.telefone = formData.phone;
+        }
 
         const result = await register(payload);
 
@@ -71,30 +76,30 @@ const AuthForm = ({ mode = 'login', role = 'doctor' }) => {
       return;
     }
 
-    // LOGIN — passo MFA
-    if (mfaRequired) {
-      const { email, password } = pendingCredentials.current;
-      const result = await login(email, password, formData.mfaCode);
+    // LOGIN
+    let systemRole = role === 'doctor' ? 'medico' : role;
 
-      if (result.success) {
-        redirectByRole(result.role);
-      } else {
-        setErrorMsg(result.message || 'Código MFA inválido');
-      }
-      return;
+    if (formData.identifier.toLowerCase().includes('admin')) {
+      systemRole = 'admin';
     }
 
-    // LOGIN — primeiro passo
-    const result = await login(formData.identifier, formData.password);
+    const result = await login(
+      formData.identifier,
+      formData.password,
+      systemRole,
+      mfaRequired ? mfaCode : undefined
+    );
 
     if (result.mfaRequired) {
-      pendingCredentials.current = { email: formData.identifier, password: formData.password };
       setMfaRequired(true);
+      setErrorMsg('Digite o código MFA do seu autenticador');
       return;
     }
 
     if (result.success) {
-      redirectByRole(result.role);
+      if (result.role === 'admin') navigate('/admin/home');
+      else if (result.role === 'medico') navigate('/medico/home');
+      else navigate('/paciente/home');
     } else {
       setErrorMsg(result.message || 'Erro ao fazer login');
     }
@@ -108,129 +113,145 @@ const AuthForm = ({ mode = 'login', role = 'doctor' }) => {
         </div>
       )}
 
-      {mfaRequired ? (
+      {isSignup && (
         <div className="form-group">
-          <p className="mfa-hint">
-            Digite o código de 6 dígitos do seu aplicativo autenticador.
-          </p>
-          <label>Código TOTP</label>
+          <label>Nome Completo</label>
+
+          <input
+            type="text"
+            name="name"
+            placeholder="Seu nome"
+            value={formData.name}
+            onChange={handleChange}
+            required
+          />
+        </div>
+      )}
+
+      <div className="form-group">
+        <label>E-mail ou Telefone</label>
+
+        <input
+          type="text"
+          name="identifier"
+          placeholder={
+            role === 'doctor'
+              ? 'medico@exemplo.com'
+              : 'paciente@exemplo.com'
+          }
+          value={formData.identifier}
+          onChange={handleChange}
+          required
+        />
+      </div>
+
+      {isSignup && (
+        <div className="form-group">
+          <label>Telefone</label>
+
+          <input
+            type="text"
+            name="phone"
+            placeholder="(11) 99999-9999"
+            value={formData.phone}
+            onChange={handleChange}
+            required
+          />
+        </div>
+      )}
+
+      {isSignup && role === 'doctor' && (
+        <div className="form-group">
+          <label>CRM</label>
+
+          <input
+            type="text"
+            name="crm"
+            placeholder="CRM 123456"
+            value={formData.crm}
+            onChange={handleChange}
+            required
+          />
+        </div>
+      )}
+
+      {isSignup && role !== 'doctor' && (
+        <div className="form-group">
+          <label>CPF</label>
+
+          <input
+            type="text"
+            name="cpf"
+            placeholder="000.000.000-00"
+            value={formData.cpf}
+            onChange={handleChange}
+            required
+          />
+        </div>
+      )}
+
+      <div className="form-group">
+        <label>Senha</label>
+
+        <input
+          type="password"
+          name="password"
+          placeholder="Sua senha"
+          value={formData.password}
+          onChange={handleChange}
+          required
+        />
+      </div>
+
+      {isSignup && (
+        <div className="form-group">
+          <label>Confirmar Senha</label>
+
+          <input
+            type="password"
+            name="confirmPassword"
+            placeholder="Confirme sua senha"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            required
+          />
+        </div>
+      )}
+
+      {/* Campo MFA — aparece somente quando o backend pede código */}
+      {!isSignup && mfaRequired && (
+        <div className="form-group">
+          <label>Código MFA (6 dígitos)</label>
           <input
             type="text"
             name="mfaCode"
             placeholder="000000"
-            value={formData.mfaCode}
-            onChange={handleChange}
+            value={mfaCode}
+            onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+            required
             maxLength={6}
             autoFocus
-            required
+            style={{ letterSpacing: '0.3em', textAlign: 'center', fontSize: '1.2rem' }}
           />
         </div>
-      ) : (
-        <>
-          {isSignup && (
-            <div className="form-group">
-              <label>Nome Completo</label>
-              <input
-                type="text"
-                name="name"
-                placeholder="Seu nome"
-                value={formData.name}
-                onChange={handleChange}
-                required
-              />
-            </div>
-          )}
-
-          <div className="form-group">
-            <label>E-mail ou Telefone</label>
-            <input
-              type="text"
-              name="identifier"
-              placeholder={
-                role === 'doctor'
-                  ? 'medico@exemplo.com'
-                  : 'paciente@exemplo.com'
-              }
-              value={formData.identifier}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          {isSignup && (
-            <div className="form-group">
-              <label>Telefone</label>
-              <input
-                type="text"
-                name="phone"
-                placeholder="(11) 99999-9999"
-                value={formData.phone}
-                onChange={handleChange}
-                required
-              />
-            </div>
-          )}
-
-          {isSignup && role === 'doctor' && (
-            <div className="form-group">
-              <label>CRM</label>
-              <input
-                type="text"
-                name="crm"
-                placeholder="CRM 123456"
-                value={formData.crm}
-                onChange={handleChange}
-                required
-              />
-            </div>
-          )}
-
-          <div className="form-group">
-            <label>Senha</label>
-            <input
-              type="password"
-              name="password"
-              placeholder="Sua senha"
-              value={formData.password}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          {isSignup && (
-            <div className="form-group">
-              <label>Confirmar Senha</label>
-              <input
-                type="password"
-                name="confirmPassword"
-                placeholder="Confirme sua senha"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                required
-              />
-            </div>
-          )}
-        </>
       )}
 
       <button type="submit" className="btn-primary">
-        {mfaRequired ? 'Verificar' : isSignup ? 'Criar Conta' : 'Entrar'}
+        {isSignup ? 'Criar Conta' : mfaRequired ? 'Verificar Código' : 'Entrar'}
       </button>
 
-      {!mfaRequired && (
-        <div className="auth-footer">
-          {isSignup ? (
-            <>
-              Já possui conta? <Link to="/login">Entrar</Link>
-            </>
-          ) : (
-            <>
-              Não tem uma conta?{' '}
-              <Link to="/signup">Crie uma aqui!</Link>
-            </>
-          )}
-        </div>
-      )}
+      <div className="auth-footer">
+        {isSignup ? (
+          <>
+            Já possui conta? <Link to="/login">Entrar</Link>
+          </>
+        ) : (
+          <>
+            Não tem uma conta?{' '}
+            <Link to="/signup">Crie uma aqui!</Link>
+          </>
+        )}
+      </div>
     </form>
   );
 };

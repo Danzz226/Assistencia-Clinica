@@ -43,12 +43,12 @@ public class AuthController {
     @PostMapping("/mfa/enable")
     @PreAuthorize("isAuthenticated()")
     public void habilitarMfa(@RequestBody @Valid MfaVerifyDTO dto, Authentication authentication) {
-        usuarioService.habilitarMfa(authentication.getName(), dto.code);
+        usuarioService.habilitarMfa(authentication.getName(), dto.code());
     }
 
     @PostMapping("/mfa/disable")
     @PreAuthorize("isAuthenticated()")
     public void desabilitarMfa(@RequestBody @Valid MfaVerifyDTO dto, Authentication authentication) {
-        usuarioService.desabilitarMfa(authentication.getName(), dto.code);
+        usuarioService.desabilitarMfa(authentication.getName(), dto.code());
     }
 }
