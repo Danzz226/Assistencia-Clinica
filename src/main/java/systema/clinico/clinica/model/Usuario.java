@@ -30,6 +30,13 @@ public class Usuario {
     @Column(nullable = false, length = 255)
     private String senha;
 
+    @JsonIgnore
+    @Column(name = "mfa_secret", length = 64)
+    private String mfaSecret;
+
+    @Column(name = "mfa_enabled", nullable = false)
+    private boolean mfaEnabled = false;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private TipoUsuario tipo;

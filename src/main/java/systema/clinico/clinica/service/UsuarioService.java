@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import systema.clinico.clinica.dto.AuthResponseDTO;
 import systema.clinico.clinica.dto.CadastroUsuarioDTO;
 import systema.clinico.clinica.dto.LoginDTO;
+import systema.clinico.clinica.dto.MfaSetupResponseDTO;
 import systema.clinico.clinica.dto.UsuarioResumoDTO;
 import systema.clinico.clinica.model.Admin;
 import systema.clinico.clinica.model.Funcionario;
@@ -19,6 +20,7 @@ import systema.clinico.clinica.repository.MedicoRepository;
 import systema.clinico.clinica.repository.PacienteRepository;
 import systema.clinico.clinica.repository.UsuarioRepository;
 import systema.clinico.clinica.security.JwtService;
+import systema.clinico.clinica.security.TotpService;
 
 import java.util.List;
 import java.util.Locale;
@@ -34,6 +36,7 @@ public class UsuarioService {
     private final FuncionarioRepository funcionarioRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final TotpService totpService;
 
     public UsuarioService(
             UsuarioRepository usuarioRepository,
@@ -42,7 +45,8 @@ public class UsuarioService {
             AdminRepository adminRepository,
             FuncionarioRepository funcionarioRepository,
             PasswordEncoder passwordEncoder,
-            JwtService jwtService) {
+            JwtService jwtService,
+            TotpService totpService) {
         this.usuarioRepository = usuarioRepository;
         this.pacienteRepository = pacienteRepository;
         this.medicoRepository = medicoRepository;
@@ -50,6 +54,7 @@ public class UsuarioService {
         this.funcionarioRepository = funcionarioRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.totpService = totpService;
     }
 
     @Transactional
@@ -85,6 +90,10 @@ public class UsuarioService {
             throw new IllegalArgumentException("E-mail ou senha inválidos");
         }
 
+        if (usuario.isMfaEnabled() && !totpService.verificar(usuario.getMfaSecret(), dto.mfaCode)) {
+            return new AuthResponseDTO(null, usuario.getNome(), usuario.getEmail(), usuario.getTipo(), true);
+        }
+
         String token = jwtService.gerarToken(usuario);
         return new AuthResponseDTO(token, usuario.getNome(), usuario.getEmail(), usuario.getTipo());
     }
@@ -100,8 +109,60 @@ public class UsuarioService {
                 .toList();
     }
 
+    @Transactional
+    public void redefinirSenha(Integer id, String novaSenha) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario nao encontrado"));
+        usuario.setSenha(passwordEncoder.encode(novaSenha));
+        usuarioRepository.save(usuario);
+    }
+
+    @Transactional
+    public MfaSetupResponseDTO iniciarMfa(String email) {
+        Usuario usuario = buscarPorEmailAutenticado(email);
+        String secret = usuario.getMfaSecret();
+        if (secret == null || secret.isBlank()) {
+            secret = totpService.gerarSecret();
+            usuario.setMfaSecret(secret);
+            usuarioRepository.save(usuario);
+        }
+        return new MfaSetupResponseDTO(
+                secret,
+                totpService.otpauthUrl("Assistencia Clinica", usuario.getEmail(), secret),
+                usuario.isMfaEnabled());
+    }
+
+    @Transactional
+    public void habilitarMfa(String email, String code) {
+        Usuario usuario = buscarPorEmailAutenticado(email);
+        if (usuario.getMfaSecret() == null || usuario.getMfaSecret().isBlank()) {
+            usuario.setMfaSecret(totpService.gerarSecret());
+        }
+        if (!totpService.verificar(usuario.getMfaSecret(), code)) {
+            throw new IllegalArgumentException("Codigo MFA invalido");
+        }
+        usuario.setMfaEnabled(true);
+        usuarioRepository.save(usuario);
+    }
+
+    @Transactional
+    public void desabilitarMfa(String email, String code) {
+        Usuario usuario = buscarPorEmailAutenticado(email);
+        if (!totpService.verificar(usuario.getMfaSecret(), code)) {
+            throw new IllegalArgumentException("Codigo MFA invalido");
+        }
+        usuario.setMfaEnabled(false);
+        usuario.setMfaSecret(null);
+        usuarioRepository.save(usuario);
+    }
+
     private static String normalizarEmail(String email) {
         return email.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private Usuario buscarPorEmailAutenticado(String email) {
+        return usuarioRepository.findByEmail(normalizarEmail(email))
+                .orElseThrow(() -> new IllegalArgumentException("Usuario autenticado nao encontrado"));
     }
 
     private void validarCadastroPorTipo(CadastroUsuarioDTO dto) {
