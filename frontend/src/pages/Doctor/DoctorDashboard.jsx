@@ -139,15 +139,14 @@ const DoctorDashboard = () => {
 
   return (
     <div className="doctor-dashboard">
-      <h1 className="doctor-dashboard__title">Dashboard Médico</h1>
-
-      <h2 className="doctor-dashboard__subtitle">
-        {getSaudacao()}, {medicoNome ? `Dr(a). ${medicoNome}` : user?.username}
-      </h2>
-
-      <p className="doctor-dashboard__desc">
-        Aqui você acompanha seus pacientes, prontuários e sua agenda de atendimento.
-      </p>
+      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+        <div>
+          <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.35rem' }}>Dashboard Médico</h1>
+          <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1.25rem' }}>
+            {getSaudacao()}, {medicoNome ? `Dr(a). ${medicoNome}` : user?.username}. Aqui você acompanha seus pacientes, prontuários e sua agenda.
+          </p>
+        </div>
+      </div>
 
       <div className="doctor-dashboard__section-label">LIFIUM · VISÃO MÉDICA</div>
       <h3 className="doctor-dashboard__section-title">Resumo</h3>
@@ -223,7 +222,7 @@ const DoctorDashboard = () => {
           <table className="doctor-dashboard__table">
             <thead>
               <tr>
-                <th>#</th>
+                <th>ID</th>
                 <th>Paciente</th>
                 <th>Descrição</th>
                 <th>Data</th>
@@ -232,8 +231,8 @@ const DoctorDashboard = () => {
             <tbody>
               {prontuariosRecentes.map((p) => (
                 <tr key={p.id}>
-                  <td className="doctor-dashboard__table-id">#{p.id}</td>
-                  <td>{p.pacienteNome || `Paciente #${p.pacienteId}`}</td>
+                  <td className="doctor-dashboard__table-id">{p.id}</td>
+                  <td>{p.pacienteNome || `Paciente ${p.pacienteId}`}</td>
                   <td className="doctor-dashboard__table-desc">
                     {p.descricao ? p.descricao.substring(0, 60) + (p.descricao.length > 60 ? '…' : '') : '—'}
                   </td>

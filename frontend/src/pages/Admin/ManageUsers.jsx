@@ -93,12 +93,7 @@ const ManageUsers = () => {
                 <Trash2 size={20} />
               </button>
             )}
-            {tipo === 'paciente' && (
-              <button className="action-btn prontuario" title="Ver Prontuário">
-                <FileText size={20} />
-              </button>
-            )}
-            {(tipo === 'medico' || tipo === 'admin' || tipo === 'funcionario') && (
+            {(tipo === 'medico' || tipo === 'admin' || tipo === 'funcionario' || tipo === 'paciente') && (
               <div className="profile-dropdown-wrapper">
                 <button
                   className={`action-btn perfil profile-dropdown-trigger${isOpen ? ' active' : ''}`}
@@ -120,6 +115,11 @@ const ManageUsers = () => {
                 </button>
               </div>
             )}
+            {tipo === 'paciente' && (
+              <button className="action-btn prontuario" title="Ver Prontuário">
+                <FileText size={20} />
+              </button>
+            )}
           </div>
         );
       },
@@ -128,13 +128,13 @@ const ManageUsers = () => {
 
   return (
     <div className="manage-users-container">
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
         <div>
           <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.35rem' }}>Gerenciar Usuários</h1>
           <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1.25rem' }}>Visualize e gerencie os acessos do sistema.</p>
         </div>
         {isAdmin && (
-          <button className="btn-create" style={{ marginTop: '0.35rem', flexShrink: 0 }} onClick={() => setCreateModalOpen(true)}>
+          <button className="btn-create" style={{ flexShrink: 0 }} onClick={() => setCreateModalOpen(true)}>
             <Plus size={15} />
             Novo Usuário
           </button>

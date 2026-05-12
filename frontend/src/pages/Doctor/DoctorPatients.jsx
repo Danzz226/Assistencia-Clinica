@@ -103,10 +103,12 @@ const DoctorPatients = () => {
 
   return (
     <div className="doctor-patients">
-      <h1 className="doctor-patients__title">Meus Pacientes</h1>
-      <p className="doctor-patients__desc">
-        Pacientes que possuem prontuário registrado por você.
-      </p>
+      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+        <div>
+          <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.35rem' }}>Meus Pacientes</h1>
+          <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1.25rem' }}>Pacientes que possuem prontuário registrado por você.</p>
+        </div>
+      </div>
 
       <div className="doctor-patients__toolbar">
         <div className="doctor-patients__search">

@@ -1,17 +1,31 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { AuthContext } from '../../context/AuthContext';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, User, Lock, LogOut } from 'lucide-react';
+import UserProfileModal from '../Modal/UserProfileModal';
+import ResetPasswordModal from '../Modal/ResetPasswordModal';
 import './Header.scss';
 
 const Header = () => {
-  const { user } = useContext(AuthContext);
+  const { user, logout } = useContext(AuthContext);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [resetModalOpen, setResetModalOpen] = useState(false);
 
   // Nome fixo conforme solicitado para o protótipo
-  const username = 'Rogerinho';
+  const username = user?.username || 'Visitante';
   const role = user?.role || 'Visitante';
 
-  // Usando um avatar genérico bonito via API do randomuser
-  const avatarUrl = "https://randomuser.me/api/portraits/men/32.jpg";
+  // Usando a sigla do perfil igual ao visualizar perfil
+  const Avatar = ({ nome }) => {
+    const initials = nome
+      ? nome.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase()
+      : '?';
+    return (
+      <div className="header-avatar-initials">
+        {initials}
+      </div>
+    );
+  };
 
   // Formata o papel para a badge
   const formatRole = (r) => {
@@ -21,16 +35,87 @@ const Header = () => {
     return r;
   };
 
+  // Mapeia o usuário do contexto para o formato esperado pelos modais
+  const mappedUser = {
+    id: user?.id || 1, // Fallback id
+    nome: username,
+    email: user?.email,
+    tipo: user?.role
+  };
+
   return (
     <header className="top-header">
-      <div className="user-profile">
-        <img src={avatarUrl} alt="Avatar" className="avatar" />
-        <div className="user-details">
-          <span className="user-name">{username}</span>
-          <span className="role-badge">{formatRole(role)}</span>
+      <div className="header-user-container">
+        <div 
+          className={`user-profile${dropdownOpen ? ' active' : ''}`}
+          onClick={() => setDropdownOpen(!dropdownOpen)}
+        >
+          <Avatar nome={username} />
+          <div className="user-details">
+            <span className="user-name">{username}</span>
+            <span className="role-badge">{formatRole(role)}</span>
+          </div>
+          <ChevronDown 
+            size={20} 
+            className="dropdown-icon" 
+            style={{ 
+              transition: 'transform 0.2s',
+              transform: dropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)'
+            }}
+          />
         </div>
-        <ChevronDown size={20} className="dropdown-icon" />
+
+        {dropdownOpen && (
+          <>
+            <div className="dropdown-overlay" onClick={() => setDropdownOpen(false)} />
+            <div className="header-dropdown-menu">
+              <button 
+                className="dropdown-item" 
+                onClick={() => {
+                  setProfileModalOpen(true);
+                  setDropdownOpen(false);
+                }}
+              >
+                <User size={16} />
+                Ver Perfil
+              </button>
+              <button 
+                className="dropdown-item" 
+                onClick={() => {
+                  setResetModalOpen(true);
+                  setDropdownOpen(false);
+                }}
+              >
+                <Lock size={16} />
+                Redefinir Senha
+              </button>
+              <div className="dropdown-divider" />
+              <button 
+                className="dropdown-item logout" 
+                onClick={() => {
+                  logout();
+                  setDropdownOpen(false);
+                }}
+              >
+                <LogOut size={16} />
+                Sair
+              </button>
+            </div>
+          </>
+        )}
       </div>
+
+      <UserProfileModal
+        isOpen={profileModalOpen}
+        onClose={() => setProfileModalOpen(false)}
+        usuario={mappedUser}
+      />
+
+      <ResetPasswordModal
+        isOpen={resetModalOpen}
+        onClose={() => setResetModalOpen(false)}
+        usuario={mappedUser}
+      />
     </header>
   );
 };

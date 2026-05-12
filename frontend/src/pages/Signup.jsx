@@ -6,7 +6,7 @@ import RoleToggle from '../components/RoleToggle';
 import AuthForm from '../components/AuthForm';
 import LoginPresentation from '../components/LoginPresentation/LoginPresentation';
 
-const Login = () => {
+const Signup = () => {
   const [role, setRole] = useState('doctor');
 
   return (
@@ -21,7 +21,7 @@ const Login = () => {
             className="login-logo"
           />
 
-          <h1>Entrar no Sistema</h1>
+          <h1>Criar Conta</h1>
 
           <RoleToggle
             role={role}
@@ -29,7 +29,7 @@ const Login = () => {
           />
 
           <AuthForm
-            mode="login"
+            mode="signup"
             role={role}
           />
         </div>
@@ -38,4 +38,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Signup;
