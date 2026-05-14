@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('token', token);
       return { success: true, role: tipo };
     } catch (error) {
-      const message = error.response?.data?.message || 'Usuário ou senha inválidos';
+      const message = error.response?.data?.erro || error.response?.data?.message || 'Usuário ou senha inválidos';
       return { success: false, message };
     }
   };
@@ -43,7 +43,7 @@ export const AuthProvider = ({ children }) => {
       await api.post('/auth/register', payload);
       return { success: true };
     } catch (error) {
-      const message = error.response?.data?.message || 'Erro ao criar conta';
+      const message = error.response?.data?.erro || error.response?.data?.message || 'Erro ao criar conta';
       return { success: false, message };
     }
   };

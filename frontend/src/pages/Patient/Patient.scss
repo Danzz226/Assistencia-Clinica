@@ -1,0 +1,396 @@
+.patient-page {
+  max-width: 1200px;
+  margin-top: 1rem;
+  padding-bottom: 2rem;
+
+  &__section-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #7a9c8e;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+  }
+
+  &__section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #000;
+    margin-bottom: 1.5rem;
+  }
+
+  // ── Cards de estatísticas ──────────────────────────────
+  &__cards {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 2.5rem;
+  }
+
+  &__card {
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    flex: 1;
+    min-width: 220px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+
+    &:hover {
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      transform: translateY(-2px);
+    }
+
+    &-icon {
+      width: 48px;
+      height: 48px;
+      background-color: #e8f0ec;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+      color: #3b5f50;
+    }
+
+    &-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #7a9c8e;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.25rem;
+    }
+
+    &-subtitle {
+      font-size: 0.75rem;
+      color: #888;
+      margin-bottom: 1rem;
+    }
+
+    &-number {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #000;
+      margin-bottom: 1rem;
+      line-height: 1;
+    }
+
+    &-pill {
+      align-self: flex-start;
+      padding: 0.25rem 0.75rem;
+      border-radius: 16px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+
+      &--green   { background-color: #e8f0ec; color: #3b5f50; }
+      &--blue    { background-color: #e8eef8; color: #2a4a80; }
+      &--orange  { background-color: #fff4e5; color: #b45309; }
+      &--neutral { background-color: #f0f0f0; color: #888; }
+    }
+  }
+
+  // ── Barra de ações ────────────────────────────────────
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+  }
+
+  &__btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: #3b5f50;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 0.6rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &:hover { background-color: #2d4a3e; }
+  }
+
+  // ── Tabela ────────────────────────────────────────────
+  &__table-wrapper {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    overflow: hidden;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+
+    thead tr {
+      background-color: #f7faf9;
+      border-bottom: 1px solid #e8f0ec;
+    }
+
+    th {
+      padding: 1rem 1.25rem;
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #7a9c8e;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    td {
+      padding: 1rem 1.25rem;
+      color: #1a2332;
+      border-bottom: 1px solid #f0f4f2;
+    }
+
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background-color: #f7faf9; }
+  }
+
+  // ── Status badges ─────────────────────────────────────
+  &__badge {
+    display: inline-block;
+    padding: 0.2rem 0.65rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: capitalize;
+
+    &--agendado  { background-color: #e8eef8; color: #2a4a80; }
+    &--realizado { background-color: #e8f0ec; color: #3b5f50; }
+    &--cancelado { background-color: #fff0f0; color: #c53030; }
+    &--default   { background-color: #f0f0f0; color: #555; }
+  }
+
+  // ── Prontuário expandível ─────────────────────────────
+  &__prontuario-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  &__prontuario-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    overflow: hidden;
+  }
+
+  &__prontuario-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.1rem 1.5rem;
+    cursor: pointer;
+    user-select: none;
+
+    &:hover { background-color: #f7faf9; }
+
+    &-left {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    &-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: #1a2332;
+    }
+
+    &-meta {
+      font-size: 0.8rem;
+      color: #888;
+    }
+
+    &-chevron {
+      color: #7a9c8e;
+      transition: transform 0.2s ease;
+
+      &--open { transform: rotate(180deg); }
+    }
+  }
+
+  &__prontuario-body {
+    border-top: 1px solid #f0f4f2;
+    padding: 1.25rem 1.5rem;
+
+    &-desc {
+      color: #333;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    &-diag-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #7a9c8e;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.5rem;
+    }
+
+    &-diag-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    &-diag-item {
+      background-color: #f7faf9;
+      border-left: 3px solid #7a9c8e;
+      padding: 0.6rem 1rem;
+      border-radius: 0 8px 8px 0;
+      font-size: 0.875rem;
+      color: #333;
+    }
+  }
+
+  // ── Estados de loading / vazio ─────────────────────────
+  &__loading,
+  &__empty {
+    padding: 2rem;
+    background: #fff;
+    border-radius: 16px;
+    text-align: center;
+    color: #888;
+    font-size: 0.95rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  }
+
+  // ── Toast de erro ─────────────────────────────────────
+  &__error {
+    position: fixed;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    padding: 1rem 1.5rem;
+    background-color: #fff3f3;
+    border-left: 4px solid #ff4d4f;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    color: #cf1322;
+    font-size: 0.875rem;
+    animation: slideDownToast 0.4s ease-out forwards;
+    pointer-events: none;
+    min-width: 300px;
+
+    h4 { margin: 0 0 0.4rem; font-weight: 600; }
+    p  { margin: 0; }
+  }
+}
+
+// ── Modal ──────────────────────────────────────────────────
+.patient-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.patient-modal {
+  background: #fff;
+  border-radius: 16px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+
+  &__title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: #1a2332;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-bottom: 1rem;
+
+    label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    select,
+    input,
+    textarea {
+      border: 1px solid #dde3e0;
+      border-radius: 8px;
+      padding: 0.6rem 0.85rem;
+      font-size: 0.9rem;
+      color: #1a2332;
+      outline: none;
+      transition: border-color 0.2s;
+
+      &:focus { border-color: #3b5f50; }
+    }
+
+    textarea { resize: vertical; min-height: 80px; }
+  }
+
+  &__error {
+    color: #c53030;
+    font-size: 0.85rem;
+    margin-bottom: 0.75rem;
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+
+  &__btn-cancel {
+    background: #f0f0f0;
+    color: #555;
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover { background: #e0e0e0; }
+  }
+
+  &__btn-submit {
+    background: #3b5f50;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover { background: #2d4a3e; }
+    &:disabled { opacity: 0.6; cursor: not-allowed; }
+  }
+}
+
+@keyframes slideDownToast {
+  from { top: -50px; opacity: 0; }
+  to   { top: 30px;  opacity: 1; }
+}
