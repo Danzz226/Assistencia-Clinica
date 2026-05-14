@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { Plus } from 'lucide-react';
 import api from '../../services/api';
+import { useToast } from '../../context/ToastContext';
 import GenericTable from '../GenericTable';
 import { AuthContext } from '../../context/AuthContext';
 import Badge from '../Badge/Badge';
@@ -20,8 +21,8 @@ const STATUS_VARIANT = {
 };
 
 const AppointmentsView = ({ viewRole }) => {
+  const { toast } = useToast();
   const [agendamentos, setAgendamentos] = useState([]);
-  const [errorMsg, setErrorMsg] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const { user } = useContext(AuthContext);
 
@@ -39,20 +40,13 @@ const AppointmentsView = ({ viewRole }) => {
       setAgendamentos([]);
       const msg = error.response?.data?.message
         || (error.response ? `Erro ${error.response.status} ao carregar agendamentos.` : 'Sem conexão com o servidor.');
-      setErrorMsg(msg);
+      toast.error(msg);
     }
   }, [viewRole, user]);
 
   useEffect(() => {
     fetchAgendamentos();
   }, [fetchAgendamentos]);
-
-  useEffect(() => {
-    if (errorMsg) {
-      const timer = setTimeout(() => setErrorMsg(''), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [errorMsg]);
 
   const formatData = (dataString) => {
     if (!dataString) return '-';
@@ -106,12 +100,6 @@ const AppointmentsView = ({ viewRole }) => {
       <div style={{ marginTop: '0' }}>
         <GenericTable columns={columns} data={agendamentos} />
       </div>
-
-      {errorMsg && (
-        <div style={{ position: 'fixed', top: '30px', left: '50%', transform: 'translateX(-50%)', zIndex: 9999, padding: '1rem', background: '#fff3f3', borderLeft: '4px solid #ff4d4f', borderRadius: '8px', boxShadow: '0 8px 24px rgba(0,0,0,0.1)', color: '#cf1322' }}>
-          <p style={{ margin: 0 }}>{errorMsg}</p>
-        </div>
-      )}
 
       <CreateAppointmentModal
         isOpen={modalOpen}

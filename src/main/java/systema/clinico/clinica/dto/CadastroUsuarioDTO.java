@@ -3,6 +3,7 @@ package systema.clinico.clinica.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import systema.clinico.clinica.model.enums.TipoUsuario;
 
@@ -26,7 +27,7 @@ public class CadastroUsuarioDTO {
     @NotNull
     public TipoUsuario tipo;
 
-    @Size(max = 50)
+    @Pattern(regexp = "^[0-9]{1,6}$", message = "CRM deve conter entre 1 e 6 dígitos numéricos")
     public String crm;
 
     @Size(max = 100)

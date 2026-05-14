@@ -69,7 +69,7 @@ const Reports = () => {
 
   return (
     <div className="reports-container">
-      <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.35rem' }}>Dashboard Analítico</h1>
+      <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.35rem' }}>Relatório de Desempenho</h1>
       <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1.25rem' }}>Visão geral do desempenho e métricas da clínica.</p>
 
       {/* Cards Superiores (KPIs) */}
@@ -106,14 +106,15 @@ const Reports = () => {
           <div className="chart-wrapper">
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
-                <Pie 
-                  data={pieData} 
-                  cx="50%" 
-                  cy="50%" 
-                  innerRadius={70} 
-                  outerRadius={100} 
-                  paddingAngle={5} 
+                <Pie
+                  data={pieData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={70}
+                  outerRadius={100}
+                  paddingAngle={5}
                   dataKey="value"
+                  stroke="none"
                 >
                   {pieData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />

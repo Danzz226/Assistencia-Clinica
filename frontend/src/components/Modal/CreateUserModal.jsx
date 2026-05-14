@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Modal from './Modal';
 import api from '../../services/api';
+import { useToast } from '../../context/ToastContext';
 
 const TIPOS = [
   { value: 'paciente', label: 'Paciente' },
@@ -16,21 +17,19 @@ const INITIAL = {
 };
 
 const CreateUserModal = ({ isOpen, onClose, onCreated }) => {
+  const { toast } = useToast();
   const [form, setForm] = useState(INITIAL);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
 
   const set = (field) => (e) => setForm(prev => ({ ...prev, [field]: e.target.value }));
 
   const handleClose = () => {
     setForm(INITIAL);
-    setError('');
     onClose();
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
     setLoading(true);
 
     try {
@@ -57,11 +56,12 @@ const CreateUserModal = ({ isOpen, onClose, onCreated }) => {
       }
 
       await api.post('/auth/register', payload);
+      toast.success('Usuário cadastrado com sucesso!');
       onCreated?.();
       handleClose();
     } catch (err) {
       const msg = err.response?.data?.message || err.response?.data;
-      setError(typeof msg === 'string' ? msg : 'Erro ao criar usuário. Verifique os dados.');
+      toast.error(typeof msg === 'string' ? msg : 'Erro ao criar usuário. Verifique os dados.');
     } finally {
       setLoading(false);
     }
@@ -129,8 +129,6 @@ const CreateUserModal = ({ isOpen, onClose, onCreated }) => {
             </div>
           </>
         )}
-
-        {error && <p className="modal-error">{error}</p>}
 
         <div className="modal-footer">
           <button type="button" className="modal-btn-cancel" onClick={handleClose}>Cancelar</button>

@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Users, FileText, TrendingUp, ClipboardPlus } from 'lucide-react';
 import api from '../../services/api';
+import { useToast } from '../../context/ToastContext';
 import './AdminHome.scss';
 
 const AdminHome = () => {
+  const { toast } = useToast();
   const [stats, setStats] = useState({
     pacientes: { count: 0, percentage: 0, label: 'ativos' },
     doutores: { count: 0, percentage: 0, label: 'ocupados' },
     prontuarios: { count: 0, percentage: 0, label: 'concluídos' }
   });
-  const [errorMsg, setErrorMsg] = useState('');
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -43,11 +44,11 @@ const AdminHome = () => {
         });
 
         if (error.response) {
-          setErrorMsg(`Erro do servidor (${error.response.status}): Não foi possível obter os dados. Verifique se os endpoints /usuarios e /agendamentos estão acessíveis.`);
+          toast.error(`Erro do servidor (${error.response.status}): não foi possível obter os dados.`);
         } else if (error.request) {
-          setErrorMsg('Erro de conexão: Não foi possível conectar ao servidor Java. O backend está rodando na porta correta?');
+          toast.error('Sem conexão com o servidor. O backend está rodando?');
         } else {
-          setErrorMsg(`Erro: ${error.message}`);
+          toast.error(`Erro: ${error.message}`);
         }
       }
     };
@@ -55,15 +56,6 @@ const AdminHome = () => {
     fetchStats();
   }, []);
 
-
-  useEffect(() => {
-    if (errorMsg) {
-      const timer = setTimeout(() => {
-        setErrorMsg('');
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [errorMsg]);
 
   const renderPill = (statObj) => {
     if (statObj.count > 0) {
@@ -132,12 +124,6 @@ const AdminHome = () => {
         </div>
       </div>
 
-      {errorMsg && (
-        <div className="admin-dashboard__error">
-          <h4>Aviso de Conexão com o Backend</h4>
-          <p>{errorMsg}</p>
-        </div>
-      )}
     </div>
   );
 };

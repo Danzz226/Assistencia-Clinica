@@ -3,17 +3,22 @@ package systema.clinico.clinica.controller;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import systema.clinico.clinica.model.Funcionario;
 import systema.clinico.clinica.model.Medico;
 import systema.clinico.clinica.model.Paciente;
 import systema.clinico.clinica.model.Usuario;
+import systema.clinico.clinica.repository.AgendamentoRepository;
+import systema.clinico.clinica.repository.ExameRepository;
 import systema.clinico.clinica.repository.FuncionarioRepository;
 import systema.clinico.clinica.repository.MedicoRepository;
 import systema.clinico.clinica.repository.PacienteRepository;
+import systema.clinico.clinica.repository.ProntuarioRepository;
 import systema.clinico.clinica.repository.UsuarioRepository;
 
 import java.time.LocalDate;
@@ -27,22 +32,40 @@ public class PerfilController {
     private final MedicoRepository medicoRepository;
     private final PacienteRepository pacienteRepository;
     private final FuncionarioRepository funcionarioRepository;
+    private final ProntuarioRepository prontuarioRepository;
+    private final ExameRepository exameRepository;
+    private final AgendamentoRepository agendamentoRepository;
 
     public PerfilController(
             UsuarioRepository usuarioRepository,
             MedicoRepository medicoRepository,
             PacienteRepository pacienteRepository,
-            FuncionarioRepository funcionarioRepository) {
+            FuncionarioRepository funcionarioRepository,
+            ProntuarioRepository prontuarioRepository,
+            ExameRepository exameRepository,
+            AgendamentoRepository agendamentoRepository) {
         this.usuarioRepository = usuarioRepository;
         this.medicoRepository = medicoRepository;
         this.pacienteRepository = pacienteRepository;
         this.funcionarioRepository = funcionarioRepository;
+        this.prontuarioRepository = prontuarioRepository;
+        this.exameRepository = exameRepository;
+        this.agendamentoRepository = agendamentoRepository;
     }
 
     @GetMapping("/medicos")
     @Transactional(readOnly = true)
     public List<MedicoResponse> listarMedicos() {
         return medicoRepository.findAll().stream().map(this::medicoResponse).toList();
+    }
+
+    @GetMapping("/medicos/me")
+    @Transactional(readOnly = true)
+    public MedicoResponse medicoLogado(Authentication authentication) {
+        String email = authentication.getName();
+        Medico medico = medicoRepository.findByUsuario_Email(email)
+                .orElseThrow(() -> new IllegalArgumentException("Médico não encontrado para o usuário logado"));
+        return medicoResponse(medico);
     }
 
     @GetMapping("/medicos/{id}")
@@ -107,7 +130,11 @@ public class PerfilController {
 
     @DeleteMapping("/pacientes/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Transactional
     public void removerPaciente(@PathVariable Integer id) {
+        prontuarioRepository.clearPaciente(id);
+        exameRepository.clearPaciente(id);
+        agendamentoRepository.clearPaciente(id);
         pacienteRepository.delete(paciente(id));
     }
 
@@ -199,7 +226,7 @@ public class PerfilController {
     public static class MedicoRequest {
         @NotNull
         public Integer usuarioId;
-        @Size(max = 50)
+        @Pattern(regexp = "^[0-9]{1,6}$", message = "CRM deve conter entre 1 e 6 dígitos numéricos")
         public String crm;
         @Size(max = 100)
         public String especialidade;

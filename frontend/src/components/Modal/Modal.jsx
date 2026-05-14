@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
 import './Modal.scss';
 
-const Modal = ({ isOpen, onClose, title, children }) => {
+const Modal = ({ isOpen, onClose, title, children, progressPercent }) => {
   useEffect(() => {
     const handler = (e) => { if (e.key === 'Escape') onClose(); };
     if (isOpen) document.addEventListener('keydown', handler);
@@ -14,6 +14,11 @@ const Modal = ({ isOpen, onClose, title, children }) => {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+        {progressPercent !== undefined && (
+          <div className="modal-progress-bar">
+            <div className="modal-progress-fill" style={{ width: `${progressPercent}%` }} />
+          </div>
+        )}
         <div className="modal-header">
           <h2>{title}</h2>
           <button className="modal-close-btn" type="button" onClick={onClose}>

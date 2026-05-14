@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { AuthContext } from '../../context/AuthContext';
 import api from '../../services/api';
+import { useToast } from '../../context/ToastContext';
 import './Patient.scss';
 
 const formatData = (str) =>
@@ -80,8 +81,8 @@ const PatientDiagnostico = () => {
 
   const [prontuarios, setProntuarios]   = useState([]);
   const [diagnosticos, setDiagnosticos] = useState([]);
+  const { toast } = useToast();
   const [loading, setLoading]           = useState(true);
-  const [errorMsg, setErrorMsg]         = useState('');
 
   useEffect(() => {
     const fetchDados = async () => {
@@ -97,7 +98,7 @@ const PatientDiagnostico = () => {
         );
 
         if (!pacienteLogado) {
-          setErrorMsg('Perfil de paciente não encontrado.');
+          toast.error('Perfil de paciente não encontrado.');
           setLoading(false);
           return;
         }
@@ -109,7 +110,7 @@ const PatientDiagnostico = () => {
         setProntuarios(meusProntuarios);
         setDiagnosticos(diagnosticosRes.data || []);
       } catch {
-        setErrorMsg('Não foi possível carregar os diagnósticos.');
+        toast.error('Não foi possível carregar os diagnósticos.');
       } finally {
         setLoading(false);
       }
@@ -117,12 +118,6 @@ const PatientDiagnostico = () => {
 
     if (user) fetchDados();
   }, [user]);
-
-  useEffect(() => {
-    if (!errorMsg) return;
-    const t = setTimeout(() => setErrorMsg(''), 4000);
-    return () => clearTimeout(t);
-  }, [errorMsg]);
 
   return (
     <div className="patient-page">
@@ -155,12 +150,6 @@ const PatientDiagnostico = () => {
         </div>
       )}
 
-      {errorMsg && (
-        <div className="patient-page__error">
-          <h4>Erro</h4>
-          <p>{errorMsg}</p>
-        </div>
-      )}
     </div>
   );
 };

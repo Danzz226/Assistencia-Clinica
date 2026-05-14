@@ -1,3 +1,19 @@
+.modal-progress-bar {
+  margin: -2rem -2rem 1.5rem -2rem;
+  height: 7px;
+  background: #ddeee9;
+  border-radius: 14px 14px 0 0;
+  overflow: hidden;
+
+  .modal-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-color), #30e3a7);
+    border-radius: 14px 14px 0 0;
+    transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 10px rgba(104, 142, 128, 0.6);
+  }
+}
+
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -20,9 +36,10 @@
 }
 
 .modal-header {
+  position: relative;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   margin-bottom: 1.5rem;
 
   h2 {
@@ -30,6 +47,12 @@
     font-weight: 700;
     color: #1a1a1a;
     margin: 0;
+    text-align: center;
+  }
+
+  .modal-close-btn {
+    position: absolute;
+    right: 0;
   }
 }
 

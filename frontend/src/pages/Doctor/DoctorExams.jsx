@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { FileText, FlaskConical } from 'lucide-react';
 import { AuthContext } from '../../context/AuthContext';
 import api from '../../services/api';
+import { useToast } from '../../context/ToastContext';
 import './DoctorExams.scss';
 
 // TODO [BACKEND]: Substituir por endpoints filtrados:
@@ -11,27 +12,18 @@ import './DoctorExams.scss';
 
 const DoctorExams = () => {
   const { user } = useContext(AuthContext);
+  const { toast } = useToast();
   const [abaAtiva, setAbaAtiva] = useState('prontuarios');
 
   const [prontuarios, setProntuarios] = useState([]);
   const [exames, setExames] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [errorMsg, setErrorMsg] = useState('');
 
   useEffect(() => {
     const fetchDados = async () => {
       try {
-        // TODO [BACKEND]: Usar perfilId do token JWT em vez de buscar todos os médicos
-        const medicosRes = await api.get('/medicos');
-        const medicoLogado = (medicosRes.data || []).find(
-          (m) => m.email?.toLowerCase() === user?.username?.toLowerCase()
-        );
-
-        if (!medicoLogado) {
-          setErrorMsg('Médico não encontrado no sistema.');
-          setLoading(false);
-          return;
-        }
+        const medicoRes = await api.get('/medicos/me');
+        const medicoLogado = medicoRes.data;
 
         // TODO [BACKEND]: Substituir por GET /prontuarios?medicoId={id} e GET /exames?medicoId={id}
         const [prontuariosRes, examesRes] = await Promise.all([
@@ -66,13 +58,6 @@ const DoctorExams = () => {
 
     if (user) fetchDados();
   }, [user]);
-
-  useEffect(() => {
-    if (errorMsg) {
-      const t = setTimeout(() => setErrorMsg(''), 4000);
-      return () => clearTimeout(t);
-    }
-  }, [errorMsg]);
 
   const formatData = (dateStr) => {
     if (!dateStr) return '—';
@@ -205,12 +190,6 @@ const DoctorExams = () => {
         </>
       )}
 
-      {errorMsg && (
-        <div className="doctor-exams__error">
-          <h4>Aviso</h4>
-          <p>{errorMsg}</p>
-        </div>
-      )}
     </div>
   );
 };
