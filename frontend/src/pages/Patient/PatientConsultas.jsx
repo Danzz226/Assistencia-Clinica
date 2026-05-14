@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Plus } from 'lucide-react';
 import { AuthContext } from '../../context/AuthContext';
 import api from '../../services/api';
+import { useToast } from '../../context/ToastContext';
 import './Patient.scss';
 
 const formatData = (str) =>
@@ -108,12 +109,12 @@ const AgendarModal = ({ pacienteId, medicos, onClose, onSucesso }) => {
 const PatientConsultas = () => {
   const { user } = useContext(AuthContext);
 
+  const { toast } = useToast();
   const [consultas, setConsultas]       = useState([]);
   const [medicos, setMedicos]           = useState([]);
   const [pacienteId, setPacienteId]     = useState(null);
   const [loading, setLoading]           = useState(true);
   const [showModal, setShowModal]       = useState(false);
-  const [errorMsg, setErrorMsg]         = useState('');
 
   const carregar = async () => {
     try {
@@ -134,7 +135,7 @@ const PatientConsultas = () => {
       setConsultas(ordenadas);
       setMedicos(medicosRes.data || []);
     } catch {
-      setErrorMsg('Não foi possível carregar as consultas.');
+      toast.error('Não foi possível carregar as consultas.');
     } finally {
       setLoading(false);
     }
@@ -143,12 +144,6 @@ const PatientConsultas = () => {
   useEffect(() => {
     if (user) carregar();
   }, [user]);
-
-  useEffect(() => {
-    if (!errorMsg) return;
-    const t = setTimeout(() => setErrorMsg(''), 4000);
-    return () => clearTimeout(t);
-  }, [errorMsg]);
 
   const handleSucesso = () => {
     setShowModal(false);
@@ -225,12 +220,6 @@ const PatientConsultas = () => {
         />
       )}
 
-      {errorMsg && (
-        <div className="patient-page__error">
-          <h4>Erro</h4>
-          <p>{errorMsg}</p>
-        </div>
-      )}
     </div>
   );
 };

@@ -81,7 +81,9 @@
 .manage-users-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  flex-wrap: nowrap;
+
   .action-btn {
     background: none;
     border: none;
@@ -92,28 +94,91 @@
     padding: 6px;
     border-radius: 6px;
     transition: all 0.2s ease;
+    flex-shrink: 0;
 
     &.edit {
-      color: #f97316; 
-      &:hover { background-color: rgba(249, 115, 22, 0.1); }
+      color: var(--primary-color);
+      &:hover { background-color: rgba(var(--primary-rgb), 0.1); }
     }
 
-   
     &.delete {
-      color: #ef4444; 
+      color: #ef4444;
       &:hover { background-color: rgba(239, 68, 68, 0.1); }
     }
 
-
     &.prontuario {
-      color: #eab308; 
-      &:hover { background-color: rgba(234, 179, 8, 0.1); }
+      color: var(--primary-color);
+      &:hover { background-color: rgba(var(--primary-rgb), 0.1); }
     }
-
 
     &.perfil {
-      color: #3b82f6; 
-      &:hover { background-color: rgba(59, 130, 246, 0.1); }
+      color: var(--primary-color);
+      &:hover { background-color: rgba(var(--primary-rgb), 0.1); }
     }
   }
+}
+
+.mu-delete-modal {
+  p { font-size: 0.95rem; color: var(--text-main); line-height: 1.6; }
+  strong { color: var(--text-dark); }
+}
+
+.modal-btn-danger {
+  padding: 0.55rem 1.4rem;
+  border: none;
+  border-radius: 8px;
+  background: var(--color-danger-bg);
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--color-danger);
+  font-family: inherit;
+  transition: background 0.15s;
+
+  &:hover { background: #fecaca; }
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
+}
+
+.mu-prontuario-modal {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.mu-prontuario-empty {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 1.5rem 0;
+}
+
+.mu-prontuario-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.mu-prontuario-item {
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-color);
+  border-left: 3px solid var(--primary-color);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+}
+
+.mu-prontuario-date {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+.mu-prontuario-desc {
+  font-size: 0.88rem;
+  color: var(--text-main);
+  line-height: 1.5;
+  margin: 0;
 }

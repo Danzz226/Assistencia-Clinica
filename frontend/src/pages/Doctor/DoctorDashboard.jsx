@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Users, FileText, TrendingUp, Clock, Calendar } from 'lucide-react';
 import { AuthContext } from '../../context/AuthContext';
 import api from '../../services/api';
+import { useToast } from '../../context/ToastContext';
 import './DoctorDashboard.scss';
 
 // TODO [BACKEND]: Quando o backend implementar:
@@ -22,6 +23,7 @@ const DIAS_LABEL = {
 
 const DoctorDashboard = () => {
   const { user } = useContext(AuthContext);
+  const { toast } = useToast();
 
   const [medicoId, setMedicoId] = useState(null);
   const [medicoNome, setMedicoNome] = useState('');
@@ -32,7 +34,6 @@ const DoctorDashboard = () => {
   });
   const [prontuariosRecentes, setProntuariosRecentes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [errorMsg, setErrorMsg] = useState('');
 
   // Identifica o dia da semana atual no enum do backend
   const getDiaSemanaHoje = () => {
@@ -45,19 +46,8 @@ const DoctorDashboard = () => {
       try {
         // TODO [BACKEND]: Substituir por GET /auth/me ou usar perfilId do token JWT
         // quando implementado. Por agora buscamos todos os médicos e filtramos pelo email.
-        const medicosRes = await api.get('/medicos');
-        const medicos = medicosRes.data || [];
-
-        // Encontra o médico logado pelo email (username = email no sistema)
-        const medicoLogado = medicos.find(
-          (m) => m.email?.toLowerCase() === user?.username?.toLowerCase()
-        );
-
-        if (!medicoLogado) {
-          setErrorMsg('Médico não encontrado no sistema. Verifique o cadastro.');
-          setLoading(false);
-          return;
-        }
+        const medicoRes = await api.get('/medicos/me');
+        const medicoLogado = medicoRes.data;
 
         setMedicoId(medicoLogado.id);
         setMedicoNome(medicoLogado.nome);
@@ -117,13 +107,6 @@ const DoctorDashboard = () => {
 
     if (user) fetchDados();
   }, [user]);
-
-  useEffect(() => {
-    if (errorMsg) {
-      const t = setTimeout(() => setErrorMsg(''), 4000);
-      return () => clearTimeout(t);
-    }
-  }, [errorMsg]);
 
   const formatData = (dateStr) => {
     if (!dateStr) return '—';
@@ -244,12 +227,6 @@ const DoctorDashboard = () => {
         </div>
       )}
 
-      {errorMsg && (
-        <div className="doctor-dashboard__error">
-          <h4>Aviso de Conexão</h4>
-          <p>{errorMsg}</p>
-        </div>
-      )}
     </div>
   );
 };

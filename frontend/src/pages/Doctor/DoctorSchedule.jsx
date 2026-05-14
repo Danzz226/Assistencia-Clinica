@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Plus, Trash2, Clock } from 'lucide-react';
 import { AuthContext } from '../../context/AuthContext';
 import api from '../../services/api';
+import { useToast } from '../../context/ToastContext';
 import './DoctorSchedule.scss';
 
 // TODO [BACKEND]: Substituir por endpoint filtrado GET /horarios?medicoId={id}
@@ -20,12 +21,11 @@ const DIAS = [
 
 const DoctorSchedule = () => {
   const { user } = useContext(AuthContext);
+  const { toast } = useToast();
 
   const [medicoId, setMedicoId] = useState(null);
   const [horarios, setHorarios] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [errorMsg, setErrorMsg] = useState('');
-  const [successMsg, setSuccessMsg] = useState('');
 
   // Estado do formulário de novo horário
   const [showForm, setShowForm] = useState(false);
@@ -51,18 +51,8 @@ const DoctorSchedule = () => {
   useEffect(() => {
     const init = async () => {
       try {
-        // TODO [BACKEND]: Usar perfilId do token JWT em vez de buscar todos os médicos
-        const medicosRes = await api.get('/medicos');
-        const medicoLogado = (medicosRes.data || []).find(
-          (m) => m.email?.toLowerCase() === user?.username?.toLowerCase()
-        );
-
-        if (!medicoLogado) {
-          setErrorMsg('Médico não encontrado no sistema.');
-          setLoading(false);
-          return;
-        }
-
+        const medicoRes = await api.get('/medicos/me');
+        const medicoLogado = medicoRes.data;
         setMedicoId(medicoLogado.id);
         const meusHorarios = await fetchHorarios(medicoLogado.id);
         setHorarios(meusHorarios);
@@ -86,20 +76,6 @@ const DoctorSchedule = () => {
     if (user) init();
   }, [user]);
 
-  useEffect(() => {
-    if (errorMsg) {
-      const t = setTimeout(() => setErrorMsg(''), 4000);
-      return () => clearTimeout(t);
-    }
-  }, [errorMsg]);
-
-  useEffect(() => {
-    if (successMsg) {
-      const t = setTimeout(() => setSuccessMsg(''), 3000);
-      return () => clearTimeout(t);
-    }
-  }, [successMsg]);
-
   const handleSalvar = async () => {
     if (!medicoId) return;
     setSalvando(true);
@@ -113,11 +89,11 @@ const DoctorSchedule = () => {
       const atualizados = await fetchHorarios(medicoId);
       setHorarios(atualizados);
       setShowForm(false);
-      setSuccessMsg('Horário adicionado com sucesso!');
+      toast.success('Horário adicionado com sucesso!');
       setNovoHorario({ diaSemana: 'segunda', horaInicio: '08:00', horaFim: '12:00' });
     } catch (error) {
       console.error('Erro ao salvar horário:', error);
-      setErrorMsg('Erro ao salvar horário. Verifique o backend.');
+      toast.error('Erro ao salvar horário. Verifique o backend.');
     } finally {
       setSalvando(false);
     }
@@ -128,10 +104,10 @@ const DoctorSchedule = () => {
     try {
       await api.delete(`/horarios/${id}`);
       setHorarios((prev) => prev.filter((h) => h.id !== id));
-      setSuccessMsg('Horário removido.');
+      toast.success('Horário removido com sucesso!');
     } catch (error) {
       console.error('Erro ao remover horário:', error);
-      setErrorMsg('Erro ao remover horário.');
+      toast.error('Erro ao remover horário.');
     }
   };
 
@@ -253,20 +229,6 @@ const DoctorSchedule = () => {
         </div>
       )}
 
-      {/* Toast sucesso */}
-      {successMsg && (
-        <div className="doctor-schedule__toast doctor-schedule__toast--success">
-          {successMsg}
-        </div>
-      )}
-
-      {/* Toast erro */}
-      {errorMsg && (
-        <div className="doctor-schedule__error">
-          <h4>Aviso</h4>
-          <p>{errorMsg}</p>
-        </div>
-      )}
     </div>
   );
 };

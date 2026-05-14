@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import Modal from './Modal';
 import api from '../../services/api';
+import { useToast } from '../../context/ToastContext';
 
 const INITIAL = { novaSenha: '', confirmar: '' };
 
 const ResetPasswordModal = ({ isOpen, onClose, usuario, isSelf = false }) => {
+  const { toast } = useToast();
   const [form, setForm] = useState(INITIAL);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -30,6 +32,7 @@ const ResetPasswordModal = ({ isOpen, onClose, usuario, isSelf = false }) => {
     try {
       const url = isSelf ? '/usuarios/me/senha' : `/usuarios/${usuario.id}/senha`;
       await api.patch(url, { novaSenha: form.novaSenha });
+      toast.success('Senha redefinida com sucesso!');
       handleClose();
     } catch (err) {
       const msg = err.response?.data?.erro || err.response?.data?.message || err.response?.data;

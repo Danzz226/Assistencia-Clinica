@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Calendar, FileText, ClipboardList, Clock } from 'lucide-react';
 import { AuthContext } from '../../context/AuthContext';
 import api from '../../services/api';
+import { useToast } from '../../context/ToastContext';
 import './Patient.scss';
 
 const getSaudacao = () => {
@@ -21,12 +22,12 @@ const STATUS_LABEL = { agendado: 'Agendado', realizado: 'Realizado', cancelado: 
 
 const PatientHome = () => {
   const { user } = useContext(AuthContext);
+  const { toast } = useToast();
 
   const [pacienteId, setPacienteId] = useState(null);
   const [stats, setStats]           = useState({ consultas: 0, exames: 0, prontuarios: 0 });
   const [proximas, setProximas]     = useState([]);
   const [loading, setLoading]       = useState(true);
-  const [errorMsg, setErrorMsg]     = useState('');
 
   useEffect(() => {
     const fetchDados = async () => {
@@ -44,7 +45,7 @@ const PatientHome = () => {
         );
 
         if (!pacienteLogado) {
-          setErrorMsg('Perfil de paciente não encontrado. Contate o administrador.');
+          toast.error('Perfil de paciente não encontrado. Contate o administrador.');
           setLoading(false);
           return;
         }
@@ -72,7 +73,7 @@ const PatientHome = () => {
         });
         setProximas(futuras);
       } catch {
-        setErrorMsg('Não foi possível conectar ao servidor.');
+        toast.error('Não foi possível conectar ao servidor.');
       } finally {
         setLoading(false);
       }
@@ -80,12 +81,6 @@ const PatientHome = () => {
 
     if (user) fetchDados();
   }, [user]);
-
-  useEffect(() => {
-    if (!errorMsg) return;
-    const t = setTimeout(() => setErrorMsg(''), 4000);
-    return () => clearTimeout(t);
-  }, [errorMsg]);
 
   return (
     <div className="patient-page">
@@ -170,12 +165,6 @@ const PatientHome = () => {
         </div>
       )}
 
-      {errorMsg && (
-        <div className="patient-page__error">
-          <h4>Aviso</h4>
-          <p>{errorMsg}</p>
-        </div>
-      )}
     </div>
   );
 };

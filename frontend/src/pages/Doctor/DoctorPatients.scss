@@ -160,6 +160,13 @@
     }
   }
 
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: nowrap;
+  }
+
   &__error {
     position: fixed;
     top: 30px;
@@ -180,6 +187,223 @@
     h4 { margin: 0 0 0.5rem; font-weight: 600; }
     p  { margin: 0; }
   }
+}
+
+.dp-action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+
+  &--prontuario {
+    color: var(--primary-color);
+    &:hover { background-color: rgba(var(--primary-rgb), 0.1); }
+  }
+
+  &--edit {
+    color: var(--primary-color);
+    &:hover { background-color: rgba(var(--primary-rgb), 0.1); }
+  }
+
+  &--delete {
+    color: #ef4444;
+    &:hover { background-color: rgba(239, 68, 68, 0.1); }
+  }
+}
+
+.dp-delete-modal {
+  p { font-size: 0.95rem; color: var(--text-main); line-height: 1.6; }
+  strong { color: var(--text-dark); }
+}
+
+.modal-btn-danger {
+  padding: 0.55rem 1.4rem;
+  border: none;
+  border-radius: 8px;
+  background: var(--color-danger-bg);
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--color-danger);
+  font-family: inherit;
+  transition: background 0.15s;
+
+  &:hover { background: #fecaca; }
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
+}
+
+.dp-prontuario-modal {
+  max-height: 480px;
+  overflow-y: auto;
+}
+
+.dp-prontuario-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: none;
+  border: 1.5px solid var(--primary-color);
+  color: var(--primary-color);
+  border-radius: 8px;
+  padding: 0.45rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  transition: background 0.15s;
+
+  &:hover { background: rgba(var(--primary-rgb), 0.07); }
+}
+
+.dp-prontuario-new-form {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  textarea {
+    width: 100%;
+    padding: 0.65rem 0.9rem;
+    border: 1.5px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    color: var(--text-main);
+    resize: vertical;
+    outline: none;
+    box-sizing: border-box;
+
+    &:focus { border-color: var(--primary-color); }
+  }
+}
+
+.dp-prontuario-new-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.dp-prontuario-empty {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 1.5rem 0;
+}
+
+.dp-prontuario-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dp-prontuario-item {
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-color);
+  border-left: 3px solid var(--primary-color);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+}
+
+.dp-prontuario-date {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+.dp-prontuario-desc {
+  font-size: 0.88rem;
+  color: var(--text-main);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.dp-perfil-modal {
+  max-height: 520px;
+  overflow-y: auto;
+}
+
+.dp-perfil-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.dp-perfil-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #e8f0ec;
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.dp-perfil-nome {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.dp-perfil-role {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 0.1rem;
+}
+
+.dp-perfil-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-bottom: 1rem;
+}
+
+.dp-perfil-info-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+  color: var(--text-main);
+
+  svg { color: var(--text-muted); flex-shrink: 0; }
+}
+
+.dp-perfil-divider {
+  border: none;
+  border-top: 1px solid var(--border-color);
+  margin: 0.75rem 0 1rem;
+}
+
+.dp-perfil-section-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
 }
 
 @keyframes slideDownToast {

@@ -1,27 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import Modal from './Modal';
 import api from '../../services/api';
+import { useToast } from '../../context/ToastContext';
 
 const INITIAL = { pacienteId: '', medicoId: '', data: '' };
 
 const CreateAppointmentModal = ({ isOpen, onClose, onCreated }) => {
+  const { toast } = useToast();
   const [form, setForm] = useState(INITIAL);
   const [pacientes, setPacientes] = useState([]);
   const [medicos, setMedicos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loadingLists, setLoadingLists] = useState(false);
-  const [error, setError] = useState('');
 
   useEffect(() => {
     if (!isOpen) return;
     setLoadingLists(true);
-    setError('');
     Promise.all([api.get('/pacientes'), api.get('/medicos')])
       .then(([pRes, mRes]) => {
         setPacientes(pRes.data || []);
         setMedicos(mRes.data || []);
       })
-      .catch(() => setError('Não foi possível carregar a lista de pacientes/médicos.'))
+      .catch(() => toast.error('Não foi possível carregar a lista de pacientes/médicos.'))
       .finally(() => setLoadingLists(false));
   }, [isOpen]);
 
@@ -29,13 +29,11 @@ const CreateAppointmentModal = ({ isOpen, onClose, onCreated }) => {
 
   const handleClose = () => {
     setForm(INITIAL);
-    setError('');
     onClose();
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
     setLoading(true);
     try {
       await api.post('/agendamentos', {
@@ -43,11 +41,12 @@ const CreateAppointmentModal = ({ isOpen, onClose, onCreated }) => {
         medicoId: parseInt(form.medicoId),
         data: form.data,
       });
+      toast.success('Agendamento criado com sucesso!');
       onCreated?.();
       handleClose();
     } catch (err) {
       const msg = err.response?.data?.message || err.response?.data;
-      setError(typeof msg === 'string' ? msg : 'Erro ao criar agendamento. Verifique os dados.');
+      toast.error(typeof msg === 'string' ? msg : 'Erro ao criar agendamento. Verifique os dados.');
     } finally {
       setLoading(false);
     }
@@ -87,8 +86,6 @@ const CreateAppointmentModal = ({ isOpen, onClose, onCreated }) => {
             min={new Date().toISOString().slice(0, 16)}
           />
         </div>
-
-        {error && <p className="modal-error">{error}</p>}
 
         <div className="modal-footer">
           <button type="button" className="modal-btn-cancel" onClick={handleClose}>Cancelar</button>

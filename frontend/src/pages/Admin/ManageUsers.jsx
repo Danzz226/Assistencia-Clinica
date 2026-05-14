@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
-import { Pencil, Trash2, FileText, User, ChevronDown, Lock, Plus } from 'lucide-react';
+import { Pencil, Trash2, FileText, User, ChevronDown, Lock, Plus, ClipboardList } from 'lucide-react';
 import api from '../../services/api';
+import { useToast } from '../../context/ToastContext';
 import GenericTable from '../../components/GenericTable';
 import { AuthContext } from '../../context/AuthContext';
 import Badge from '../../components/Badge/Badge';
+import Modal from '../../components/Modal/Modal';
 import CreateUserModal from '../../components/Modal/CreateUserModal';
 import ResetPasswordModal from '../../components/Modal/ResetPasswordModal';
 import UserProfileModal from '../../components/Modal/UserProfileModal';
@@ -11,13 +13,21 @@ import '../../components/Modal/Modal.scss';
 import './ManageUsers.scss';
 
 const ManageUsers = () => {
+  const { toast } = useToast();
   const [usuarios, setUsuarios] = useState([]);
-  const [errorMsg, setErrorMsg] = useState('');
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [resetPasswordUser, setResetPasswordUser] = useState(null);
   const [profileUser, setProfileUser] = useState(null);
   const [openDropdownId, setOpenDropdownId] = useState(null);
   const [dropdownPos, setDropdownPos] = useState({ top: 0, right: 0 });
+
+  const [editUser, setEditUser] = useState(null);
+  const [editForm, setEditForm] = useState({});
+  const [saving, setSaving] = useState(false);
+  const [deleteUser, setDeleteUser] = useState(null);
+  const [prontuarioUser, setProntuarioUser] = useState(null);
+  const [prontuarios, setProntuarios] = useState([]);
+  const [loadingProntuarios, setLoadingProntuarios] = useState(false);
 
   const { user } = useContext(AuthContext);
   const isAdmin = user?.role === 'admin';
@@ -30,20 +40,66 @@ const ManageUsers = () => {
       setUsuarios([]);
       const msg = error.response?.data?.message
         || (error.response ? `Erro ${error.response.status} ao carregar usuários.` : 'Sem conexão com o servidor.');
-      setErrorMsg(msg);
+      toast.error(msg);
     }
   }, []);
 
-  useEffect(() => {
-    fetchUsuarios();
-  }, [fetchUsuarios]);
+  useEffect(() => { fetchUsuarios(); }, [fetchUsuarios]);
 
-  useEffect(() => {
-    if (errorMsg) {
-      const timer = setTimeout(() => setErrorMsg(''), 3000);
-      return () => clearTimeout(timer);
+  const openEdit = (row) => {
+    setEditUser(row);
+    setEditForm({ nome: row.nome, email: row.email, tipo: row.tipo });
+  };
+
+  const openDelete = (row) => setDeleteUser(row);
+
+  const openProntuario = async (row) => {
+    setProntuarioUser(row);
+    setLoadingProntuarios(true);
+    try {
+      const [pacientesRes, prontuariosRes] = await Promise.all([
+        api.get('/pacientes'),
+        api.get('/prontuarios'),
+      ]);
+      const paciente = (pacientesRes.data || []).find(p => p.usuarioId === row.id);
+      const lista = paciente
+        ? (prontuariosRes.data || []).filter(p => p.pacienteId === paciente.id)
+        : [];
+      setProntuarios(lista.sort((a, b) => new Date(b.dataRegistro) - new Date(a.dataRegistro)));
+    } catch {
+      setProntuarios([]);
+    } finally {
+      setLoadingProntuarios(false);
     }
-  }, [errorMsg]);
+  };
+
+  const handleEditSave = async () => {
+    setSaving(true);
+    try {
+      await api.put(`/usuarios/${editUser.id}`, editForm);
+      setUsuarios(prev => prev.map(u => u.id === editUser.id ? { ...u, ...editForm } : u));
+      toast.success('Alterações salvas com sucesso!');
+      setEditUser(null);
+    } catch {
+      toast.error('Erro ao salvar alterações.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    setSaving(true);
+    try {
+      await api.delete(`/usuarios/${deleteUser.id}`);
+      setUsuarios(prev => prev.filter(u => u.id !== deleteUser.id));
+      toast.success('Usuário excluído com sucesso!');
+      setDeleteUser(null);
+    } catch {
+      toast.error('Erro ao excluir usuário.');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const openResetPassword = (row) => {
     setOpenDropdownId(null);
@@ -53,6 +109,11 @@ const ManageUsers = () => {
   const openProfile = (row) => {
     setOpenDropdownId(null);
     setProfileUser(row);
+  };
+
+  const formatData = (dateStr) => {
+    if (!dateStr) return '—';
+    return new Date(dateStr).toLocaleDateString('pt-BR');
   };
 
   const columns = [
@@ -75,12 +136,12 @@ const ManageUsers = () => {
 
         return (
           <div className="manage-users-actions">
-            <button className="action-btn edit" title="Editar">
-              <Pencil size={20} />
+            <button className="action-btn edit" title="Editar" onClick={() => openEdit(row)}>
+              <Pencil size={16} />
             </button>
             {isAdmin && (
-              <button className="action-btn delete" title="Excluir">
-                <Trash2 size={20} />
+              <button className="action-btn delete" title="Excluir" onClick={() => openDelete(row)}>
+                <Trash2 size={16} />
               </button>
             )}
             {(tipo === 'medico' || tipo === 'admin' || tipo === 'funcionario' || tipo === 'paciente') && (
@@ -94,21 +155,17 @@ const ManageUsers = () => {
                     setOpenDropdownId(isOpen ? null : row.id);
                   }}
                 >
-                  <User size={20} />
-                  <ChevronDown
-                    size={12}
-                    style={{
-                      transition: 'transform 0.2s',
-                      transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                    }}
-                  />
+                  <User size={16} />
+                  <ChevronDown size={12} style={{ transition: 'transform 0.2s', transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }} />
                 </button>
               </div>
             )}
-            {tipo === 'paciente' && (
-              <button className="action-btn prontuario" title="Ver Prontuário">
-                <FileText size={20} />
+            {tipo === 'paciente' ? (
+              <button className="action-btn prontuario" title="Ver Prontuário" onClick={() => openProntuario(row)}>
+                <ClipboardList size={16} />
               </button>
+            ) : (
+              <span style={{ width: 28, display: 'inline-block', flexShrink: 0 }} />
             )}
           </div>
         );
@@ -133,15 +190,10 @@ const ManageUsers = () => {
 
       <GenericTable columns={columns} data={usuarios} />
 
-      {/* Overlay fecha o dropdown ao clicar fora */}
       {openDropdownId !== null && (
-        <div
-          style={{ position: 'fixed', inset: 0, zIndex: 150 }}
-          onClick={() => setOpenDropdownId(null)}
-        />
+        <div style={{ position: 'fixed', inset: 0, zIndex: 150 }} onClick={() => setOpenDropdownId(null)} />
       )}
 
-      {/* Menu do dropdown renderizado fora do overflow da tabela */}
       {openDropdownId !== null && (
         <div
           className="profile-dropdown-menu"
@@ -166,30 +218,71 @@ const ManageUsers = () => {
         </div>
       )}
 
-      {errorMsg && (
-        <div className="manage-users-error">
-          <h4>Aviso de Conexão</h4>
-          <p>{errorMsg}</p>
+      {/* Modal Editar */}
+      <Modal isOpen={!!editUser} onClose={() => setEditUser(null)} title="Editar Usuário">
+        <div className="modal-form">
+          <div className="modal-field">
+            <label>Nome</label>
+            <input value={editForm.nome || ''} onChange={(e) => setEditForm({ ...editForm, nome: e.target.value })} />
+          </div>
+          <div className="modal-field">
+            <label>Email</label>
+            <input type="email" value={editForm.email || ''} onChange={(e) => setEditForm({ ...editForm, email: e.target.value })} />
+          </div>
+          <div className="modal-field">
+            <label>Tipo</label>
+            <select value={editForm.tipo || ''} onChange={(e) => setEditForm({ ...editForm, tipo: e.target.value })}>
+              <option value="admin">Admin</option>
+              <option value="medico">Médico</option>
+              <option value="paciente">Paciente</option>
+              <option value="funcionario">Funcionário</option>
+            </select>
+          </div>
+          <div className="modal-footer">
+            <button className="modal-btn-cancel" onClick={() => setEditUser(null)}>Cancelar</button>
+            <button className="modal-btn-submit" onClick={handleEditSave} disabled={saving}>
+              {saving ? 'Salvando...' : 'Salvar'}
+            </button>
+          </div>
         </div>
-      )}
+      </Modal>
 
-      <CreateUserModal
-        isOpen={createModalOpen}
-        onClose={() => setCreateModalOpen(false)}
-        onCreated={fetchUsuarios}
-      />
+      {/* Modal Excluir */}
+      <Modal isOpen={!!deleteUser} onClose={() => setDeleteUser(null)} title="Excluir Usuário">
+        <div className="mu-delete-modal">
+          <p>Tem certeza que deseja excluir o usuário <strong>{deleteUser?.nome}</strong>? Esta ação não pode ser desfeita.</p>
+          <div className="modal-footer">
+            <button className="modal-btn-cancel" onClick={() => setDeleteUser(null)}>Cancelar</button>
+            <button className="modal-btn-danger" onClick={handleDelete} disabled={saving}>
+              {saving ? 'Excluindo...' : 'Excluir'}
+            </button>
+          </div>
+        </div>
+      </Modal>
 
-      <ResetPasswordModal
-        isOpen={!!resetPasswordUser}
-        onClose={() => setResetPasswordUser(null)}
-        usuario={resetPasswordUser}
-      />
+      {/* Modal Prontuário */}
+      <Modal isOpen={!!prontuarioUser} onClose={() => setProntuarioUser(null)} title={`Prontuários — ${prontuarioUser?.nome}`}>
+        <div className="mu-prontuario-modal">
+          {loadingProntuarios ? (
+            <p className="mu-prontuario-empty">Carregando prontuários...</p>
+          ) : prontuarios.length === 0 ? (
+            <p className="mu-prontuario-empty">Nenhum prontuário registrado para este paciente.</p>
+          ) : (
+            <ul className="mu-prontuario-list">
+              {prontuarios.map((pr) => (
+                <li key={pr.id} className="mu-prontuario-item">
+                  <span className="mu-prontuario-date">{formatData(pr.dataRegistro)}</span>
+                  <p className="mu-prontuario-desc">{pr.descricao || 'Sem descrição.'}</p>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </Modal>
 
-      <UserProfileModal
-        isOpen={!!profileUser}
-        onClose={() => setProfileUser(null)}
-        usuario={profileUser}
-      />
+      <CreateUserModal isOpen={createModalOpen} onClose={() => setCreateModalOpen(false)} onCreated={fetchUsuarios} />
+      <ResetPasswordModal isOpen={!!resetPasswordUser} onClose={() => setResetPasswordUser(null)} usuario={resetPasswordUser} />
+      <UserProfileModal isOpen={!!profileUser} onClose={() => setProfileUser(null)} usuario={profileUser} />
     </div>
   );
 };

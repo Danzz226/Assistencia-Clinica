@@ -3,6 +3,8 @@
 import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
+import MfaLoginModal from './Modal/MfaLoginModal';
 import './Auth.scss';
 
 const AuthForm = ({ mode = 'login', role = 'doctor' }) => {
@@ -18,9 +20,9 @@ const AuthForm = ({ mode = 'login', role = 'doctor' }) => {
     confirmPassword: '',
   });
 
-  const [errorMsg, setErrorMsg] = useState('');
+  const { toast } = useToast();
   const [mfaRequired, setMfaRequired] = useState(false);
-  const [mfaCode, setMfaCode] = useState('');
+  const [pendingCredentials, setPendingCredentials] = useState(null);
 
   const { login, register } = useContext(AuthContext);
 
@@ -36,11 +38,10 @@ const AuthForm = ({ mode = 'login', role = 'doctor' }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    setErrorMsg('');
-
     if (isSignup) {
       if (formData.password !== formData.confirmPassword) {
-        return setErrorMsg('As senhas não coincidem');
+        toast.error('As senhas não coincidem');
+        return;
       }
 
       try {
@@ -65,12 +66,13 @@ const AuthForm = ({ mode = 'login', role = 'doctor' }) => {
         const result = await register(payload);
 
         if (result.success) {
+          toast.success('Conta criada com sucesso!');
           navigate('/login');
         } else {
-          setErrorMsg(result.message || 'Erro ao criar conta');
+          toast.error(result.message || 'Erro ao criar conta');
         }
       } catch (err) {
-        setErrorMsg('Erro interno');
+        toast.error('Erro interno');
       }
 
       return;
@@ -83,16 +85,11 @@ const AuthForm = ({ mode = 'login', role = 'doctor' }) => {
       systemRole = 'admin';
     }
 
-    const result = await login(
-      formData.identifier,
-      formData.password,
-      systemRole,
-      mfaRequired ? mfaCode : undefined
-    );
+    const result = await login(formData.identifier, formData.password, systemRole);
 
     if (result.mfaRequired) {
-      setMfaRequired(true);setMfaCode('');
-      setErrorMsg('Digite o código MFA do seu autenticador');
+      setPendingCredentials({ email: formData.identifier, password: formData.password, role: systemRole });
+      setMfaRequired(true);
       return;
     }
 
@@ -101,18 +98,40 @@ const AuthForm = ({ mode = 'login', role = 'doctor' }) => {
       else if (result.role === 'medico') navigate('/medico/home');
       else navigate('/paciente/home');
     } else {
-      setErrorMsg(result.message || 'Erro ao fazer login');
+      toast.error(result.message || 'Erro ao fazer login');
     }
   };
 
-  return (
-    <form className="auth-form" onSubmit={handleSubmit}>
-      {errorMsg && (
-        <div className="error-message">
-          {errorMsg}
-        </div>
-      )}
+  const handleMfaVerify = async (mfaCode) => {
+    const result = await login(
+      pendingCredentials.email,
+      pendingCredentials.password,
+      pendingCredentials.role,
+      mfaCode
+    );
 
+    if (result.success) {
+      if (result.role === 'admin') navigate('/admin/home');
+      else if (result.role === 'medico') navigate('/medico/home');
+      else navigate('/paciente/home');
+    }
+
+    return result;
+  };
+
+  const handleMfaClose = () => {
+    setMfaRequired(false);
+    setPendingCredentials(null);
+  };
+
+  return (
+    <>
+      <MfaLoginModal
+      isOpen={mfaRequired}
+      onClose={handleMfaClose}
+      onVerify={handleMfaVerify}
+    />
+      <form className="auth-form" onSubmit={handleSubmit}>
       {isSignup && (
         <div className="form-group">
           <label>Nome Completo</label>
@@ -218,25 +237,8 @@ const AuthForm = ({ mode = 'login', role = 'doctor' }) => {
         </div>
       )}
 
-      {!isSignup && mfaRequired && (
-        <div className="form-group">
-          <label>Código do autenticador</label>
-          <input
-            type="text"
-            name="mfaCode"
-            placeholder="000000"
-            value={mfaCode}
-            onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-            required
-            maxLength={6}
-            autoFocus
-            style={{ letterSpacing: '0.3em', textAlign: 'center', fontSize: '1.2rem' }}
-          />
-        </div>
-      )}
-
       <button type="submit" className="btn-primary">
-        {isSignup ? 'Criar Conta' : mfaRequired ? 'Verificar Código' : 'Entrar'}
+        {isSignup ? 'Criar Conta' : 'Entrar'}
       </button>
 
       <div className="auth-footer">
@@ -252,6 +254,7 @@ const AuthForm = ({ mode = 'login', role = 'doctor' }) => {
         )}
       </div>
     </form>
+    </>
   );
 };
 

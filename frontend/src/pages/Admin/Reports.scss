@@ -94,6 +94,17 @@
         width: 100%;
         display: flex;
         justify-content: center;
+
+        .recharts-wrapper,
+        .recharts-surface,
+        .recharts-wrapper * {
+          outline: none;
+        }
+
+        .recharts-sector:focus,
+        .recharts-bar-rectangle:focus {
+          outline: none;
+        }
       }
     }
   }

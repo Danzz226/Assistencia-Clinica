@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { ClipboardList } from 'lucide-react';
 import { AuthContext } from '../../context/AuthContext';
 import api from '../../services/api';
+import { useToast } from '../../context/ToastContext';
 import './Patient.scss';
 
 const formatData = (str) =>
@@ -9,10 +10,10 @@ const formatData = (str) =>
 
 const PatientExames = () => {
   const { user } = useContext(AuthContext);
+  const { toast } = useToast();
 
   const [exames, setExames]   = useState([]);
   const [loading, setLoading] = useState(true);
-  const [errorMsg, setErrorMsg] = useState('');
 
   useEffect(() => {
     const fetchDados = async () => {
@@ -27,7 +28,7 @@ const PatientExames = () => {
         );
 
         if (!pacienteLogado) {
-          setErrorMsg('Perfil de paciente não encontrado.');
+          toast.error('Perfil de paciente não encontrado.');
           setLoading(false);
           return;
         }
@@ -38,7 +39,7 @@ const PatientExames = () => {
 
         setExames(meusExames);
       } catch {
-        setErrorMsg('Não foi possível carregar os exames.');
+        toast.error('Não foi possível carregar os exames.');
       } finally {
         setLoading(false);
       }
@@ -46,12 +47,6 @@ const PatientExames = () => {
 
     if (user) fetchDados();
   }, [user]);
-
-  useEffect(() => {
-    if (!errorMsg) return;
-    const t = setTimeout(() => setErrorMsg(''), 4000);
-    return () => clearTimeout(t);
-  }, [errorMsg]);
 
   return (
     <div className="patient-page">
@@ -108,12 +103,6 @@ const PatientExames = () => {
         </div>
       )}
 
-      {errorMsg && (
-        <div className="patient-page__error">
-          <h4>Erro</h4>
-          <p>{errorMsg}</p>
-        </div>
-      )}
     </div>
   );
 };

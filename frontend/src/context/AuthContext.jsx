@@ -59,24 +59,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-      // Apenas retorna sucesso para que a tela redirecione ao login
-
-
-      return { success: true, role: tipo };
-    } catch (error) {
-      console.error("Erro ao registrar", error);
-
-      const msg =
-        error.response?.data?.erro ||
-        error.response?.data?.message ||
-        (error.response
-          ? `Erro do servidor (${error.response.status})`
-          : 'Erro ao conectar ao servidor.');
-
-      return { success: false, message: msg };
-    }
-  };
-
   const logout = () => {
     setUser(null);
     localStorage.removeItem('usuario');
