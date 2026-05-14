@@ -10,6 +10,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import systema.clinico.clinica.repository.UsuarioRepository;
+import systema.clinico.clinica.security.TotpService;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -30,6 +32,12 @@ class BackendIntegrationTests {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private TotpService totpService;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -101,6 +109,63 @@ class BackendIntegrationTests {
         mockMvc.perform(delete("/agendamentos/{id}", agendamentoId)
                         .header("Authorization", bearer(adminToken)))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void mfaPodeSerAtivadoEExigidoNoLogin() throws Exception {
+        String suffix = UUID.randomUUID().toString().substring(0, 8);
+        String email = "mfa-" + suffix + "@teste.local";
+
+        registrar("""
+                {"nome":"Usuario MFA","email":"%s","senha":"123456","tipo":"admin"}
+                """.formatted(email));
+
+        String token = login(email, "123456");
+
+        JsonNode setup = json(mockMvc.perform(post("/auth/mfa/setup")
+                        .header("Authorization", bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.secret").isNotEmpty())
+                .andExpect(jsonPath("$.otpauthUrl").value(org.hamcrest.Matchers.containsString("otpauth://totp/")))
+                .andReturn());
+
+        String secret = setup.get("secret").asText();
+        long contadorAtual = java.time.Instant.now().getEpochSecond() / 30;
+        String codigoAtual = totpService.gerarCodigoPublico(secret, contadorAtual);
+
+        mockMvc.perform(post("/auth/mfa/enable")
+                        .header("Authorization", bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"code":"%s"}
+                                """.formatted(codigoAtual)))
+                .andExpect(status().isOk());
+
+        assertThat(usuarioRepository.findByEmail(email)).isPresent()
+                .get()
+                .extracting(usuario -> usuario.isMfaEnabled())
+                .isEqualTo(true);
+
+        mockMvc.perform(post("/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"email":"%s","senha":"123456"}
+                                """.formatted(email)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.mfaRequired").value(true))
+                .andExpect(jsonPath("$.token").isEmpty());
+
+        String codigoLogin = totpService.gerarCodigoPublico(secret, java.time.Instant.now().getEpochSecond() / 30);
+
+        mockMvc.perform(post("/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"email":"%s","senha":"123456","mfaCode":"%s"}
+                                """.formatted(email, codigoLogin)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.mfaRequired").value(false))
+                .andExpect(jsonPath("$.mfaEnabled").value(true))
+                .andExpect(jsonPath("$.token").isNotEmpty());
     }
 
     private void registrar(String body) throws Exception {

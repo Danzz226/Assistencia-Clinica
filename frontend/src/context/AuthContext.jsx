@@ -27,14 +27,14 @@ export const AuthProvider = ({ children }) => {
       }
 
       const response = await api.post('/auth/login', payload);
-      const { token, nome, tipo, mfaRequired } = response.data;
+      const { token, nome, email: responseEmail, tipo, mfaRequired, mfaEnabled } = response.data;
 
       // Backend pede código MFA
       if (mfaRequired && !token) {
         return { success: false, mfaRequired: true };
       }
 
-      const loggedUser = { username: nome, email, role: tipo };
+      const loggedUser = { username: nome, email: responseEmail || email, role: tipo, mfaEnabled: !!mfaEnabled };
       setUser(loggedUser);
       localStorage.setItem('usuario', JSON.stringify(loggedUser));
       localStorage.setItem('token', token);

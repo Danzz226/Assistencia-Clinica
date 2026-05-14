@@ -91,7 +91,7 @@ const AuthForm = ({ mode = 'login', role = 'doctor' }) => {
     );
 
     if (result.mfaRequired) {
-      setMfaRequired(true);
+      setMfaRequired(true);setMfaCode('');
       setErrorMsg('Digite o código MFA do seu autenticador');
       return;
     }
@@ -218,10 +218,9 @@ const AuthForm = ({ mode = 'login', role = 'doctor' }) => {
         </div>
       )}
 
-      {/* Campo MFA — aparece somente quando o backend pede código */}
       {!isSignup && mfaRequired && (
         <div className="form-group">
-          <label>Código MFA (6 dígitos)</label>
+          <label>Código do autenticador</label>
           <input
             type="text"
             name="mfaCode"
