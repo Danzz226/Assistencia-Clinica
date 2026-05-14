@@ -18,7 +18,10 @@ import DoctorExams from './pages/Doctor/DoctorExams';
 import DoctorSchedule from './pages/Doctor/DoctorSchedule';
 
 // Paciente
-import PatientHome from './pages/Patient/PatientHome';
+import PatientHome        from './pages/Patient/PatientHome';
+import PatientConsultas   from './pages/Patient/PatientConsultas';
+import PatientExames      from './pages/Patient/PatientExames';
+import PatientDiagnostico from './pages/Patient/PatientDiagnostico';
 
 const AppRoutes = () => {
   return (
@@ -77,8 +80,11 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       >
-        <Route path="home" element={<PatientHome />} />
-        <Route path=""     element={<Navigate to="home" replace />} />
+        <Route path="home"             element={<PatientHome />} />
+        <Route path="consultas"        element={<PatientConsultas />} />
+        <Route path="historico-exames" element={<PatientExames />} />
+        <Route path="diagnostico"      element={<PatientDiagnostico />} />
+        <Route path=""                 element={<Navigate to="home" replace />} />
       </Route>
 
       {/* Fallback 404 */}

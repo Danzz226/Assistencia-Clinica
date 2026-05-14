@@ -40,16 +40,8 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('token', token);
       return { success: true, role: tipo };
     } catch (error) {
-      console.error("Erro ao fazer login", error);
-
-      const msg =
-        error.response?.data?.erro ||
-        error.response?.data?.message ||
-        (error.response
-          ? `Erro do servidor (${error.response.status})`
-          : 'Erro ao conectar ao servidor. Verifique se o backend está rodando.');
-
-      return { success: false, message: msg };
+      const message = error.response?.data?.erro || error.response?.data?.message || 'Usuário ou senha inválidos';
+      return { success: false, message };
     }
   };
 
@@ -59,8 +51,13 @@ export const AuthProvider = ({ children }) => {
    */
   const register = async (payload) => {
     try {
-      const response = await api.post('/auth/register', payload);
-      const { token, nome, tipo } = response.data;
+      await api.post('/auth/register', payload);
+      return { success: true };
+    } catch (error) {
+      const message = error.response?.data?.erro || error.response?.data?.message || 'Erro ao criar conta';
+      return { success: false, message };
+    }
+  };
 
       // Apenas retorna sucesso para que a tela redirecione ao login
 
