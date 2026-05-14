@@ -4,7 +4,7 @@ import api from '../../services/api';
 
 const INITIAL = { novaSenha: '', confirmar: '' };
 
-const ResetPasswordModal = ({ isOpen, onClose, usuario }) => {
+const ResetPasswordModal = ({ isOpen, onClose, usuario, isSelf = false }) => {
   const [form, setForm] = useState(INITIAL);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -28,10 +28,11 @@ const ResetPasswordModal = ({ isOpen, onClose, usuario }) => {
 
     setLoading(true);
     try {
-      await api.patch(`/usuarios/${usuario.id}/senha`, { novaSenha: form.novaSenha });
+      const url = isSelf ? '/usuarios/me/senha' : `/usuarios/${usuario.id}/senha`;
+      await api.patch(url, { novaSenha: form.novaSenha });
       handleClose();
     } catch (err) {
-      const msg = err.response?.data?.message || err.response?.data;
+      const msg = err.response?.data?.erro || err.response?.data?.message || err.response?.data;
       setError(typeof msg === 'string' ? msg : 'Erro ao redefinir senha.');
     } finally {
       setLoading(false);

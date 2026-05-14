@@ -2,6 +2,7 @@ package systema.clinico.clinica.controller;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -34,10 +35,30 @@ public class UsuarioController {
         return usuarioService.listarResumo();
     }
 
+    /**
+     * Retorna os dados do próprio usuário autenticado.
+     * Qualquer usuário logado pode acessar.
+     */
+    @GetMapping("/me")
+    @PreAuthorize("isAuthenticated()")
+    public UsuarioResumoDTO perfilProprio(Authentication authentication) {
+        return usuarioService.buscarResumoPorEmail(authentication.getName());
+    }
+
     @PatchMapping("/{id}/senha")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasRole('ADMIN')")
     public void redefinirSenha(@PathVariable Integer id, @RequestBody @Valid RedefinirSenhaDTO dto) {
         usuarioService.redefinirSenha(id, dto.novaSenha);
+    }
+
+    /**
+     * Permite ao próprio usuário autenticado redefinir sua senha.
+     */
+    @PatchMapping("/me/senha")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("isAuthenticated()")
+    public void redefinirSenhaPropria(@RequestBody @Valid RedefinirSenhaDTO dto, Authentication authentication) {
+        usuarioService.redefinirSenhaPorEmail(authentication.getName(), dto.novaSenha);
     }
 }

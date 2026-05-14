@@ -15,18 +15,25 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const login = async (email, password, mfaCode) => {
+  /**
+   * Login real via backend.
+   * Se o backend retornar mfaRequired: true, retorna { mfaRequired: true } para o formulário.
+   */
+  const login = async (email, password, selectedRole, mfaCode) => {
     try {
       const payload = { email, senha: password };
-      if (mfaCode) payload.mfaCode = mfaCode;
+      if (mfaCode) {
+        payload.mfaCode = mfaCode;
+      }
 
       const response = await api.post('/auth/login', payload);
+      const { token, nome, tipo, mfaRequired } = response.data;
 
-      if (response.data.mfaRequired) {
+      // Backend pede código MFA
+      if (mfaRequired && !token) {
         return { success: false, mfaRequired: true };
       }
 
-      const { token, nome, tipo } = response.data;
       const loggedUser = { username: nome, email, role: tipo };
       setUser(loggedUser);
       localStorage.setItem('usuario', JSON.stringify(loggedUser));
@@ -38,6 +45,10 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  /**
+   * Registro de novo usuário via backend (signup).
+   * Recebe payload já mapeado para os nomes do backend.
+   */
   const register = async (payload) => {
     try {
       await api.post('/auth/register', payload);
@@ -48,26 +59,21 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const fetchProfile = async () => {
-    try {
-      const response = await api.get('/auth/profile');
-      const updatedUser = { ...user, ...response.data };
-      setUser(updatedUser);
-      localStorage.setItem('usuario', JSON.stringify(updatedUser));
-      return { success: true, data: updatedUser };
-    } catch (error) {
-      const message = error.response?.data?.message || 'Erro ao buscar perfil';
-      return { success: false, message };
-    }
-  };
+      // Apenas retorna sucesso para que a tela redirecione ao login
 
-  const resetPassword = async (email) => {
-    try {
-      await api.post('/auth/reset-password', { email });
-      return { success: true };
+
+      return { success: true, role: tipo };
     } catch (error) {
-      const message = error.response?.data?.message || 'Erro ao redefinir senha';
-      return { success: false, message };
+      console.error("Erro ao registrar", error);
+
+      const msg =
+        error.response?.data?.erro ||
+        error.response?.data?.message ||
+        (error.response
+          ? `Erro do servidor (${error.response.status})`
+          : 'Erro ao conectar ao servidor.');
+
+      return { success: false, message: msg };
     }
   };
 
@@ -78,7 +84,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ authenticated: !!user, user, login, register, fetchProfile, resetPassword, logout, loading }}>
+    <AuthContext.Provider value={{ authenticated: !!user, user, login, register, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
