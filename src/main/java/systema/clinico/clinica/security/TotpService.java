@@ -27,21 +27,20 @@ public class TotpService {
     }
 
     public String otpauthUrl(String issuer, String account, String secret) {
-        String label = urlEncode(issuer + ":" + account);
+        String label = urlEncodePathSegment(issuer) + ":" + urlEncodePathSegment(account);
         return "otpauth://totp/" + label
-                + "?secret=" + secret
+                + "?secret=" + urlEncodeQueryParam(secret)
                 + "&issuer=" + urlEncode(issuer)
                 + "&algorithm=SHA1&digits=" + CODE_DIGITS
                 + "&period=" + TIME_STEP_SECONDS;
     }
-
     public boolean verificar(String secret, String code) {
         if (secret == null || secret.isBlank() || code == null || !code.matches("\\d{6}")) {
             return false;
         }
 
         long contadorAtual = Instant.now().getEpochSecond() / TIME_STEP_SECONDS;
-        for (long offset = -3; offset <= 3; offset++) {
+        for (long offset = -10; offset <= 10; offset++) {
             if (gerarCodigo(secret, contadorAtual + offset).equals(code)) {
                 return true;
             }
@@ -122,5 +121,13 @@ public class TotpService {
 
     private static String urlEncode(String value) {
         return URLEncoder.encode(value, StandardCharsets.UTF_8);
+    }
+
+    private static String urlEncodePathSegment(String value) {
+        return urlEncode(value).replace("+", "%20");
+    }
+
+    private static String urlEncodeQueryParam(String value) {
+        return urlEncode(value);
     }
 }

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { ChevronDown, User, Lock, LogOut, ShieldCheck, ShieldOff } from 'lucide-react';
 import UserProfileModal from '../Modal/UserProfileModal';
@@ -13,6 +13,10 @@ const Header = () => {
   const [resetModalOpen, setResetModalOpen] = useState(false);
   const [mfaModalOpen, setMfaModalOpen] = useState(false);
   const [mfaEnabled, setMfaEnabled] = useState(user?.mfaEnabled ?? false);
+
+  useEffect(() => {
+    setMfaEnabled(user?.mfaEnabled ?? false);
+  }, [user?.mfaEnabled]);
 
   const handleDisableMfa = () => {
     setMfaModalOpen(true);

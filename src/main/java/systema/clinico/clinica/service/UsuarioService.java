@@ -76,7 +76,7 @@ public class UsuarioService {
         criarPerfil(salvo, dto);
 
         String token = jwtService.gerarToken(salvo);
-        return new AuthResponseDTO(token, salvo.getNome(), salvo.getEmail(), salvo.getTipo());
+        return new AuthResponseDTO(token, salvo.getNome(), salvo.getEmail(), salvo.getTipo(), salvo.isMfaEnabled());
     }
 
     /** readOnly não pode ser usado aqui porque a migração de senha em texto pode persistir novo hash no login. */
@@ -90,12 +90,16 @@ public class UsuarioService {
             throw new IllegalArgumentException("E-mail ou senha inválidos");
         }
 
-        if (usuario.isMfaEnabled() && !totpService.verificar(usuario.getMfaSecret(), dto.mfaCode)) {
-            return new AuthResponseDTO(null, usuario.getNome(), usuario.getEmail(), usuario.getTipo(), true);
+        if (usuario.isMfaEnabled()) {
+            if (dto.mfaCode == null || dto.mfaCode.isBlank()) {
+                return new AuthResponseDTO(null, usuario.getNome(), usuario.getEmail(), usuario.getTipo(), true, true);
+            } else if (!totpService.verificar(usuario.getMfaSecret(), dto.mfaCode)) {
+                throw new IllegalArgumentException("Código MFA inválido");
+            }
         }
 
         String token = jwtService.gerarToken(usuario);
-        return new AuthResponseDTO(token, usuario.getNome(), usuario.getEmail(), usuario.getTipo());
+        return new AuthResponseDTO(token, usuario.getNome(), usuario.getEmail(), usuario.getTipo(), usuario.isMfaEnabled());
     }
 
     @Transactional(readOnly = true)
