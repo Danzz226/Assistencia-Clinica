@@ -26,7 +26,18 @@ public class AuthController {
 
     @PostMapping("/register")
     public AuthResponseDTO cadastrar(@RequestBody @Valid CadastroUsuarioDTO dto) {
-        return usuarioService.registrar(dto);
+        try {
+            return usuarioService.registrar(dto);
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            System.err.println("=== ERRO DE INTEGRIDADE NO BANCO DE DADOS ===");
+            e.printStackTrace();
+            throw new IllegalArgumentException("Conflito de dados detalhado: " + 
+                (e.getMostSpecificCause() != null ? e.getMostSpecificCause().getMessage() : e.getMessage()));
+        } catch (Exception e) {
+            System.err.println("=== ERRO GERAL NO CADASTRO ===");
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     @PostMapping("/login")

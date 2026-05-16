@@ -66,9 +66,15 @@ public class UsuarioService {
             throw new IllegalArgumentException("E-mail já cadastrado");
         }
 
+        String cpfLimpo = dto.cpf.replaceAll("[^0-9]", "");
+        if (usuarioRepository.findByCpf(cpfLimpo).isPresent()) {
+            throw new IllegalArgumentException("CPF já cadastrado");
+        }
+
         Usuario u = new Usuario();
         u.setNome(dto.nome.trim());
         u.setEmail(emailNorm);
+        u.setCpf(cpfLimpo); // salva apenas números
         u.setSenha(passwordEncoder.encode(dto.senha));
         u.setTipo(dto.tipo);
 

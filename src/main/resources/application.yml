@@ -9,9 +9,9 @@ spring:
     name: clinica
 
   datasource:
-    url: jdbc:mysql://localhost:3306/clinica?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-    username: root
-    password: 12711271**12
+    url: ${DB_URL:jdbc:mysql://localhost:3306/clinica?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    username: ${DB_USER:root}
+    password: ${DB_PASSWORD:12711271**12}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
     hikari:
