@@ -14,11 +14,13 @@ import systema.clinico.clinica.model.Medico;
 import systema.clinico.clinica.model.Paciente;
 import systema.clinico.clinica.model.Usuario;
 import systema.clinico.clinica.repository.AgendamentoRepository;
+import systema.clinico.clinica.repository.DiagnosticoRepository;
 import systema.clinico.clinica.repository.ExameRepository;
 import systema.clinico.clinica.repository.FuncionarioRepository;
 import systema.clinico.clinica.repository.MedicoRepository;
 import systema.clinico.clinica.repository.PacienteRepository;
 import systema.clinico.clinica.repository.ProntuarioRepository;
+import systema.clinico.clinica.repository.ReceitaRepository;
 import systema.clinico.clinica.repository.UsuarioRepository;
 
 import java.time.LocalDate;
@@ -35,6 +37,8 @@ public class PerfilController {
     private final ProntuarioRepository prontuarioRepository;
     private final ExameRepository exameRepository;
     private final AgendamentoRepository agendamentoRepository;
+    private final DiagnosticoRepository diagnosticoRepository;
+    private final ReceitaRepository receitaRepository;
 
     public PerfilController(
             UsuarioRepository usuarioRepository,
@@ -43,7 +47,9 @@ public class PerfilController {
             FuncionarioRepository funcionarioRepository,
             ProntuarioRepository prontuarioRepository,
             ExameRepository exameRepository,
-            AgendamentoRepository agendamentoRepository) {
+            AgendamentoRepository agendamentoRepository,
+            DiagnosticoRepository diagnosticoRepository,
+            ReceitaRepository receitaRepository) {
         this.usuarioRepository = usuarioRepository;
         this.medicoRepository = medicoRepository;
         this.pacienteRepository = pacienteRepository;
@@ -51,6 +57,8 @@ public class PerfilController {
         this.prontuarioRepository = prontuarioRepository;
         this.exameRepository = exameRepository;
         this.agendamentoRepository = agendamentoRepository;
+        this.diagnosticoRepository = diagnosticoRepository;
+        this.receitaRepository = receitaRepository;
     }
 
     @GetMapping("/medicos")
@@ -113,6 +121,7 @@ public class PerfilController {
     @PostMapping("/pacientes")
     @Transactional
     public PacienteResponse criarPaciente(@RequestBody @Valid PacienteRequest dto) {
+        if (dto.usuarioId == null) throw new IllegalArgumentException("usuarioId é obrigatório para criar paciente");
         Paciente paciente = new Paciente();
         paciente.setUsuario(usuario(dto.usuarioId));
         aplicarPaciente(paciente, dto);
@@ -123,7 +132,6 @@ public class PerfilController {
     @Transactional
     public PacienteResponse atualizarPaciente(@PathVariable Integer id, @RequestBody @Valid PacienteRequest dto) {
         Paciente paciente = paciente(id);
-        paciente.setUsuario(usuario(dto.usuarioId));
         aplicarPaciente(paciente, dto);
         return pacienteResponse(pacienteRepository.save(paciente));
     }
@@ -132,9 +140,11 @@ public class PerfilController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Transactional
     public void removerPaciente(@PathVariable Integer id) {
-        prontuarioRepository.clearPaciente(id);
-        exameRepository.clearPaciente(id);
-        agendamentoRepository.clearPaciente(id);
+        diagnosticoRepository.deleteByPacienteId(id);
+        receitaRepository.deleteByPacienteId(id);
+        prontuarioRepository.deleteByPacienteId(id);
+        exameRepository.deleteByPacienteId(id);
+        agendamentoRepository.deleteByPacienteId(id);
         pacienteRepository.delete(paciente(id));
     }
 
@@ -194,7 +204,9 @@ public class PerfilController {
 
     private static void aplicarMedico(Medico medico, MedicoRequest dto) {
         medico.setCrm(dto.crm);
+        medico.setUf(dto.uf);
         medico.setEspecialidade(dto.especialidade);
+        if (dto.telefone != null && !dto.telefone.isBlank()) medico.setTelefone(dto.telefone.trim());
     }
 
     private static void aplicarPaciente(Paciente paciente, PacienteRequest dto) {
@@ -207,7 +219,7 @@ public class PerfilController {
         Usuario usuario = medico.getUsuario();
         return new MedicoResponse(
                 medico.getId(), usuario.getId(), usuario.getNome(), usuario.getEmail(),
-                medico.getCrm(), medico.getEspecialidade());
+                medico.getCrm(), medico.getUf(), medico.getEspecialidade(), medico.getTelefone());
     }
 
     private PacienteResponse pacienteResponse(Paciente paciente) {
@@ -228,18 +240,25 @@ public class PerfilController {
         public Integer usuarioId;
         @Pattern(regexp = "^[0-9]{1,6}$", message = "CRM deve conter entre 1 e 6 dígitos numéricos")
         public String crm;
+        @Pattern(regexp = "^(AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SP|SE|TO)$",
+                 message = "UF inválida")
+        public String uf;
         @Size(max = 100)
         public String especialidade;
+        @Pattern(regexp = "^\\(\\d{2}\\) \\d{5}-\\d{4}$", message = "Telefone deve estar no formato (XX) XXXXX-XXXX")
+        @Size(max = 20)
+        public String telefone;
     }
 
     public record MedicoResponse(
-            Integer id, Integer usuarioId, String nome, String email, String crm, String especialidade) {
+            Integer id, Integer usuarioId, String nome, String email,
+            String crm, String uf, String especialidade, String telefone) {
     }
 
     public static class PacienteRequest {
-        @NotNull
         public Integer usuarioId;
         public LocalDate dataNascimento;
+        @Pattern(regexp = "^\\(\\d{2}\\) \\d{5}-\\d{4}$", message = "Telefone deve estar no formato: (11) 99999-9999")
         @Size(max = 20)
         public String telefone;
         public String endereco;

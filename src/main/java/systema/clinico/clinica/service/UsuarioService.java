@@ -1,5 +1,7 @@
 package systema.clinico.clinica.service;
 
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -7,6 +9,7 @@ import systema.clinico.clinica.dto.AuthResponseDTO;
 import systema.clinico.clinica.dto.CadastroUsuarioDTO;
 import systema.clinico.clinica.dto.LoginDTO;
 import systema.clinico.clinica.dto.MfaSetupResponseDTO;
+import systema.clinico.clinica.dto.EditarUsuarioDTO;
 import systema.clinico.clinica.dto.UsuarioResumoDTO;
 import systema.clinico.clinica.model.Admin;
 import systema.clinico.clinica.model.Funcionario;
@@ -15,9 +18,15 @@ import systema.clinico.clinica.model.Paciente;
 import systema.clinico.clinica.model.Usuario;
 import systema.clinico.clinica.model.enums.TipoUsuario;
 import systema.clinico.clinica.repository.AdminRepository;
+import systema.clinico.clinica.repository.AgendamentoRepository;
+import systema.clinico.clinica.repository.DiagnosticoRepository;
+import systema.clinico.clinica.repository.ExameRepository;
 import systema.clinico.clinica.repository.FuncionarioRepository;
+import systema.clinico.clinica.repository.HorarioRepository;
 import systema.clinico.clinica.repository.MedicoRepository;
 import systema.clinico.clinica.repository.PacienteRepository;
+import systema.clinico.clinica.repository.ProntuarioRepository;
+import systema.clinico.clinica.repository.ReceitaRepository;
 import systema.clinico.clinica.repository.UsuarioRepository;
 import systema.clinico.clinica.security.JwtService;
 import systema.clinico.clinica.security.TotpService;
@@ -34,6 +43,12 @@ public class UsuarioService {
     private final MedicoRepository medicoRepository;
     private final AdminRepository adminRepository;
     private final FuncionarioRepository funcionarioRepository;
+    private final AgendamentoRepository agendamentoRepository;
+    private final HorarioRepository horarioRepository;
+    private final ProntuarioRepository prontuarioRepository;
+    private final DiagnosticoRepository diagnosticoRepository;
+    private final ReceitaRepository receitaRepository;
+    private final ExameRepository exameRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final TotpService totpService;
@@ -44,6 +59,12 @@ public class UsuarioService {
             MedicoRepository medicoRepository,
             AdminRepository adminRepository,
             FuncionarioRepository funcionarioRepository,
+            AgendamentoRepository agendamentoRepository,
+            HorarioRepository horarioRepository,
+            ProntuarioRepository prontuarioRepository,
+            DiagnosticoRepository diagnosticoRepository,
+            ReceitaRepository receitaRepository,
+            ExameRepository exameRepository,
             PasswordEncoder passwordEncoder,
             JwtService jwtService,
             TotpService totpService) {
@@ -52,6 +73,12 @@ public class UsuarioService {
         this.medicoRepository = medicoRepository;
         this.adminRepository = adminRepository;
         this.funcionarioRepository = funcionarioRepository;
+        this.agendamentoRepository = agendamentoRepository;
+        this.horarioRepository = horarioRepository;
+        this.prontuarioRepository = prontuarioRepository;
+        this.diagnosticoRepository = diagnosticoRepository;
+        this.receitaRepository = receitaRepository;
+        this.exameRepository = exameRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.totpService = totpService;
@@ -114,9 +141,77 @@ public class UsuarioService {
     }
 
     @Transactional
+    public void deletar(Integer id) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
+
+        switch (usuario.getTipo()) {
+            case medico -> medicoRepository.findByUsuario_Id(id).ifPresent(medico -> {
+                agendamentoRepository.clearMedico(medico.getId());
+                horarioRepository.deleteByMedico_Id(medico.getId());
+                medicoRepository.delete(medico);
+            });
+            case paciente -> pacienteRepository.findByUsuario_Id(id).ifPresent(paciente -> {
+                diagnosticoRepository.deleteByPacienteId(paciente.getId());
+                receitaRepository.deleteByPacienteId(paciente.getId());
+                prontuarioRepository.deleteByPacienteId(paciente.getId());
+                exameRepository.deleteByPacienteId(paciente.getId());
+                agendamentoRepository.deleteByPacienteId(paciente.getId());
+                pacienteRepository.delete(paciente);
+            });
+            case admin -> adminRepository.findByUsuario_Id(id).ifPresent(adminRepository::delete);
+            case funcionario -> funcionarioRepository.findByUsuario_Id(id).ifPresent(funcionarioRepository::delete);
+        }
+
+        usuarioRepository.delete(usuario);
+    }
+
+    @Transactional
+    public void atualizar(Integer id, EditarUsuarioDTO dto, Authentication authentication) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
+
+        boolean isMedico = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_MEDICO"));
+        
+        if (isMedico && usuario.getTipo() != TipoUsuario.paciente) {
+            throw new AccessDeniedException("Médicos só podem editar perfis de pacientes.");
+        }
+
+        String emailNorm = normalizarEmail(dto.email);
+        if (!usuario.getEmail().equals(emailNorm)) {
+            if (usuarioRepository.findByEmail(emailNorm).isPresent()) {
+                throw new IllegalArgumentException("E-mail já está em uso por outro usuário");
+            }
+            usuario.setEmail(emailNorm);
+        }
+
+        usuario.setNome(dto.nome.trim());
+        usuarioRepository.save(usuario);
+
+        switch (usuario.getTipo()) {
+            case paciente -> pacienteRepository.findByUsuario_Id(usuario.getId()).ifPresent(p -> {
+                p.setDataNascimento(dto.dataNascimento);
+                if (dto.telefone != null && !dto.telefone.isBlank()) p.setTelefone(dto.telefone.trim());
+                if (dto.endereco != null && !dto.endereco.isBlank()) p.setEndereco(dto.endereco.trim());
+                pacienteRepository.save(p);
+            });
+            case medico -> medicoRepository.findByUsuario_Id(usuario.getId()).ifPresent(m -> {
+                if (dto.crm != null && !dto.crm.isBlank()) m.setCrm(dto.crm.trim());
+                if (dto.uf != null && !dto.uf.isBlank()) m.setUf(dto.uf.trim());
+                if (dto.especialidade != null && !dto.especialidade.isBlank()) m.setEspecialidade(dto.especialidade.trim());
+                if (dto.telefone != null && !dto.telefone.isBlank()) m.setTelefone(dto.telefone.trim());
+                medicoRepository.save(m);
+            });
+            default -> {}
+        }
+    }
+
+    @Transactional
     public void redefinirSenha(Integer id, String novaSenha) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario nao encontrado"));
+        validarSenhaDiferente(usuario, novaSenha);
         usuario.setSenha(passwordEncoder.encode(novaSenha));
         usuarioRepository.save(usuario);
     }
@@ -134,6 +229,7 @@ public class UsuarioService {
     @Transactional
     public void redefinirSenhaPorEmail(String email, String novaSenha) {
         Usuario usuario = buscarPorEmailAutenticado(email);
+        validarSenhaDiferente(usuario, novaSenha);
         usuario.setSenha(passwordEncoder.encode(novaSenha));
         usuarioRepository.save(usuario);
     }
@@ -213,9 +309,9 @@ public class UsuarioService {
                 Medico m = new Medico();
                 m.setUsuario(salvo);
                 m.setCrm(dto.crm.trim());
-                if (dto.especialidade != null && !dto.especialidade.isBlank()) {
-                    m.setEspecialidade(dto.especialidade.trim());
-                }
+                if (dto.uf != null && !dto.uf.isBlank()) m.setUf(dto.uf.trim());
+                if (dto.especialidade != null && !dto.especialidade.isBlank()) m.setEspecialidade(dto.especialidade.trim());
+                if (dto.telefone != null && !dto.telefone.isBlank()) m.setTelefone(dto.telefone.trim());
                 medicoRepository.save(m);
             }
             case funcionario -> {
@@ -237,6 +333,15 @@ public class UsuarioService {
                 pacienteRepository.save(p);
             }
         }
+    }
+
+    private void validarSenhaDiferente(Usuario usuario, String novaSenha) {
+        String armazenada = usuario.getSenha();
+        if (armazenada == null) return;
+        boolean igual = armazenada.startsWith("$2")
+                ? passwordEncoder.matches(novaSenha, armazenada)
+                : novaSenha.equals(armazenada);
+        if (igual) throw new IllegalArgumentException("A nova senha não pode ser igual à senha atual.");
     }
 
     /**
