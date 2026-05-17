@@ -122,7 +122,7 @@ public class AtendimentoController {
     @GetMapping("/prontuarios")
     @Transactional(readOnly = true)
     public List<ProntuarioResponse> listarProntuarios() {
-        return prontuarioRepository.findAll().stream().map(this::prontuarioResponse).toList();
+        return prontuarioRepository.findByPacienteIsNotNull().stream().map(this::prontuarioResponse).toList();
     }
 
     @GetMapping("/prontuarios/{id}")
@@ -338,14 +338,21 @@ public class AtendimentoController {
     }
 
     private ExameResponse exameResponse(Exame e) {
-        return new ExameResponse(e.getId(), e.getPaciente().getId(), e.getPaciente().getUsuario().getNome(),
-                e.getMedico().getId(), e.getMedico().getUsuario().getNome(), e.getTipo(), e.getResultado(),
-                e.getDataExame());
+        Integer pacienteId = e.getPaciente() != null ? e.getPaciente().getId() : null;
+        String pacienteNome = e.getPaciente() != null ? e.getPaciente().getUsuario().getNome() : null;
+        Integer medicoId = e.getMedico() != null ? e.getMedico().getId() : null;
+        String medicoNome = e.getMedico() != null ? e.getMedico().getUsuario().getNome() : null;
+        return new ExameResponse(e.getId(), pacienteId, pacienteNome, medicoId, medicoNome,
+                e.getTipo(), e.getResultado(), e.getDataExame());
     }
 
     private ProntuarioResponse prontuarioResponse(Prontuario p) {
-        return new ProntuarioResponse(p.getId(), p.getPaciente().getId(), p.getPaciente().getUsuario().getNome(),
-                p.getMedico().getId(), p.getMedico().getUsuario().getNome(), p.getDescricao(), p.getDataRegistro());
+        Integer pacienteId = p.getPaciente() != null ? p.getPaciente().getId() : null;
+        String pacienteNome = p.getPaciente() != null ? p.getPaciente().getUsuario().getNome() : null;
+        Integer medicoId = p.getMedico() != null ? p.getMedico().getId() : null;
+        String medicoNome = p.getMedico() != null ? p.getMedico().getUsuario().getNome() : null;
+        return new ProntuarioResponse(p.getId(), pacienteId, pacienteNome, medicoId, medicoNome,
+                p.getDescricao(), p.getDataRegistro());
     }
 
     private DiagnosticoResponse diagnosticoResponse(Diagnostico d) {

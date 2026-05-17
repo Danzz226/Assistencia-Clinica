@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Lock, Mail, User, Stethoscope, Briefcase, Calendar, Phone, MapPin } from 'lucide-react';
+import { Lock, Mail, Stethoscope, Briefcase, Calendar, Phone, MapPin, CreditCard } from 'lucide-react';
 import Modal from './Modal';
 import ResetPasswordModal from './ResetPasswordModal';
 import Badge from '../Badge/Badge';
@@ -39,7 +39,7 @@ const InfoRow = ({ icon: Icon, label, value }) => {
   if (!value) return null;
   return (
     <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem', padding: '0.6rem 0', borderBottom: '1px solid #f5f5f5' }}>
-      <Icon size={16} style={{ color: '#30e3a7', marginTop: 2, flexShrink: 0 }} />
+      <Icon size={16} style={{ color: 'var(--primary-color)', marginTop: 2, flexShrink: 0 }} />
       <div>
         <div style={{ fontSize: '0.75rem', color: '#999', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>{label}</div>
         <div style={{ fontSize: '0.92rem', color: '#333', marginTop: 2 }}>{value}</div>
@@ -48,7 +48,7 @@ const InfoRow = ({ icon: Icon, label, value }) => {
   );
 };
 
-const UserProfileModal = ({ isOpen, onClose, usuario }) => {
+const UserProfileModal = ({ isOpen, onClose, usuario, isSelf = false }) => {
   const [perfil, setPerfil] = useState(null);
   const [loading, setLoading] = useState(false);
   const [resetOpen, setResetOpen] = useState(false);
@@ -57,18 +57,23 @@ const UserProfileModal = ({ isOpen, onClose, usuario }) => {
     if (!isOpen || !usuario) return;
     setPerfil(null);
 
-    const endpoint = TIPO_ENDPOINT[usuario.tipo];
-    if (!endpoint) return;
+    const tipo = usuario.tipo;
+    if (!TIPO_ENDPOINT[tipo]) return;
 
     setLoading(true);
-    api.get(endpoint)
-      .then(res => {
-        const found = (res.data || []).find(p => p.usuarioId === usuario.id);
-        setPerfil(found || null);
-      })
+
+    const request = isSelf && tipo === 'medico'
+      ? api.get('/medicos/me')
+      : api.get(TIPO_ENDPOINT[tipo]).then(res => {
+          const found = (res.data || []).find(p => p.usuarioId === usuario.id);
+          return { data: found || null };
+        });
+
+    request
+      .then(res => setPerfil(res.data || null))
       .catch(() => setPerfil(null))
       .finally(() => setLoading(false));
-  }, [isOpen, usuario]);
+  }, [isOpen, usuario, isSelf]);
 
   const handleClose = () => {
     setPerfil(null);
@@ -80,12 +85,16 @@ const UserProfileModal = ({ isOpen, onClose, usuario }) => {
     return new Date(dateStr + 'T00:00:00').toLocaleDateString('pt-BR');
   };
 
+  const formatCrm = (crm, uf) => {
+    if (!crm) return null;
+    return uf ? `${uf}/${crm}` : crm;
+  };
+
   return (
     <>
       <Modal isOpen={isOpen} onClose={handleClose} title="Perfil do Usuário">
         {usuario && (
           <div>
-            {/* Cabeçalho com avatar */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem', padding: '1rem', background: '#f9fbfa', borderRadius: 10 }}>
               <Avatar nome={usuario.nome} />
               <div>
@@ -97,7 +106,6 @@ const UserProfileModal = ({ isOpen, onClose, usuario }) => {
               </div>
             </div>
 
-            {/* Infos gerais */}
             <div style={{ marginBottom: '0.5rem' }}>
               <InfoRow icon={Mail} label="E-mail" value={usuario.email} />
 
@@ -105,15 +113,14 @@ const UserProfileModal = ({ isOpen, onClose, usuario }) => {
                 <p style={{ fontSize: '0.85rem', color: '#aaa', padding: '0.75rem 0' }}>Carregando dados do perfil...</p>
               )}
 
-              {/* Médico */}
               {!loading && usuario.tipo === 'medico' && (
                 <>
-                  <InfoRow icon={Stethoscope} label="CRM" value={perfil?.crm} />
-                  <InfoRow icon={User} label="Especialidade" value={perfil?.especialidade} />
+                  <InfoRow icon={CreditCard} label="CRM" value={formatCrm(perfil?.crm, perfil?.uf)} />
+                  <InfoRow icon={Stethoscope} label="Especialidade" value={perfil?.especialidade} />
+                  <InfoRow icon={Phone} label="Telefone" value={perfil?.telefone} />
                 </>
               )}
 
-              {/* Paciente */}
               {!loading && usuario.tipo === 'paciente' && (
                 <>
                   <InfoRow icon={Calendar} label="Data de Nascimento" value={formatDate(perfil?.dataNascimento)} />
@@ -122,18 +129,15 @@ const UserProfileModal = ({ isOpen, onClose, usuario }) => {
                 </>
               )}
 
-              {/* Funcionário */}
               {!loading && usuario.tipo === 'funcionario' && (
                 <InfoRow icon={Briefcase} label="Cargo" value={perfil?.cargo} />
               )}
 
-              {/* Admin sem campos extras */}
               {!loading && usuario.tipo === 'admin' && (
                 <p style={{ fontSize: '0.85rem', color: '#aaa', padding: '0.5rem 0' }}>Administrador do sistema.</p>
               )}
             </div>
 
-            {/* Rodapé com ação */}
             <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid #f0f0f0', display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
               <button className="modal-btn-cancel" onClick={handleClose}>Fechar</button>
               <button
@@ -153,6 +157,7 @@ const UserProfileModal = ({ isOpen, onClose, usuario }) => {
         isOpen={resetOpen}
         onClose={() => setResetOpen(false)}
         usuario={usuario}
+        isSelf={isSelf}
       />
     </>
   );

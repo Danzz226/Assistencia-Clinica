@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import Modal from './Modal';
 import api from '../../services/api';
 import { useToast } from '../../context/ToastContext';
+import PasswordStrengthMeter, { getPasswordStrength } from './PasswordStrengthMeter';
+import PasswordInput from './PasswordInput';
 
 const INITIAL = { novaSenha: '', confirmar: '' };
 
@@ -23,6 +25,14 @@ const ResetPasswordModal = ({ isOpen, onClose, usuario, isSelf = false }) => {
     e.preventDefault();
     setError('');
 
+    if (form.novaSenha.length < 8) {
+      setError('A senha deve ter no mínimo 8 caracteres.');
+      return;
+    }
+    if (getPasswordStrength(form.novaSenha).level < 2) {
+      toast.error('senha muito fraca');
+      return;
+    }
     if (form.novaSenha !== form.confirmar) {
       setError('As senhas não coincidem.');
       return;
@@ -52,24 +62,23 @@ const ResetPasswordModal = ({ isOpen, onClose, usuario, isSelf = false }) => {
       <form className="modal-form" onSubmit={handleSubmit}>
         <div className="modal-field">
           <label>Nova senha *</label>
-          <input
-            type="password"
+          <PasswordInput
             value={form.novaSenha}
             onChange={set('novaSenha')}
             required
-            minLength={6}
+            minLength={8}
             maxLength={255}
-            placeholder="Mínimo 6 caracteres"
+            placeholder="Mínimo 8 caracteres"
           />
+          <PasswordStrengthMeter password={form.novaSenha} />
         </div>
         <div className="modal-field">
           <label>Confirmar senha *</label>
-          <input
-            type="password"
+          <PasswordInput
             value={form.confirmar}
             onChange={set('confirmar')}
             required
-            minLength={6}
+            minLength={8}
             maxLength={255}
             placeholder="Confirme sua nova senha"
           />

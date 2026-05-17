@@ -111,6 +111,15 @@
     }
   }
 
+  select {
+    appearance: none;
+    padding-right: 2.5rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    cursor: pointer;
+  }
+
   textarea {
     resize: vertical;
     min-height: 72px;
@@ -161,6 +170,76 @@
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+  }
+}
+
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  input {
+    width: 100%;
+    padding-right: 2.4rem !important;
+  }
+
+  .password-input-toggle {
+    position: absolute;
+    right: 0.65rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    color: var(--primary-color);
+    transition: opacity 0.15s;
+
+    &:hover { opacity: 0.7; }
+  }
+}
+
+.password-strength {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+
+  &-bars {
+    display: flex;
+    gap: 4px;
+    flex: 1;
+  }
+
+  &-bar {
+    flex: 1;
+    height: 4px;
+    border-radius: 4px;
+    background: var(--border-color);
+    transition: background 0.25s;
+  }
+
+  &-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    min-width: 36px;
+    text-align: right;
+    transition: color 0.25s;
+  }
+
+  &--weak {
+    .password-strength-bar.active { background: var(--color-danger); }
+    .password-strength-label      { color: var(--color-danger); }
+  }
+
+  &--medium {
+    .password-strength-bar.active { background: var(--color-medium); }
+    .password-strength-label      { color: var(--color-medium); }
+  }
+
+  &--strong {
+    .password-strength-bar.active { background: var(--color-success); }
+    .password-strength-label      { color: var(--color-success); }
   }
 }
 
@@ -216,14 +295,14 @@
 
   svg {
     flex-shrink: 0;
-    color: #777;
+    color: var(--primary-color);
   }
 
   &:hover {
     background: var(--surface-hover);
 
     svg {
-      color: var(--text-dark);
+      color: var(--primary-color);
     }
   }
 

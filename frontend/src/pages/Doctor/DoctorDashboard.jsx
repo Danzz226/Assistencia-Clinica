@@ -44,62 +44,42 @@ const DoctorDashboard = () => {
   useEffect(() => {
     const fetchDados = async () => {
       try {
-        // TODO [BACKEND]: Substituir por GET /auth/me ou usar perfilId do token JWT
-        // quando implementado. Por agora buscamos todos os médicos e filtramos pelo email.
         const medicoRes = await api.get('/medicos/me');
         const medicoLogado = medicoRes.data;
-
         setMedicoId(medicoLogado.id);
         setMedicoNome(medicoLogado.nome);
 
-        // TODO [BACKEND]: Substituir por GET /prontuarios?medicoId={id}
-        const prontuariosRes = await api.get('/prontuarios');
-        const todosProntuarios = prontuariosRes.data || [];
-        const meusProntuarios = todosProntuarios.filter(
-          (p) => p.medicoId === medicoLogado.id
-        );
+        // /pacientes buscado separado para não ser afetado por falha em outras chamadas
+        const pacientesRes = await api.get('/pacientes');
+        setStats(prev => ({ ...prev, pacientes: (pacientesRes.data || []).length }));
 
-        // TODO [BACKEND]: Substituir por GET /horarios?medicoId={id}
-        const horariosRes = await api.get('/horarios');
-        const todosHorarios = horariosRes.data || [];
-        const meusHorarios = todosHorarios.filter(
-          (h) => h.medicoId === medicoLogado.id
-        );
-        const horariosHoje = meusHorarios.filter(
-          (h) => h.diaSemana === getDiaSemanaHoje()
-        );
+        try {
+          const [prontuariosRes, horariosRes] = await Promise.all([
+            api.get('/prontuarios'),
+            api.get('/horarios'),
+          ]);
 
-        // Pacientes únicos via prontuários
-        const pacientesUnicos = new Set(meusProntuarios.map((p) => p.pacienteId));
+          const meusProntuarios = (prontuariosRes.data || []).filter(
+            (p) => p.medicoId === medicoLogado.id
+          );
+          const horariosHoje = (horariosRes.data || [])
+            .filter((h) => h.medicoId === medicoLogado.id && h.diaSemana === getDiaSemanaHoje());
 
-        setStats({
-          pacientes: pacientesUnicos.size,
-          prontuarios: meusProntuarios.length,
-          horariosHoje,
-        });
+          setStats(prev => ({
+            ...prev,
+            prontuarios: meusProntuarios.length,
+            horariosHoje,
+          }));
 
-        // 5 prontuários mais recentes
-        const recentes = [...meusProntuarios]
-          .sort((a, b) => new Date(b.dataRegistro) - new Date(a.dataRegistro))
-          .slice(0, 5);
-        setProntuariosRecentes(recentes);
-      } catch (error) {
-        console.warn('⚠️ Backend offline — carregando dados mock para visualização.');
-        // MOCK: Dados fictícios para testar a UI sem o backend
-        const nomeUsuario = user?.username?.split('@')[0] || 'Médico';
-        setMedicoNome(nomeUsuario.charAt(0).toUpperCase() + nomeUsuario.slice(1));
-        setStats({
-          pacientes: 12,
-          prontuarios: 47,
-          horariosHoje: [{ horaInicio: '08:00', horaFim: '12:00' }],
-        });
-        setProntuariosRecentes([
-          { id: 1, pacienteNome: 'Ana Oliveira',    descricao: 'Consulta de rotina — pressão arterial estável.', dataRegistro: '2026-05-10T09:30:00' },
-          { id: 2, pacienteNome: 'Bruno Santos',    descricao: 'Revisão pós-cirúrgica, cicatrização normal.', dataRegistro: '2026-05-09T14:00:00' },
-          { id: 3, pacienteNome: 'Carla Mendes',    descricao: 'Queixa de dor abdominal, solicitado exame.', dataRegistro: '2026-05-08T10:15:00' },
-          { id: 4, pacienteNome: 'Diego Almeida',   descricao: 'Acompanhamento diabetes tipo 2.', dataRegistro: '2026-05-07T11:00:00' },
-          { id: 5, pacienteNome: 'Eduarda Ferreira', descricao: 'Retorno de resultado de exame laboratorial.', dataRegistro: '2026-05-06T16:30:00' },
-        ]);
+          const recentes = [...meusProntuarios]
+            .sort((a, b) => new Date(b.dataRegistro) - new Date(a.dataRegistro))
+            .slice(0, 5);
+          setProntuariosRecentes(recentes);
+        } catch {
+          // prontuários/horários indisponíveis, mas contagem de pacientes já está correta
+        }
+      } catch {
+        setMedicoNome(user?.nome || 'Médico');
       } finally {
         setLoading(false);
       }
@@ -141,7 +121,7 @@ const DoctorDashboard = () => {
             <Users size={24} />
           </div>
           <div className="doctor-dashboard__card-title">MEUS PACIENTES</div>
-          <div className="doctor-dashboard__card-subtitle">Pacientes com prontuário</div>
+          <div className="doctor-dashboard__card-subtitle">Total de pacientes</div>
           <div className="doctor-dashboard__card-number">
             {loading ? '—' : stats.pacientes}
           </div>
