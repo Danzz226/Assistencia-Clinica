@@ -19,7 +19,15 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Intege
 
     List<Agendamento> findByPaciente_Id(Integer pacienteId);
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("UPDATE Agendamento a SET a.paciente = null WHERE a.paciente.id = :id")
     void clearPaciente(@Param("id") Integer pacienteId);
+
+    @Modifying(clearAutomatically = true)
+    @Query("UPDATE Agendamento a SET a.medico = null WHERE a.medico.id = :id")
+    void clearMedico(@Param("id") Integer medicoId);
+
+    @Modifying(clearAutomatically = true)
+    @Query(value = "DELETE FROM agendamentos WHERE paciente_id = :pacienteId", nativeQuery = true)
+    void deleteByPacienteId(@Param("pacienteId") Integer pacienteId);
 }

@@ -8,7 +8,11 @@ import systema.clinico.clinica.model.Exame;
 
 public interface ExameRepository extends JpaRepository<Exame, Integer> {
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("UPDATE Exame e SET e.paciente = null WHERE e.paciente.id = :id")
     void clearPaciente(@Param("id") Integer pacienteId);
+
+    @Modifying(clearAutomatically = true)
+    @Query(value = "DELETE FROM exames WHERE paciente_id = :pacienteId", nativeQuery = true)
+    void deleteByPacienteId(@Param("pacienteId") Integer pacienteId);
 }
