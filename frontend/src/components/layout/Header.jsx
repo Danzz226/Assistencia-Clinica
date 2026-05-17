@@ -138,6 +138,7 @@ const Header = () => {
         isOpen={profileModalOpen}
         onClose={() => setProfileModalOpen(false)}
         usuario={mappedUser}
+        isSelf={true}
       />
 
       <ResetPasswordModal

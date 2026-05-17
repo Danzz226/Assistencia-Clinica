@@ -35,7 +35,9 @@ const ManageUsers = () => {
   const fetchUsuarios = useCallback(async () => {
     try {
       const response = await api.get('/usuarios');
-      setUsuarios(response.data);
+
+      const filteredUsuarios = response.data.filter(u => u.tipo?.toLowerCase() !== 'admin');
+      setUsuarios(filteredUsuarios);
     } catch (error) {
       setUsuarios([]);
       const msg = error.response?.data?.message
@@ -46,9 +48,45 @@ const ManageUsers = () => {
 
   useEffect(() => { fetchUsuarios(); }, [fetchUsuarios]);
 
-  const openEdit = (row) => {
+  const formatPhone = (val) => {
+    if (!val) return '';
+    let num = val.replace(/\D/g, '');
+    if (num.length > 11) num = num.substring(0, 11);
+    if (num.length <= 2) return num ? `(${num}` : '';
+    if (num.length <= 7) return `(${num.substring(0, 2)}) ${num.substring(2)}`;
+    return `(${num.substring(0, 2)}) ${num.substring(2, 7)}-${num.substring(7)}`;
+  };
+
+  const openEdit = async (row) => {
     setEditUser(row);
     setEditForm({ nome: row.nome, email: row.email, tipo: row.tipo });
+
+    try {
+      if (row.tipo === 'paciente') {
+        const res = await api.get('/pacientes');
+        const p = res.data.find(x => x.usuarioId === row.id);
+        if (p) {
+          setEditForm(prev => ({
+            ...prev,
+            telefone: formatPhone(p.telefone),
+            dataNascimento: p.dataNascimento || '',
+            endereco: p.endereco || ''
+          }));
+        }
+      } else if (row.tipo === 'medico') {
+        const res = await api.get('/medicos');
+        const m = res.data.find(x => x.usuarioId === row.id);
+        if (m) {
+          setEditForm(prev => ({
+            ...prev,
+            crm: m.crm || '',
+            especialidade: m.especialidade || ''
+          }));
+        }
+      }
+    } catch (e) {
+      console.error('Erro ao carregar dados do perfil', e);
+    }
   };
 
   const openDelete = (row) => setDeleteUser(row);
@@ -74,6 +112,12 @@ const ManageUsers = () => {
   };
 
   const handleEditSave = async () => {
+    const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!EMAIL_RE.test(editForm.email)) {
+      toast.error('Formato de e-mail inválido.');
+      return;
+    }
+
     setSaving(true);
     try {
       await api.put(`/usuarios/${editUser.id}`, editForm);
@@ -92,7 +136,7 @@ const ManageUsers = () => {
     try {
       await api.delete(`/usuarios/${deleteUser.id}`);
       setUsuarios(prev => prev.filter(u => u.id !== deleteUser.id));
-      toast.success('Usuário excluído com sucesso!');
+      toast.delete('Usuário excluído com sucesso!');
       setDeleteUser(null);
     } catch {
       toast.error('Erro ao excluir usuário.');
@@ -229,15 +273,41 @@ const ManageUsers = () => {
             <label>Email</label>
             <input type="email" value={editForm.email || ''} onChange={(e) => setEditForm({ ...editForm, email: e.target.value })} />
           </div>
-          <div className="modal-field">
-            <label>Tipo</label>
-            <select value={editForm.tipo || ''} onChange={(e) => setEditForm({ ...editForm, tipo: e.target.value })}>
-              <option value="admin">Admin</option>
-              <option value="medico">Médico</option>
-              <option value="paciente">Paciente</option>
-              <option value="funcionario">Funcionário</option>
-            </select>
-          </div>
+
+          {editForm.tipo === 'paciente' && (
+            <>
+              <div className="modal-field">
+                <label>Data de Nascimento</label>
+                <input type="date" value={editForm.dataNascimento || ''} onChange={(e) => setEditForm({ ...editForm, dataNascimento: e.target.value })} />
+              </div>
+              <div className="modal-field">
+                <label>Telefone</label>
+                <input 
+                  value={editForm.telefone || ''} 
+                  onChange={(e) => setEditForm({ ...editForm, telefone: formatPhone(e.target.value) })} 
+                  maxLength={15}
+                  placeholder="(00) 00000-0000"
+                />
+              </div>
+              <div className="modal-field">
+                <label>Endereço</label>
+                <input value={editForm.endereco || ''} onChange={(e) => setEditForm({ ...editForm, endereco: e.target.value })} />
+              </div>
+            </>
+          )}
+
+          {editForm.tipo === 'medico' && (
+            <>
+              <div className="modal-field">
+                <label>CRM</label>
+                <input value={editForm.crm || ''} onChange={(e) => setEditForm({ ...editForm, crm: e.target.value })} maxLength={6} />
+              </div>
+              <div className="modal-field">
+                <label>Especialidade</label>
+                <input value={editForm.especialidade || ''} onChange={(e) => setEditForm({ ...editForm, especialidade: e.target.value })} />
+              </div>
+            </>
+          )}
           <div className="modal-footer">
             <button className="modal-btn-cancel" onClick={() => setEditUser(null)}>Cancelar</button>
             <button className="modal-btn-submit" onClick={handleEditSave} disabled={saving}>
