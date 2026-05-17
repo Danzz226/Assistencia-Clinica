@@ -11,7 +11,13 @@ import java.util.List;
 public interface ProntuarioRepository extends JpaRepository<Prontuario, Integer> {
     List<Prontuario> findByPaciente_Id(Integer pacienteId);
 
-    @Modifying
+    List<Prontuario> findByPacienteIsNotNull();
+
+    @Modifying(clearAutomatically = true)
     @Query("UPDATE Prontuario p SET p.paciente = null WHERE p.paciente.id = :id")
     void clearPaciente(@Param("id") Integer pacienteId);
+
+    @Modifying(clearAutomatically = true)
+    @Query(value = "DELETE FROM prontuarios WHERE paciente_id = :pacienteId", nativeQuery = true)
+    void deleteByPacienteId(@Param("pacienteId") Integer pacienteId);
 }
