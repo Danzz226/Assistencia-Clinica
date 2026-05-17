@@ -89,6 +89,15 @@
     .toast__icon { background: #fee2e2; color: #dc2626; }
     .toast__label { color: #b91c1c; }
   }
+
+  &--delete {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #7f1d1d;
+
+    .toast__icon { background: #fee2e2; color: #dc2626; }
+    .toast__label { color: #b91c1c; }
+  }
 }
 
 @keyframes toastSlideIn {

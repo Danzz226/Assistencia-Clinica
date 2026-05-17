@@ -1,11 +1,12 @@
 import React from 'react';
-import { CheckCircle2, XCircle, X } from 'lucide-react';
+import { CheckCircle2, XCircle, Trash2, X } from 'lucide-react';
 import './Toast.scss';
 
-const LABELS = { success: 'Sucesso', error: 'Erro' };
+const LABELS = { success: 'Sucesso', error: 'Erro', delete: 'Excluído' };
 const ICONS  = {
   success: <CheckCircle2 size={18} />,
   error:   <XCircle size={18} />,
+  delete:  <Trash2 size={18} />,
 };
 
 const ToastContainer = ({ toasts, onRemove }) => (

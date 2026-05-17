@@ -20,6 +20,7 @@ export const ToastProvider = ({ children }) => {
   const toast = useMemo(() => ({
     success: (msg) => addToast('success', msg),
     error:   (msg) => addToast('error', msg),
+    delete:  (msg) => addToast('delete', msg),
   }), [addToast]);
 
   return (
