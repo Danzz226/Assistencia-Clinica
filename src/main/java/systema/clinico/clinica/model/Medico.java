@@ -22,6 +22,12 @@ public class Medico {
     @Column(nullable = false, length = 50)
     private String crm;
 
+    @Column(length = 2)
+    private String uf;
+
     @Column(length = 100)
     private String especialidade;
+
+    @Column(length = 20)
+    private String telefone;
 }
