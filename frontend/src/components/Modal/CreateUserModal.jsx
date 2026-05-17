@@ -2,6 +2,21 @@ import React, { useState } from 'react';
 import Modal from './Modal';
 import api from '../../services/api';
 import { useToast } from '../../context/ToastContext';
+import PasswordStrengthMeter, { getPasswordStrength } from './PasswordStrengthMeter';
+import PasswordInput from './PasswordInput';
+import CustomSelect from '../CustomSelect/CustomSelect';
+import { ESTADOS_BR } from '../CustomSelect/states';
+
+const PHONE_RE = /^\(\d{2}\) \d{5}-\d{4}$/;
+
+const formatPhone = (val) => {
+  if (!val) return '';
+  let num = val.replace(/\D/g, '');
+  if (num.length > 11) num = num.substring(0, 11);
+  if (num.length <= 2) return num ? `(${num}` : '';
+  if (num.length <= 7) return `(${num.substring(0, 2)}) ${num.substring(2)}`;
+  return `(${num.substring(0, 2)}) ${num.substring(2, 7)}-${num.substring(7)}`;
+};
 
 const TIPOS = [
   { value: 'paciente', label: 'Paciente' },
@@ -12,7 +27,7 @@ const TIPOS = [
 
 const INITIAL = {
   nome: '', email: '', senha: '', tipo: 'paciente',
-  crm: '', especialidade: '', cargo: '',
+  crm: '', uf: '', especialidade: '', cargo: '',
   dataNascimento: '', telefone: '', endereco: '',
 };
 
@@ -20,16 +35,30 @@ const CreateUserModal = ({ isOpen, onClose, onCreated }) => {
   const { toast } = useToast();
   const [form, setForm] = useState(INITIAL);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const set = (field) => (e) => setForm(prev => ({ ...prev, [field]: e.target.value }));
 
   const handleClose = () => {
     setForm(INITIAL);
+    setError('');
     onClose();
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+
+    if (form.tipo === 'paciente' && form.telefone && !PHONE_RE.test(form.telefone)) {
+      setError('Telefone deve estar no formato: (11) 99999-9999');
+      return;
+    }
+
+    if (getPasswordStrength(form.senha).level < 2) {
+      toast.error('senha muito fraca');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -42,7 +71,9 @@ const CreateUserModal = ({ isOpen, onClose, onCreated }) => {
 
       if (form.tipo === 'medico') {
         if (form.crm) payload.crm = form.crm;
+        if (form.uf) payload.uf = form.uf;
         if (form.especialidade) payload.especialidade = form.especialidade;
+        if (form.telefone) payload.telefone = form.telefone;
       }
 
       if (form.tipo === 'funcionario') {
@@ -61,7 +92,8 @@ const CreateUserModal = ({ isOpen, onClose, onCreated }) => {
       handleClose();
     } catch (err) {
       const msg = err.response?.data?.message || err.response?.data;
-      toast.error(typeof msg === 'string' ? msg : 'Erro ao criar usuário. Verifique os dados.');
+      const errorMsg = typeof msg === 'string' ? msg : 'Erro ao criar usuário. Verifique os dados.';
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -83,7 +115,8 @@ const CreateUserModal = ({ isOpen, onClose, onCreated }) => {
 
         <div className="modal-field">
           <label>Senha *</label>
-          <input type="password" value={form.senha} onChange={set('senha')} required minLength={6} maxLength={255} placeholder="Mínimo 6 caracteres" />
+          <PasswordInput value={form.senha} onChange={set('senha')} required minLength={8} maxLength={255} placeholder="Mínimo 8 caracteres" />
+          <PasswordStrengthMeter password={form.senha} />
         </div>
 
         <div className="modal-field">
@@ -95,13 +128,28 @@ const CreateUserModal = ({ isOpen, onClose, onCreated }) => {
 
         {form.tipo === 'medico' && (
           <>
-            <div className="modal-field">
-              <label>CRM</label>
-              <input type="text" value={form.crm} onChange={set('crm')} maxLength={50} placeholder="Ex: CRM/SP 123456" />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '0.75rem' }}>
+              <div className="modal-field">
+                <label>UF *</label>
+                <CustomSelect
+                  options={ESTADOS_BR}
+                  value={form.uf}
+                  onChange={(v) => setForm(prev => ({ ...prev, uf: v }))}
+                  placeholder="Estado"
+                />
+              </div>
+              <div className="modal-field">
+                <label>CRM *</label>
+                <input type="text" value={form.crm} onChange={set('crm')} maxLength={6} placeholder="Ex: 123456" />
+              </div>
             </div>
             <div className="modal-field">
               <label>Especialidade</label>
               <input type="text" value={form.especialidade} onChange={set('especialidade')} maxLength={100} placeholder="Ex: Cardiologia" />
+            </div>
+            <div className="modal-field">
+              <label>Telefone</label>
+              <input type="text" value={form.telefone} onChange={(e) => setForm(prev => ({ ...prev, telefone: formatPhone(e.target.value) }))} maxLength={15} placeholder="(11) 99999-9999" />
             </div>
           </>
         )}
@@ -121,7 +169,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreated }) => {
             </div>
             <div className="modal-field">
               <label>Telefone</label>
-              <input type="text" value={form.telefone} onChange={set('telefone')} maxLength={20} placeholder="(11) 99999-9999" />
+              <input type="text" value={form.telefone} onChange={(e) => setForm(prev => ({ ...prev, telefone: formatPhone(e.target.value) }))} maxLength={15} placeholder="(11) 99999-9999" />
             </div>
             <div className="modal-field">
               <label>Endereço</label>
@@ -129,6 +177,8 @@ const CreateUserModal = ({ isOpen, onClose, onCreated }) => {
             </div>
           </>
         )}
+
+        {error && <p className="modal-error">{error}</p>}
 
         <div className="modal-footer">
           <button type="button" className="modal-btn-cancel" onClick={handleClose}>Cancelar</button>

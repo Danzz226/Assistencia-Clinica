@@ -5,7 +5,20 @@ import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import MfaLoginModal from './Modal/MfaLoginModal';
+import PasswordStrengthMeter, { getPasswordStrength } from './Modal/PasswordStrengthMeter';
+import PasswordInput from './Modal/PasswordInput';
+import CustomSelect from './CustomSelect/CustomSelect';
+import { ESTADOS_BR } from './CustomSelect/states';
 import './Auth.scss';
+
+const formatPhone = (val) => {
+  if (!val) return '';
+  let num = val.replace(/\D/g, '');
+  if (num.length > 11) num = num.substring(0, 11);
+  if (num.length <= 2) return num ? `(${num}` : '';
+  if (num.length <= 7) return `(${num.substring(0, 2)}) ${num.substring(2)}`;
+  return `(${num.substring(0, 2)}) ${num.substring(2, 7)}-${num.substring(7)}`;
+};
 
 const AuthForm = ({ mode = 'login', role = 'doctor' }) => {
   const isSignup = mode === 'signup';
@@ -15,6 +28,7 @@ const AuthForm = ({ mode = 'login', role = 'doctor' }) => {
     identifier: '',
     phone: '',
     crm: '',
+    uf: '',
     cpf: '',
     password: '',
     confirmPassword: '',
@@ -39,13 +53,18 @@ const AuthForm = ({ mode = 'login', role = 'doctor' }) => {
     e.preventDefault();
 
     if (isSignup) {
+      if (getPasswordStrength(formData.password).level < 2) {
+        toast.error('senha muito fraca');
+        return;
+      }
+
       if (formData.password !== formData.confirmPassword) {
         toast.error('As senhas não coincidem');
         return;
       }
 
       try {
-        // Mapear campos para os nomes do backend (CadastroUsuarioDTO)
+       
         const tipo = role === 'doctor' ? 'medico' : 'paciente';
         const payload = {
           nome: formData.name,
@@ -54,9 +73,10 @@ const AuthForm = ({ mode = 'login', role = 'doctor' }) => {
           tipo: tipo,
         };
 
-        // Campos específicos por tipo
+ 
         if (tipo === 'medico') {
           payload.crm = formData.crm;
+          if (formData.uf) payload.uf = formData.uf;
         }
 
         if (tipo === 'paciente') {
@@ -173,24 +193,36 @@ const AuthForm = ({ mode = 'login', role = 'doctor' }) => {
             name="phone"
             placeholder="(11) 99999-9999"
             value={formData.phone}
-            onChange={handleChange}
+            onChange={(e) => setFormData(prev => ({ ...prev, phone: formatPhone(e.target.value) }))}
+            maxLength={15}
             required
           />
         </div>
       )}
 
       {isSignup && role === 'doctor' && (
-        <div className="form-group">
-          <label>CRM</label>
-
-          <input
-            type="text"
-            name="crm"
-            placeholder="CRM 123456"
-            value={formData.crm}
-            onChange={handleChange}
-            required
-          />
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '0.75rem' }}>
+          <div className="form-group">
+            <label>UF</label>
+            <CustomSelect
+              options={ESTADOS_BR}
+              value={formData.uf}
+              onChange={(v) => setFormData(prev => ({ ...prev, uf: v }))}
+              placeholder="Estado"
+            />
+          </div>
+          <div className="form-group">
+            <label>CRM</label>
+            <input
+              type="text"
+              name="crm"
+              placeholder="Ex: 123456"
+              value={formData.crm}
+              onChange={handleChange}
+              required
+              maxLength={6}
+            />
+          </div>
         </div>
       )}
 
@@ -212,22 +244,22 @@ const AuthForm = ({ mode = 'login', role = 'doctor' }) => {
       <div className="form-group">
         <label>Senha</label>
 
-        <input
-          type="password"
+        <PasswordInput
           name="password"
-          placeholder="Sua senha"
+          placeholder={isSignup ? 'Mínimo 8 caracteres' : 'Sua senha'}
           value={formData.password}
           onChange={handleChange}
           required
+          minLength={isSignup ? 8 : undefined}
         />
+        {isSignup && <PasswordStrengthMeter password={formData.password} />}
       </div>
 
       {isSignup && (
         <div className="form-group">
           <label>Confirmar Senha</label>
 
-          <input
-            type="password"
+          <PasswordInput
             name="confirmPassword"
             placeholder="Confirme sua senha"
             value={formData.confirmPassword}
