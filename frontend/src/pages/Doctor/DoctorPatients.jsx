@@ -20,6 +20,7 @@ const DoctorPatients = () => {
   const [selectedPaciente, setSelectedPaciente] = useState(null);
   const [editForm, setEditForm] = useState({});
   const [saving, setSaving] = useState(false);
+  const [editError, setEditError] = useState('');
 
   const [showNewProntuario, setShowNewProntuario] = useState(false);
   const [novaDescricao, setNovaDescricao] = useState('');
@@ -86,10 +87,15 @@ const DoctorPatients = () => {
     return new Date(dateStr).toLocaleDateString('pt-BR');
   };
 
+  const PHONE_RE = /^\(\d{2}\) \d{5}-\d{4}$/;
+
   const openEdit = (p) => {
     setSelectedPaciente(p);
+    setEditError('');
     setEditForm({
       usuarioId: p.usuarioId,
+      nome: p.nome || '',
+      email: p.email || '',
       telefone: p.telefone || '',
       dataNascimento: p.dataNascimento || '',
       endereco: p.endereco || '',
@@ -121,20 +127,40 @@ const DoctorPatients = () => {
     .sort((a, b) => new Date(b.dataRegistro) - new Date(a.dataRegistro));
 
   const handleEditSave = async () => {
+    setEditError('');
+
+    const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (editForm.email && !EMAIL_RE.test(editForm.email)) {
+      setEditError('Formato de e-mail inválido.');
+      return;
+    }
+
+    if (editForm.telefone && !PHONE_RE.test(editForm.telefone)) {
+      setEditError('Telefone deve estar no formato: (11) 99999-9999');
+      return;
+    }
     setSaving(true);
     try {
-      await api.put(`/pacientes/${selectedPaciente.id}`, editForm);
+      const payload = {
+        nome: editForm.nome,
+        email: editForm.email,
+        telefone: editForm.telefone || null,
+        dataNascimento: editForm.dataNascimento || null,
+        endereco: editForm.endereco || null,
+      };
+      await api.put(`/usuarios/${selectedPaciente.usuarioId}`, payload);
       setPacientes((prev) =>
         prev.map((p) =>
           p.id === selectedPaciente.id
-            ? { ...p, telefone: editForm.telefone, dataNascimento: editForm.dataNascimento, endereco: editForm.endereco }
+            ? { ...p, nome: payload.nome, email: payload.email, telefone: payload.telefone, dataNascimento: payload.dataNascimento, endereco: payload.endereco }
             : p
         )
       );
       toast.success('Alterações salvas com sucesso!');
       closeModal();
-    } catch {
-      toast.error('Erro ao salvar alterações.');
+    } catch (err) {
+      const msg = err.response?.data?.erro || err.response?.data?.message || err.response?.data;
+      setEditError(typeof msg === 'string' ? msg : 'Erro ao salvar alterações.');
     } finally {
       setSaving(false);
     }
@@ -145,7 +171,7 @@ const DoctorPatients = () => {
     try {
       await api.delete(`/pacientes/${selectedPaciente.id}`);
       setPacientes((prev) => prev.filter((p) => p.id !== selectedPaciente.id));
-      toast.success('Paciente excluído com sucesso!');
+      toast.delete('Paciente excluído com sucesso!');
       closeModal();
     } catch {
       toast.error('Erro ao excluir paciente.');
@@ -187,6 +213,15 @@ const DoctorPatients = () => {
       p.nome?.toLowerCase().includes(filtro.toLowerCase()) ||
       p.email?.toLowerCase().includes(filtro.toLowerCase())
   );
+
+  const formatPhone = (val) => {
+    if (!val) return '';
+    let num = val.replace(/\D/g, '');
+    if (num.length > 11) num = num.substring(0, 11);
+    if (num.length <= 2) return num ? `(${num}` : '';
+    if (num.length <= 7) return `(${num.substring(0, 2)}) ${num.substring(2)}`;
+    return `(${num.substring(0, 2)}) ${num.substring(2, 7)}-${num.substring(7)}`;
+  };
 
   return (
     <div className="doctor-patients">
@@ -278,8 +313,16 @@ const DoctorPatients = () => {
       <Modal isOpen={modalType === 'edit'} onClose={closeModal} title={`Editar Paciente — ${selectedPaciente?.nome}`}>
         <div className="modal-form">
           <div className="modal-field">
+            <label>Nome</label>
+            <input value={editForm.nome || ''} onChange={(e) => setEditForm({ ...editForm, nome: e.target.value })} />
+          </div>
+          <div className="modal-field">
+            <label>E-mail</label>
+            <input type="email" value={editForm.email || ''} onChange={(e) => setEditForm({ ...editForm, email: e.target.value })} />
+          </div>
+          <div className="modal-field">
             <label>Telefone</label>
-            <input value={editForm.telefone || ''} onChange={(e) => setEditForm({ ...editForm, telefone: e.target.value })} />
+            <input value={editForm.telefone || ''} onChange={(e) => setEditForm({ ...editForm, telefone: formatPhone(e.target.value) })} placeholder="(11) 99999-9999" maxLength={15} />
           </div>
           <div className="modal-field">
             <label>Data de Nascimento</label>
@@ -289,6 +332,7 @@ const DoctorPatients = () => {
             <label>Endereço</label>
             <input value={editForm.endereco || ''} onChange={(e) => setEditForm({ ...editForm, endereco: e.target.value })} />
           </div>
+          {editError && <p className="modal-error">{editError}</p>}
           <div className="modal-footer">
             <button className="modal-btn-cancel" onClick={closeModal}>Cancelar</button>
             <button className="modal-btn-submit" onClick={handleEditSave} disabled={saving}>
