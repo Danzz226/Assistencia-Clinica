@@ -24,7 +24,6 @@ public class CadastroUsuarioDTO {
     @Size(min = 6, max = 255)
     public String senha;
 
-    @NotBlank
     @Size(max = 14)
     public String cpf;
 

@@ -21,7 +21,7 @@ public class EditarUsuarioDTO {
     public LocalDate dataNascimento;
 
     @Pattern(regexp = "^\\(\\d{2}\\) \\d{5}-\\d{4}$", message = "Telefone deve estar no formato (11) 99999-9999")
-    @Size(max = 20)
+    @Size(max = 20, message = "Telefone deve ter no máximo 20 caracteres")
     public String telefone;
 
     public String endereco;
@@ -33,6 +33,6 @@ public class EditarUsuarioDTO {
              message = "UF inválida")
     public String uf;
 
-    @Size(max = 100)
+    @Size(max = 100, message = "Especialidade deve ter no máximo 100 caracteres")
     public String especialidade;
 }
