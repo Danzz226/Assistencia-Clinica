@@ -27,14 +27,14 @@ export const AuthProvider = ({ children }) => {
       }
 
       const response = await api.post('/auth/login', payload);
-      const { token, nome, email: responseEmail, tipo, mfaRequired, mfaEnabled } = response.data;
+      const { id, token, nome, email: responseEmail, tipo, mfaRequired, mfaEnabled } = response.data;
 
       // Backend pede código MFA
       if (mfaRequired && !token) {
         return { success: false, mfaRequired: true };
       }
 
-      const loggedUser = { username: nome, email: responseEmail || email, role: tipo, mfaEnabled: !!mfaEnabled };
+      const loggedUser = { id, username: nome, email: responseEmail || email, role: tipo, mfaEnabled: !!mfaEnabled };
       setUser(loggedUser);
       localStorage.setItem('usuario', JSON.stringify(loggedUser));
       localStorage.setItem('token', token);
@@ -51,7 +51,14 @@ export const AuthProvider = ({ children }) => {
    */
   const register = async (payload) => {
     try {
-      await api.post('/auth/register', payload);
+      const response = await api.post('/auth/register', payload);
+      const { id, token, nome, email: responseEmail, tipo, mfaEnabled } = response.data;
+      if (token) {
+        const loggedUser = { id, username: nome, email: responseEmail, role: tipo, mfaEnabled: !!mfaEnabled };
+        setUser(loggedUser);
+        localStorage.setItem('usuario', JSON.stringify(loggedUser));
+        localStorage.setItem('token', token);
+      }
       return { success: true };
     } catch (error) {
       const message = error.response?.data?.erro || error.response?.data?.message || 'Erro ao criar conta';

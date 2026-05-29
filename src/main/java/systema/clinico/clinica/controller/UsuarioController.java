@@ -57,7 +57,7 @@ public class UsuarioController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasAnyRole('ADMIN', 'MEDICO')")
+    @PreAuthorize("isAuthenticated()")
     public void atualizar(@PathVariable Integer id, @RequestBody @Valid EditarUsuarioDTO dto, Authentication authentication) {
         usuarioService.atualizar(id, dto, authentication);
     }

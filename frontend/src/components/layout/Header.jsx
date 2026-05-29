@@ -49,10 +49,11 @@ const Header = () => {
 
   // Mapeia o usuário do contexto para o formato esperado pelos modais
   const mappedUser = {
-    id: user?.id || 1, // Fallback id
+    id: user?.id,
     nome: username,
     email: user?.email,
-    tipo: user?.role
+    tipo: user?.role,
+    cpf: user?.cpf,
   };
 
   return (

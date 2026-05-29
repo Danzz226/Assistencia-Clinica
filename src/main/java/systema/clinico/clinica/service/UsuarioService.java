@@ -34,9 +34,29 @@ import systema.clinico.clinica.security.TotpService;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 
 @Service
 public class UsuarioService {
+
+    private static final Set<String> ESPECIALIDADES_VALIDAS = Set.of(
+        "Acupuntura", "Alergia e Imunologia", "Anestesiologia", "Angiologia",
+        "Cancerologia", "Cardiologia", "Cirurgia Cardiovascular", "Cirurgia da Mão",
+        "Cirurgia de Cabeça e Pescoço", "Cirurgia do Aparelho Digestivo", "Cirurgia Geral",
+        "Cirurgia Pediátrica", "Cirurgia Plástica", "Cirurgia Torácica", "Cirurgia Vascular",
+        "Clínica Médica", "Coloproctologia", "Dermatologia", "Endocrinologia e Metabologia",
+        "Endoscopia", "Gastroenterologia", "Genética Médica", "Geriatria",
+        "Ginecologia e Obstetrícia", "Hematologia e Hemoterapia", "Homeopatia",
+        "Infectologia", "Mastologia", "Medicina de Emergência",
+        "Medicina de Família e Comunidade", "Medicina do Trabalho", "Medicina do Tráfego",
+        "Medicina Esportiva", "Medicina Física e Reabilitação", "Medicina Intensiva",
+        "Medicina Legal e Perícia Médica", "Medicina Nuclear", "Medicina Preventiva e Social",
+        "Nefrologia", "Neurocirurgia", "Neurologia", "Nutrologia", "Oftalmologia",
+        "Oncologia Clínica", "Ortopedia e Traumatologia", "Otorrinolaringologia",
+        "Patologia", "Patologia Clínica / Medicina Laboratorial", "Pediatria",
+        "Pneumologia", "Psiquiatria", "Radiologia e Diagnóstico por Imagem",
+        "Reumatologia", "Urologia"
+    );
 
     private final UsuarioRepository usuarioRepository;
     private final PacienteRepository pacienteRepository;
@@ -93,15 +113,18 @@ public class UsuarioService {
             throw new IllegalArgumentException("E-mail já cadastrado");
         }
 
-        String cpfLimpo = dto.cpf.replaceAll("[^0-9]", "");
-        if (usuarioRepository.findByCpf(cpfLimpo).isPresent()) {
-            throw new IllegalArgumentException("CPF já cadastrado");
+        String cpfLimpo = null;
+        if (dto.cpf != null && !dto.cpf.isBlank()) {
+            cpfLimpo = dto.cpf.replaceAll("[^0-9]", "");
+            if (usuarioRepository.findByCpf(cpfLimpo).isPresent()) {
+                throw new IllegalArgumentException("CPF já cadastrado");
+            }
         }
 
         Usuario u = new Usuario();
         u.setNome(dto.nome.trim());
         u.setEmail(emailNorm);
-        u.setCpf(cpfLimpo); // salva apenas números
+        u.setCpf(cpfLimpo);
         u.setSenha(passwordEncoder.encode(dto.senha));
         u.setTipo(dto.tipo);
 
@@ -109,7 +132,7 @@ public class UsuarioService {
         criarPerfil(salvo, dto);
 
         String token = jwtService.gerarToken(salvo);
-        return new AuthResponseDTO(token, salvo.getNome(), salvo.getEmail(), salvo.getTipo(), salvo.isMfaEnabled());
+        return new AuthResponseDTO(salvo.getId(), token, salvo.getNome(), salvo.getEmail(), salvo.getTipo(), salvo.isMfaEnabled());
     }
 
     /** readOnly não pode ser usado aqui porque a migração de senha em texto pode persistir novo hash no login. */
@@ -132,7 +155,7 @@ public class UsuarioService {
         }
 
         String token = jwtService.gerarToken(usuario);
-        return new AuthResponseDTO(token, usuario.getNome(), usuario.getEmail(), usuario.getTipo(), usuario.isMfaEnabled());
+        return new AuthResponseDTO(usuario.getId(), token, usuario.getNome(), usuario.getEmail(), usuario.getTipo(), usuario.isMfaEnabled());
     }
 
     @Transactional(readOnly = true)
@@ -177,11 +200,18 @@ public class UsuarioService {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
 
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
         boolean isMedico = authentication.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_MEDICO"));
-        
-        if (isMedico && usuario.getTipo() != TipoUsuario.paciente) {
-            throw new AccessDeniedException("Médicos só podem editar perfis de pacientes.");
+        String emailLogado = authentication.getName();
+
+        if (!isAdmin) {
+            boolean editandoSiMesmo = usuario.getEmail().equals(normalizarEmail(emailLogado));
+            boolean medicoEditandoPaciente = isMedico && usuario.getTipo() == TipoUsuario.paciente;
+            if (!editandoSiMesmo && !medicoEditandoPaciente) {
+                throw new AccessDeniedException("Sem permissão para editar este usuário.");
+            }
         }
 
         String emailNorm = normalizarEmail(dto.email);
@@ -203,9 +233,17 @@ public class UsuarioService {
                 pacienteRepository.save(p);
             });
             case medico -> medicoRepository.findByUsuario_Id(usuario.getId()).ifPresent(m -> {
-                if (dto.crm != null && !dto.crm.isBlank()) m.setCrm(dto.crm.trim());
-                if (dto.uf != null && !dto.uf.isBlank()) m.setUf(dto.uf.trim());
-                if (dto.especialidade != null && !dto.especialidade.isBlank()) m.setEspecialidade(dto.especialidade.trim());
+                // CRM, UF e especialidade são credenciais profissionais — só ADMIN pode alterar
+                if (isAdmin) {
+                    if (dto.crm != null && !dto.crm.isBlank()) m.setCrm(dto.crm.trim());
+                    if (dto.uf != null && !dto.uf.isBlank()) m.setUf(dto.uf.trim());
+                    if (dto.especialidade != null && !dto.especialidade.isBlank()) {
+                        if (!ESPECIALIDADES_VALIDAS.contains(dto.especialidade.trim())) {
+                            throw new IllegalArgumentException("Especialidade inválida");
+                        }
+                        m.setEspecialidade(dto.especialidade.trim());
+                    }
+                }
                 if (dto.telefone != null && !dto.telefone.isBlank()) m.setTelefone(dto.telefone.trim());
                 medicoRepository.save(m);
             });
@@ -295,6 +333,12 @@ public class UsuarioService {
             }
             if (medicoRepository.existsByCrm(dto.crm.trim())) {
                 throw new IllegalArgumentException("CRM já cadastrado");
+            }
+            if (dto.especialidade == null || dto.especialidade.isBlank()) {
+                throw new IllegalArgumentException("Especialidade é obrigatória para cadastro de médico");
+            }
+            if (!ESPECIALIDADES_VALIDAS.contains(dto.especialidade.trim())) {
+                throw new IllegalArgumentException("Especialidade inválida");
             }
         }
         if (dto.tipo == TipoUsuario.funcionario) {

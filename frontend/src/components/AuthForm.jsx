@@ -1,6 +1,6 @@
 // components/Auth/AuthForm.jsx
 
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
@@ -9,7 +9,18 @@ import PasswordStrengthMeter, { getPasswordStrength } from './Modal/PasswordStre
 import PasswordInput from './Modal/PasswordInput';
 import CustomSelect from './CustomSelect/CustomSelect';
 import { ESTADOS_BR } from './CustomSelect/states';
+import { ESPECIALIDADES_MEDICAS } from './CustomSelect/specialties';
 import './Auth.scss';
+
+const formatCpf = (val) => {
+  if (!val) return '';
+  let num = val.replace(/\D/g, '');
+  if (num.length > 11) num = num.substring(0, 11);
+  if (num.length <= 3) return num;
+  if (num.length <= 6) return `${num.substring(0, 3)}.${num.substring(3)}`;
+  if (num.length <= 9) return `${num.substring(0, 3)}.${num.substring(3, 6)}.${num.substring(6)}`;
+  return `${num.substring(0, 3)}.${num.substring(3, 6)}.${num.substring(6, 9)}-${num.substring(9)}`;
+};
 
 const formatPhone = (val) => {
   if (!val) return '';
@@ -29,10 +40,26 @@ const AuthForm = ({ mode = 'login', role = 'doctor' }) => {
     phone: '',
     crm: '',
     uf: '',
+    especialidade: '',
     cpf: '',
     password: '',
     confirmPassword: '',
   });
+
+  useEffect(() => {
+    if (!isSignup) return;
+    setFormData({
+      name: '',
+      identifier: '',
+      phone: '',
+      crm: '',
+      uf: '',
+      especialidade: '',
+      cpf: '',
+      password: '',
+      confirmPassword: '',
+    });
+  }, [role]);
 
   const { toast } = useToast();
   const [mfaRequired, setMfaRequired] = useState(false);
@@ -77,9 +104,12 @@ const AuthForm = ({ mode = 'login', role = 'doctor' }) => {
         if (tipo === 'medico') {
           payload.crm = formData.crm;
           if (formData.uf) payload.uf = formData.uf;
+          if (formData.especialidade) payload.especialidade = formData.especialidade;
+          if (formData.phone) payload.telefone = formData.phone;
         }
 
         if (tipo === 'paciente') {
+          payload.cpf = formData.cpf;
           if (formData.phone) payload.telefone = formData.phone;
         }
 
@@ -168,7 +198,7 @@ const AuthForm = ({ mode = 'login', role = 'doctor' }) => {
       )}
 
       <div className="form-group">
-        <label>E-mail ou Telefone</label>
+        <label>E-mail</label>
 
         <input
           type="text"
@@ -201,29 +231,40 @@ const AuthForm = ({ mode = 'login', role = 'doctor' }) => {
       )}
 
       {isSignup && role === 'doctor' && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '0.75rem' }}>
+        <>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '0.75rem' }}>
+            <div className="form-group">
+              <label>UF</label>
+              <CustomSelect
+                options={ESTADOS_BR}
+                value={formData.uf}
+                onChange={(v) => setFormData(prev => ({ ...prev, uf: v }))}
+                placeholder="Estado"
+              />
+            </div>
+            <div className="form-group">
+              <label>CRM</label>
+              <input
+                type="text"
+                name="crm"
+                placeholder="Ex: 123456"
+                value={formData.crm}
+                onChange={handleChange}
+                required
+                maxLength={6}
+              />
+            </div>
+          </div>
           <div className="form-group">
-            <label>UF</label>
+            <label>Especialidade</label>
             <CustomSelect
-              options={ESTADOS_BR}
-              value={formData.uf}
-              onChange={(v) => setFormData(prev => ({ ...prev, uf: v }))}
-              placeholder="Estado"
+              options={ESPECIALIDADES_MEDICAS}
+              value={formData.especialidade}
+              onChange={(v) => setFormData(prev => ({ ...prev, especialidade: v }))}
+              placeholder="Selecione sua especialidade"
             />
           </div>
-          <div className="form-group">
-            <label>CRM</label>
-            <input
-              type="text"
-              name="crm"
-              placeholder="Ex: 123456"
-              value={formData.crm}
-              onChange={handleChange}
-              required
-              maxLength={6}
-            />
-          </div>
-        </div>
+        </>
       )}
 
       {isSignup && role !== 'doctor' && (
@@ -235,7 +276,8 @@ const AuthForm = ({ mode = 'login', role = 'doctor' }) => {
             name="cpf"
             placeholder="000.000.000-00"
             value={formData.cpf}
-            onChange={handleChange}
+            onChange={(e) => setFormData(prev => ({ ...prev, cpf: formatCpf(e.target.value) }))}
+            maxLength={14}
             required
           />
         </div>
