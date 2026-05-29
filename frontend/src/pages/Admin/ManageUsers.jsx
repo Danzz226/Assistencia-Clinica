@@ -80,7 +80,9 @@ const ManageUsers = () => {
           setEditForm(prev => ({
             ...prev,
             crm: m.crm || '',
-            especialidade: m.especialidade || ''
+            uf: m.uf || '',
+            especialidade: m.especialidade || '',
+            telefone: formatPhone(m.telefone || ''),
           }));
         }
       }

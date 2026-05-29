@@ -6,6 +6,7 @@ import PasswordStrengthMeter, { getPasswordStrength } from './PasswordStrengthMe
 import PasswordInput from './PasswordInput';
 import CustomSelect from '../CustomSelect/CustomSelect';
 import { ESTADOS_BR } from '../CustomSelect/states';
+import { ESPECIALIDADES_MEDICAS } from '../CustomSelect/specialties';
 
 const PHONE_RE = /^\(\d{2}\) \d{5}-\d{4}$/;
 
@@ -49,7 +50,12 @@ const CreateUserModal = ({ isOpen, onClose, onCreated }) => {
     e.preventDefault();
     setError('');
 
-    if (form.tipo === 'paciente' && form.telefone && !PHONE_RE.test(form.telefone)) {
+    if (form.tipo === 'medico' && !form.especialidade) {
+      setError('Especialidade é obrigatória para médico.');
+      return;
+    }
+
+    if (form.telefone && !PHONE_RE.test(form.telefone)) {
       setError('Telefone deve estar no formato: (11) 99999-9999');
       return;
     }
@@ -144,8 +150,13 @@ const CreateUserModal = ({ isOpen, onClose, onCreated }) => {
               </div>
             </div>
             <div className="modal-field">
-              <label>Especialidade</label>
-              <input type="text" value={form.especialidade} onChange={set('especialidade')} maxLength={100} placeholder="Ex: Cardiologia" />
+              <label>Especialidade *</label>
+              <CustomSelect
+                options={ESPECIALIDADES_MEDICAS}
+                value={form.especialidade}
+                onChange={(v) => setForm(prev => ({ ...prev, especialidade: v }))}
+                placeholder="Selecione a especialidade"
+              />
             </div>
             <div className="modal-field">
               <label>Telefone</label>
