@@ -1,0 +1,67 @@
+.edit-profile-modal {
+  &__field {
+    margin-bottom: 0.85rem;
+  }
+
+  &__label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.3rem;
+    display: block;
+  }
+
+  &__label-hint {
+    color: #aaa;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  &__input {
+    width: 100%;
+    padding: 0.55rem 0.75rem;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    outline: none;
+    box-sizing: border-box;
+    font-family: inherit;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+    &:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
+    }
+
+    &--readonly {
+      background: #f5f5f5;
+      color: #999;
+      cursor: not-allowed;
+    }
+  }
+
+  &__medico-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 0.75rem;
+    margin-bottom: 0.85rem;
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #f0f0f0;
+  }
+
+  &__btn-save {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+}
