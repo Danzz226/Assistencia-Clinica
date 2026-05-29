@@ -1,5 +1,10 @@
 @import './Modal/Modal.scss';
 
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
+
 .auth-form {
   width: 100%;
   display: flex;
