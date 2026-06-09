@@ -63,7 +63,7 @@ const AppointmentsView = ({ viewRole }) => {
       header: 'Paciente',
       render: (row) => (
         <div>
-          <div style={{ fontWeight: '600', color: '#333' }}>{row.pacienteNome}</div>
+          <div style={{ fontWeight: '600', color: 'var(--text-body)' }}>{row.pacienteNome}</div>
         </div>
       ),
     },
@@ -85,7 +85,7 @@ const AppointmentsView = ({ viewRole }) => {
           <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.35rem' }}>
             {viewRole === 'admin' ? 'Controle Geral de Agendamentos' : 'Meus Agendamentos'}
           </h1>
-          <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1.25rem' }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.25rem' }}>
             Acompanhe e gerencie as consultas marcadas na clínica.
           </p>
         </div>
