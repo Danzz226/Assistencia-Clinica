@@ -277,6 +277,24 @@ public class AtendimentoController {
     private void aplicarProntuario(Prontuario prontuario, ProntuarioRequest dto) {
         prontuario.setPaciente(paciente(dto.pacienteId));
         prontuario.setMedico(medico(dto.medicoId));
+        prontuario.setQueixaPrincipal(dto.queixaPrincipal);
+        prontuario.setHistoricoDoencaAtual(dto.historicoDoencaAtual);
+        prontuario.setHistoricoMedico(dto.historicoMedico);
+        prontuario.setHistoricoFamiliar(dto.historicoFamiliar);
+        prontuario.setHabitosVida(dto.habitosVida);
+        prontuario.setAlergias(dto.alergias);
+        prontuario.setMedicamentosEmUso(dto.medicamentosEmUso);
+        prontuario.setPressaoArterial(dto.pressaoArterial);
+        prontuario.setFrequenciaCardiaca(dto.frequenciaCardiaca);
+        prontuario.setFrequenciaRespiratoria(dto.frequenciaRespiratoria);
+        prontuario.setTemperatura(dto.temperatura);
+        prontuario.setSaturacaoO2(dto.saturacaoO2);
+        prontuario.setPeso(dto.peso);
+        prontuario.setAltura(dto.altura);
+        prontuario.setExameFisico(dto.exameFisico);
+        prontuario.setCid10(dto.cid10);
+        prontuario.setHipoteseDiagnostica(dto.hipoteseDiagnostica);
+        prontuario.setConduta(dto.conduta);
         prontuario.setDescricao(dto.descricao);
     }
 
@@ -347,11 +365,35 @@ public class AtendimentoController {
     }
 
     private ProntuarioResponse prontuarioResponse(Prontuario p) {
-        Integer pacienteId = p.getPaciente() != null ? p.getPaciente().getId() : null;
-        String pacienteNome = p.getPaciente() != null ? p.getPaciente().getUsuario().getNome() : null;
-        Integer medicoId = p.getMedico() != null ? p.getMedico().getId() : null;
-        String medicoNome = p.getMedico() != null ? p.getMedico().getUsuario().getNome() : null;
-        return new ProntuarioResponse(p.getId(), pacienteId, pacienteNome, medicoId, medicoNome,
+        Integer pacienteId = null;
+        String pacienteNome = null, pacienteCpf = null, pacienteTelefone = null, pacienteDataNascimento = null;
+        if (p.getPaciente() != null) {
+            pacienteId = p.getPaciente().getId();
+            pacienteNome = p.getPaciente().getUsuario().getNome();
+            pacienteCpf = p.getPaciente().getUsuario().getCpf();
+            pacienteTelefone = p.getPaciente().getTelefone();
+            pacienteDataNascimento = p.getPaciente().getDataNascimento() != null
+                    ? p.getPaciente().getDataNascimento().toString() : null;
+        }
+        Integer medicoId = null;
+        String medicoNome = null, medicoCrm = null, medicoUf = null, medicoEspecialidade = null, medicoTelefone = null;
+        if (p.getMedico() != null) {
+            medicoId = p.getMedico().getId();
+            medicoNome = p.getMedico().getUsuario().getNome();
+            medicoCrm = p.getMedico().getCrm();
+            medicoUf = p.getMedico().getUf();
+            medicoEspecialidade = p.getMedico().getEspecialidade();
+            medicoTelefone = p.getMedico().getTelefone();
+        }
+        return new ProntuarioResponse(
+                p.getId(),
+                pacienteId, pacienteNome, pacienteCpf, pacienteTelefone, pacienteDataNascimento,
+                medicoId, medicoNome, medicoCrm, medicoUf, medicoEspecialidade, medicoTelefone,
+                p.getQueixaPrincipal(), p.getHistoricoDoencaAtual(), p.getHistoricoMedico(),
+                p.getHistoricoFamiliar(), p.getHabitosVida(), p.getAlergias(), p.getMedicamentosEmUso(),
+                p.getPressaoArterial(), p.getFrequenciaCardiaca(), p.getFrequenciaRespiratoria(),
+                p.getTemperatura(), p.getSaturacaoO2(), p.getPeso(), p.getAltura(),
+                p.getExameFisico(), p.getCid10(), p.getHipoteseDiagnostica(), p.getConduta(),
                 p.getDescricao(), p.getDataRegistro());
     }
 
@@ -406,11 +448,38 @@ public class AtendimentoController {
         public Integer pacienteId;
         @NotNull
         public Integer medicoId;
+        public String queixaPrincipal;
+        public String historicoDoencaAtual;
+        public String historicoMedico;
+        public String historicoFamiliar;
+        public String habitosVida;
+        public String alergias;
+        public String medicamentosEmUso;
+        public String pressaoArterial;
+        public Integer frequenciaCardiaca;
+        public Integer frequenciaRespiratoria;
+        public Double temperatura;
+        public Integer saturacaoO2;
+        public Double peso;
+        public Integer altura;
+        public String exameFisico;
+        public String cid10;
+        public String hipoteseDiagnostica;
+        public String conduta;
         public String descricao;
     }
 
     public record ProntuarioResponse(
-            Integer id, Integer pacienteId, String pacienteNome, Integer medicoId, String medicoNome,
+            Integer id,
+            Integer pacienteId, String pacienteNome, String pacienteCpf,
+            String pacienteTelefone, String pacienteDataNascimento,
+            Integer medicoId, String medicoNome, String medicoCrm,
+            String medicoUf, String medicoEspecialidade, String medicoTelefone,
+            String queixaPrincipal, String historicoDoencaAtual, String historicoMedico,
+            String historicoFamiliar, String habitosVida, String alergias, String medicamentosEmUso,
+            String pressaoArterial, Integer frequenciaCardiaca, Integer frequenciaRespiratoria,
+            Double temperatura, Integer saturacaoO2, Double peso, Integer altura,
+            String exameFisico, String cid10, String hipoteseDiagnostica, String conduta,
             String descricao, LocalDateTime dataRegistro) {
     }
 
