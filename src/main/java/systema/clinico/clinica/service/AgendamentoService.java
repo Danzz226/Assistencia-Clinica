@@ -105,16 +105,38 @@ public class AgendamentoService {
 
     @Transactional
     public AgendamentoResponseDTO atualizar(Integer id, AgendamentoRequestDTO dto) {
+        return atualizar(id, dto, null);
+    }
+
+    @Transactional
+    public AgendamentoResponseDTO atualizar(Integer id, AgendamentoRequestDTO dto, Authentication authentication) {
         Agendamento a = agendamentoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Agendamento nao encontrado"));
-        validarData(dto.data);
+
+        if (temRole(authentication, "ROLE_MEDICO")) {
+            Medico medicoAutenticado = medicoDoUsuario(authentication);
+            if (!medicoAutenticado.getId().equals(a.getMedico().getId())) {
+                throw new AccessDeniedException("Voce nao tem permissao para alterar este agendamento");
+            }
+            // Médico só pode alterar o status — paciente e médico do agendamento são imutáveis
+            if (dto.status != null) {
+                a.setStatus(dto.status);
+            }
+            return paraDTO(agendamentoRepository.save(a));
+        }
+
+        // Valida data apenas se ela foi alterada
+        if (!dto.data.equals(a.getData())) {
+            validarData(dto.data);
+        }
 
         Paciente paciente = pacienteRepository.findById(dto.pacienteId)
                 .orElseThrow(() -> new IllegalArgumentException("Paciente nao encontrado"));
         Medico medico = medicoRepository.findById(dto.medicoId)
                 .orElseThrow(() -> new IllegalArgumentException("Medico nao encontrado"));
 
-        if (agendamentoRepository.existsByMedico_IdAndDataAndIdNot(dto.medicoId, dto.data, id)) {
+        if (!dto.data.equals(a.getData()) &&
+                agendamentoRepository.existsByMedico_IdAndDataAndIdNot(dto.medicoId, dto.data, id)) {
             throw new IllegalArgumentException("Ja existe agendamento para este medico neste horario");
         }
 
@@ -181,6 +203,9 @@ public class AgendamentoService {
 
     private void validarPacientePodeAgendar(Integer pacienteId, Authentication authentication) {
         if (authentication == null || temRole(authentication, "ROLE_ADMIN")) {
+            return;
+        }
+        if (temRole(authentication, "ROLE_MEDICO")) {
             return;
         }
         if (temRole(authentication, "ROLE_PACIENTE")

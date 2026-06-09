@@ -45,15 +45,15 @@ public class AgendamentoController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasAnyRole('ADMIN', 'PACIENTE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MEDICO', 'PACIENTE')")
     public AgendamentoResponseDTO criar(@RequestBody @Valid AgendamentoRequestDTO dto, Authentication authentication) {
         return agendamentoService.criar(dto, authentication);
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public AgendamentoResponseDTO atualizar(@PathVariable Integer id, @RequestBody @Valid AgendamentoRequestDTO dto) {
-        return agendamentoService.atualizar(id, dto);
+    @PreAuthorize("hasAnyRole('ADMIN', 'MEDICO')")
+    public AgendamentoResponseDTO atualizar(@PathVariable Integer id, @RequestBody @Valid AgendamentoRequestDTO dto, Authentication authentication) {
+        return agendamentoService.atualizar(id, dto, authentication);
     }
 
     @DeleteMapping("/{id}")

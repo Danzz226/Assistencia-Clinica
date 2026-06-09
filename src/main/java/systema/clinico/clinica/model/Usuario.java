@@ -26,7 +26,7 @@ public class Usuario {
     @Column(nullable = false, unique = true, length = 150)
     private String email;
 
-    @Column(nullable = false, unique = true, length = 14)
+    @Column(nullable = true, unique = true, length = 14)
     private String cpf;
 
     @JsonIgnore
@@ -39,6 +39,9 @@ public class Usuario {
 
     @Column(name = "mfa_enabled", nullable = false)
     private boolean mfaEnabled = false;
+
+    @Column(name = "forcar_troca_senha", nullable = false)
+    private boolean forcarTrocaSenha = false;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)

@@ -18,4 +18,7 @@ public class Admin {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
+
+    @Column(name = "telefone", length = 20)
+    private String telefone;
 }

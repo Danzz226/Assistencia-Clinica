@@ -33,8 +33,10 @@ import systema.clinico.clinica.security.TotpService;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class UsuarioService {
@@ -132,7 +134,7 @@ public class UsuarioService {
         criarPerfil(salvo, dto);
 
         String token = jwtService.gerarToken(salvo);
-        return new AuthResponseDTO(salvo.getId(), token, salvo.getNome(), salvo.getEmail(), salvo.getTipo(), salvo.isMfaEnabled());
+        return new AuthResponseDTO(salvo.getId(), token, salvo.getNome(), salvo.getEmail(), salvo.getTipo(), salvo.isMfaEnabled(), salvo.getCpf());
     }
 
     /** readOnly não pode ser usado aqui porque a migração de senha em texto pode persistir novo hash no login. */
@@ -155,17 +157,21 @@ public class UsuarioService {
         }
 
         String token = jwtService.gerarToken(usuario);
-        return new AuthResponseDTO(usuario.getId(), token, usuario.getNome(), usuario.getEmail(), usuario.getTipo(), usuario.isMfaEnabled());
+        return new AuthResponseDTO(usuario.getId(), token, usuario.getNome(), usuario.getEmail(), usuario.getTipo(), usuario.isMfaEnabled(), usuario.getCpf(), usuario.isForcarTrocaSenha());
     }
 
     @Transactional(readOnly = true)
     public List<UsuarioResumoDTO> listarResumo() {
+        Map<Integer, String> espMap = medicoRepository.findAllWithUsuario().stream()
+                .collect(Collectors.toMap(m -> m.getUsuario().getId(), Medico::getEspecialidade));
         return usuarioRepository.findAll().stream()
                 .map(usuario -> new UsuarioResumoDTO(
                         usuario.getId(),
                         usuario.getNome(),
                         usuario.getEmail(),
-                        usuario.getTipo()))
+                        usuario.getTipo(),
+                        usuario.getCpf(),
+                        espMap.getOrDefault(usuario.getId(), null)))
                 .toList();
     }
 
@@ -257,17 +263,23 @@ public class UsuarioService {
                 .orElseThrow(() -> new IllegalArgumentException("Usuario nao encontrado"));
         validarSenhaDiferente(usuario, novaSenha);
         usuario.setSenha(passwordEncoder.encode(novaSenha));
+        usuario.setForcarTrocaSenha(true);
         usuarioRepository.save(usuario);
     }
 
     @Transactional(readOnly = true)
     public UsuarioResumoDTO buscarResumoPorEmail(String email) {
         Usuario usuario = buscarPorEmailAutenticado(email);
+        String especialidade = usuario.getTipo() == TipoUsuario.medico
+                ? medicoRepository.findByUsuario_Id(usuario.getId()).map(Medico::getEspecialidade).orElse(null)
+                : null;
         return new UsuarioResumoDTO(
                 usuario.getId(),
                 usuario.getNome(),
                 usuario.getEmail(),
-                usuario.getTipo());
+                usuario.getTipo(),
+                usuario.getCpf(),
+                especialidade);
     }
 
     @Transactional
@@ -275,6 +287,7 @@ public class UsuarioService {
         Usuario usuario = buscarPorEmailAutenticado(email);
         validarSenhaDiferente(usuario, novaSenha);
         usuario.setSenha(passwordEncoder.encode(novaSenha));
+        usuario.setForcarTrocaSenha(false);
         usuarioRepository.save(usuario);
     }
 
