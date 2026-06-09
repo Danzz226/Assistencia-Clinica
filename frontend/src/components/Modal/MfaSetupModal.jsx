@@ -77,12 +77,12 @@ const MfaSetupModal = ({ isOpen, onClose, onEnabled }) => {
       <div style={{ textAlign: 'center' }}>
 
         {step === 'loading' && (
-          <p style={{ color: '#888', padding: '2rem 0' }}>Carregando...</p>
+          <p style={{ color: 'var(--text-neutral)', padding: '2rem 0' }}>Carregando...</p>
         )}
 
         {step === 'setup' && (
           <>
-            <p style={{ fontSize: '0.9rem', color: '#555', marginBottom: '1.25rem', lineHeight: 1.5 }}>
+            <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '1.25rem', lineHeight: 1.5 }}>
               Escaneie o QR Code abaixo com seu aplicativo autenticador
               <br />(Google Authenticator, Authy, Microsoft Authenticator, etc.)
             </p>
@@ -91,9 +91,9 @@ const MfaSetupModal = ({ isOpen, onClose, onEnabled }) => {
               <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.25rem' }}>
                 <div style={{
                   padding: '1rem',
-                  background: '#fff',
+                  background: 'var(--surface-elevated)',
                   borderRadius: 12,
-                  border: '1px solid #e8e8e8',
+                  border: '1px solid var(--border-input)',
                   display: 'inline-block',
                 }}>
                   <QRCodeSVG value={otpauthUrl} size={200} level="M" />
@@ -102,11 +102,11 @@ const MfaSetupModal = ({ isOpen, onClose, onEnabled }) => {
             )}
 
             <div style={{
-              background: '#f5f8f7',
+              background: 'var(--surface-subtle)',
               padding: '0.75rem 1rem',
               borderRadius: 8,
               fontSize: '0.8rem',
-              color: '#666',
+              color: 'var(--text-muted)',
               marginBottom: '1.25rem',
               wordBreak: 'break-all',
             }}>
@@ -144,15 +144,15 @@ const MfaSetupModal = ({ isOpen, onClose, onEnabled }) => {
           <div style={{ padding: '2rem 0' }}>
             <div style={{
               width: 64, height: 64, borderRadius: '50%',
-              background: 'linear-gradient(135deg, #30e3a7 0%, #1a9e78 100%)',
+              background: 'linear-gradient(135deg, var(--teal-color) 0%, var(--teal-gradient-end) 100%)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               margin: '0 auto 1rem',
-              fontSize: '2rem', color: '#fff',
+              fontSize: '2rem', color: 'var(--text-light)',
             }}>
               ✓
             </div>
-            <h3 style={{ marginBottom: '0.5rem', color: '#1a1a1a' }}>MFA Ativado com Sucesso!</h3>
-            <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
+            <h3 style={{ marginBottom: '0.5rem', color: 'var(--text-heading)' }}>MFA Ativado com Sucesso!</h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
               A partir do próximo login, você precisará informar o código do autenticador.
             </p>
             <button className="modal-btn-submit" onClick={handleClose}>Fechar</button>
@@ -168,7 +168,7 @@ const MfaSetupModal = ({ isOpen, onClose, onEnabled }) => {
               padding: '1rem',
               marginBottom: '1.25rem',
               fontSize: '0.9rem',
-              color: '#cf1322',
+              color: 'var(--color-error)',
             }}>
               O MFA está <strong>ativado</strong> na sua conta. Para desativar, digite o código atual do autenticador.
             </div>

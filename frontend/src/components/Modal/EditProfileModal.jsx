@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Save } from 'lucide-react';
+import { AuthContext } from '../../context/AuthContext';
 import Modal from './Modal';
 import CustomSelect from '../CustomSelect/CustomSelect';
 import { ESTADOS_BR } from '../CustomSelect/states';
@@ -19,6 +20,7 @@ const formatPhone = (val) => {
 
 const EditProfileModal = ({ isOpen, onClose, usuario, perfil, onSaved, isAdmin = false }) => {
   const { toast } = useToast();
+  const { user: currentUser, updateUser } = useContext(AuthContext);
   const [form, setForm] = useState({});
   const [saving, setSaving] = useState(false);
 
@@ -49,10 +51,12 @@ const EditProfileModal = ({ isOpen, onClose, usuario, perfil, onSaved, isAdmin =
     if (!form.nome?.trim()) { toast.error('Nome é obrigatório'); return; }
     if (!form.email?.trim()) { toast.error('E-mail é obrigatório'); return; }
 
+    const phone = form.telefone?.trim() || null;
+
     const payload = {
       nome: form.nome.trim(),
       email: form.email.trim(),
-      telefone: form.telefone?.trim() || null,
+      telefone: phone,
     };
 
     if (usuario.tipo === 'medico') {
@@ -73,6 +77,16 @@ const EditProfileModal = ({ isOpen, onClose, usuario, perfil, onSaved, isAdmin =
     setSaving(true);
     try {
       await api.put(`/usuarios/${userId}`, payload);
+
+      // Admin: salva telefone na entidade Admin separadamente
+      if (usuario.tipo === 'admin' && perfil?.id) {
+        await api.put(`/admin/${perfil.id}`, { telefone: phone });
+      }
+
+      if (currentUser?.id === userId) {
+        updateUser({ username: payload.nome, email: payload.email });
+      }
+
       toast.success('Perfil atualizado com sucesso!');
       onSaved?.();
       onClose();

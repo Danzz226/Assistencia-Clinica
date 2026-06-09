@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Lock, Mail, Stethoscope, Briefcase, Calendar, Phone, MapPin, CreditCard, Pencil } from 'lucide-react';
+import { Lock, Mail, Stethoscope, Briefcase, Calendar, Phone, MapPin, CreditCard, Pencil, ShieldCheck, ShieldOff } from 'lucide-react';
 import Modal from './Modal';
 import ResetPasswordModal from './ResetPasswordModal';
 import EditProfileModal from './EditProfileModal';
@@ -12,6 +12,7 @@ const TIPO_ENDPOINT = {
   medico: '/medicos',
   paciente: '/pacientes',
   funcionario: '/funcionarios',
+  admin: '/admin',
 };
 
 const TIPO_VARIANT = {
@@ -29,13 +30,13 @@ const Avatar = ({ nome }) => {
 };
 
 const InfoRow = ({ icon: Icon, label, value }) => {
-  if (!value) return null;
+  const displayValue = value || 'Não informado';
   return (
     <div className="user-profile-modal__info-row">
       <Icon size={16} className="user-profile-modal__info-row-icon" />
       <div>
         <div className="user-profile-modal__info-row-label">{label}</div>
-        <div className="user-profile-modal__info-row-value">{value}</div>
+        <div className="user-profile-modal__info-row-value">{displayValue}</div>
       </div>
     </div>
   );
@@ -61,6 +62,10 @@ const UserProfileModal = ({ isOpen, onClose, usuario, isSelf = false }) => {
 
     const request = isSelf && tipo === 'medico'
       ? api.get('/medicos/me')
+      : isSelf && tipo === 'paciente'
+      ? api.get('/pacientes/me')
+      : isSelf && tipo === 'admin'
+      ? api.get('/admin/me')
       : api.get(TIPO_ENDPOINT[tipo]).then(res => {
           const found = (res.data || []).find(p => p.usuarioId === usuario.id);
           return { data: found || null };
@@ -85,6 +90,10 @@ const UserProfileModal = ({ isOpen, onClose, usuario, isSelf = false }) => {
     setLoading(true);
     const request = isSelf && tipo === 'medico'
       ? api.get('/medicos/me')
+      : isSelf && tipo === 'paciente'
+      ? api.get('/pacientes/me')
+      : isSelf && tipo === 'admin'
+      ? api.get('/admin/me')
       : api.get(TIPO_ENDPOINT[tipo]).then(res => {
           const found = (res.data || []).find(p => p.usuarioId === usuario.id);
           return { data: found || null };
@@ -139,13 +148,13 @@ const UserProfileModal = ({ isOpen, onClose, usuario, isSelf = false }) => {
                   <InfoRow icon={CreditCard} label="CRM" value={formatCrm(perfil?.crm, perfil?.uf)} />
                   <InfoRow icon={Stethoscope} label="Especialidade" value={perfil?.especialidade} />
                   <InfoRow icon={Phone} label="Telefone" value={perfil?.telefone} />
-                  <InfoRow icon={CreditCard} label="CPF" value={formatCpf(usuario.cpf)} />
+                  <InfoRow icon={CreditCard} label="CPF" value={formatCpf(usuario.cpf || perfil?.cpf)} />
                 </>
               )}
 
               {!loading && usuario.tipo === 'paciente' && (
                 <>
-                  <InfoRow icon={CreditCard} label="CPF" value={formatCpf(usuario.cpf)} />
+                  <InfoRow icon={CreditCard} label="CPF" value={formatCpf(usuario.cpf || perfil?.cpf)} />
                   <InfoRow icon={Calendar} label="Data de Nascimento" value={formatDate(perfil?.dataNascimento)} />
                   <InfoRow icon={Phone} label="Telefone" value={perfil?.telefone} />
                   <InfoRow icon={MapPin} label="Endereço" value={perfil?.endereco} />
@@ -155,12 +164,20 @@ const UserProfileModal = ({ isOpen, onClose, usuario, isSelf = false }) => {
               {!loading && usuario.tipo === 'funcionario' && (
                 <>
                   <InfoRow icon={Briefcase} label="Cargo" value={perfil?.cargo} />
-                  <InfoRow icon={CreditCard} label="CPF" value={formatCpf(usuario.cpf)} />
+                  <InfoRow icon={CreditCard} label="CPF" value={formatCpf(usuario.cpf || perfil?.cpf)} />
                 </>
               )}
 
               {!loading && usuario.tipo === 'admin' && (
-                <p className="user-profile-modal__admin-note">Administrador do sistema.</p>
+                <>
+                  <InfoRow icon={Phone} label="Telefone" value={perfil?.telefone} />
+                  <InfoRow icon={CreditCard} label="CPF" value={formatCpf(usuario.cpf || perfil?.cpf)} />
+                  <InfoRow
+                    icon={perfil?.mfaEnabled ? ShieldCheck : ShieldOff}
+                    label="Autenticação 2FA"
+                    value={perfil?.mfaEnabled ? 'Ativada' : 'Inativa'}
+                  />
+                </>
               )}
             </div>
 
@@ -173,15 +190,13 @@ const UserProfileModal = ({ isOpen, onClose, usuario, isSelf = false }) => {
                 <Lock size={14} />
                 Redefinir Senha
               </button>
-              {usuario.tipo !== 'admin' && (
-                <button
-                  className="modal-btn-submit user-profile-modal__btn-icon"
-                  onClick={() => setEditOpen(true)}
-                >
-                  <Pencil size={14} />
-                  Editar Perfil
-                </button>
-              )}
+              <button
+                className="modal-btn-submit user-profile-modal__btn-icon"
+                onClick={() => setEditOpen(true)}
+              >
+                <Pencil size={14} />
+                Editar Perfil
+              </button>
             </div>
           </div>
         )}

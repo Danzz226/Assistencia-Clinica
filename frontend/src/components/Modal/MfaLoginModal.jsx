@@ -76,12 +76,12 @@ const MfaLoginModal = ({ isOpen, onClose, onVerify }) => {
           style={{ height: 80, objectFit: 'contain', marginBottom: '1.25rem' }}
         />
 
-        <p style={{ fontSize: '0.9rem', color: '#555', marginBottom: '1.25rem', lineHeight: 1.5 }}>
+        <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '1.25rem', lineHeight: 1.5 }}>
           Digite o código de 6 dígitos gerado pelo seu aplicativo autenticador.
         </p>
 
         <svg width="80" height="80" viewBox="0 0 80 80" style={{ marginBottom: '1.5rem' }}>
-          <circle cx="40" cy="40" r={RADIUS} fill="none" stroke="#e8e8e8" strokeWidth="6" />
+          <circle cx="40" cy="40" r={RADIUS} fill="none" stroke="var(--border-color)" strokeWidth="6" />
           <circle
             cx="40" cy="40" r={RADIUS}
             fill="none"
