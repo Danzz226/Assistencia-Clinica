@@ -65,7 +65,7 @@ const AuthForm = ({ mode = 'login', role = 'doctor' }) => {
   const [mfaRequired, setMfaRequired] = useState(false);
   const [pendingCredentials, setPendingCredentials] = useState(null);
 
-  const { login, register } = useContext(AuthContext);
+  const { login, register, logout } = useContext(AuthContext);
 
   const navigate = useNavigate();
 
@@ -144,6 +144,17 @@ const AuthForm = ({ mode = 'login', role = 'doctor' }) => {
     }
 
     if (result.success) {
+      const isMedicoTab = role === 'doctor';
+      if (isMedicoTab && result.role === 'paciente') {
+        logout();
+        toast.error('E-mail ou senha inválidos.');
+        return;
+      }
+      if (!isMedicoTab && result.role === 'medico') {
+        logout();
+        toast.error('E-mail ou senha inválidos.');
+        return;
+      }
       if (result.role === 'admin') navigate('/admin/home');
       else if (result.role === 'medico') navigate('/medico/home');
       else navigate('/paciente/home');
