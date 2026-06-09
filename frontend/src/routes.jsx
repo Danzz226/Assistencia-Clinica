@@ -16,6 +16,7 @@ import DoctorDashboard from './pages/Doctor/DoctorDashboard';
 import DoctorPatients from './pages/Doctor/DoctorPatients';
 import DoctorExams from './pages/Doctor/DoctorExams';
 import DoctorSchedule from './pages/Doctor/DoctorSchedule';
+import DoctorConsultas from './pages/Doctor/DoctorConsultas';
 
 // Paciente
 import PatientHome        from './pages/Patient/PatientHome';
@@ -56,16 +57,10 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       >
-        {/* Dashboard principal com stats e prontuários recentes */}
         <Route path="home"      element={<DoctorDashboard />} />
-
-        {/* Lista de pacientes vinculados ao médico via prontuários */}
+        <Route path="consultas" element={<DoctorConsultas />} />
         <Route path="pacientes" element={<DoctorPatients />} />
-
-        {/* Prontuários (aba 1) e Exames (aba 2) do médico */}
         <Route path="exames"    element={<DoctorExams />} />
-
-        {/* Grade semanal de horários de atendimento */}
         <Route path="horarios"  element={<DoctorSchedule />} />
 
         <Route path="" element={<Navigate to="home" replace />} />

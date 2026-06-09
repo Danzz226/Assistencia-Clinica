@@ -1,0 +1,309 @@
+.doctor-consultas {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  padding-top: 1.5rem;
+  padding-bottom: 1rem;
+
+  &__heading {
+    flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.25rem;
+  }
+
+  &__title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-heading);
+    margin-bottom: 0.35rem;
+  }
+
+  &__desc {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin: 0;
+  }
+
+  // ── Botão nova consulta ───────────────────────
+  &__btn-nova {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--primary-color);
+    color: var(--text-light);
+    border: none;
+    padding: 0.55rem 1.15rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
+
+    &:hover { background: var(--primary-hover); }
+  }
+
+  // ── Toolbar (tabs + busca) ────────────────────
+  &__toolbar {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  // ── Abas ─────────────────────────────────────
+  &__tabs {
+    display: flex;
+    gap: 0.5rem;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 0;
+  }
+
+  &__tab {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-radius: 6px 6px 0 0;
+    font-family: inherit;
+    transition: color 0.2s ease, background-color 0.2s ease;
+
+    &:hover {
+      color: var(--primary-color);
+      background-color: var(--surface-hover);
+    }
+
+    &--active {
+      color: var(--primary-color);
+      border-bottom-color: var(--primary-color);
+      background-color: var(--surface-hover);
+    }
+  }
+
+  &__tab-badge {
+    background: var(--badge-admin-bg);
+    color: var(--badge-admin-color);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 2px;
+    min-width: 22px;
+    text-align: center;
+    transition: background-color 0.35s ease, color 0.25s ease;
+
+    &--hoje {
+      background: var(--primary-color);
+      color: var(--text-light);
+    }
+  }
+
+  // ── Busca ─────────────────────────────────────
+  &__search {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 0.85rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--surface-elevated);
+    color: var(--text-muted);
+    min-width: 200px;
+
+    input {
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 0.82rem;
+      color: var(--text-heading);
+      width: 100%;
+
+      &::placeholder { color: var(--text-muted); }
+    }
+  }
+
+  // ── Lista de consultas ────────────────────────
+  &__list {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    min-height: 0;
+  }
+
+  &__state {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    padding: 2rem;
+  }
+
+  &__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 3rem;
+    color: var(--text-muted);
+    opacity: 0.6;
+
+    p {
+      font-size: 0.9rem;
+      margin: 0;
+    }
+  }
+
+  // ── Card de consulta ──────────────────────────
+  &__card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.9rem 1.1rem;
+    background: var(--surface-elevated);
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: box-shadow 0.15s, border-color 0.15s;
+    position: relative;
+    overflow: hidden;
+
+    &:hover {
+      border-color: var(--primary-color);
+      box-shadow: var(--shadow-soft);
+    }
+  }
+
+  &__card-indicator {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    border-radius: 10px 0 0 10px;
+
+    &--agendado  { background: var(--color-info); }
+    &--realizado { background: var(--color-success); }
+    &--cancelado { background: var(--color-danger); }
+  }
+
+  &__card-datetime {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 90px;
+    flex-shrink: 0;
+    padding-left: 0.5rem;
+  }
+
+  &__card-date,
+  &__card-time {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+
+  &__card-date {
+    font-weight: 700;
+    color: var(--text-heading);
+  }
+
+  &__card-patient {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__card-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--accent-color);
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+
+  &__card-patient-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-heading);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__card-motivo {
+    flex: 1;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    font-style: italic;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+
+  &__card-right {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    flex-shrink: 0;
+  }
+
+  // ── Status badge no card ──────────────────────
+  &__card-status {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+
+    &--agendado  { background: var(--badge-info-bg);    color: var(--badge-info-color); }
+    &--realizado { background: var(--badge-success-bg); color: var(--badge-success-color); }
+    &--cancelado { background: var(--badge-danger-bg);  color: var(--badge-danger-color); }
+  }
+
+  // ── Botão gerenciar ───────────────────────────
+  &__btn-gerenciar {
+    padding: 0.4rem 0.85rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--surface-elevated);
+    color: var(--text-heading);
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+
+    &:hover {
+      background: var(--primary-color);
+      color: var(--text-light);
+      border-color: var(--primary-color);
+    }
+  }
+}
