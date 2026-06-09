@@ -27,14 +27,14 @@ export const AuthProvider = ({ children }) => {
       }
 
       const response = await api.post('/auth/login', payload);
-      const { id, token, nome, email: responseEmail, tipo, mfaRequired, mfaEnabled } = response.data;
+      const { id, token, nome, email: responseEmail, tipo, mfaRequired, mfaEnabled, forcarTrocaSenha } = response.data;
 
       // Backend pede código MFA
       if (mfaRequired && !token) {
         return { success: false, mfaRequired: true };
       }
 
-      const loggedUser = { id, username: nome, email: responseEmail || email, role: tipo, mfaEnabled: !!mfaEnabled };
+      const loggedUser = { id, username: nome, email: responseEmail || email, role: tipo, mfaEnabled: !!mfaEnabled, cpf: response.data.cpf ?? null, forcarTrocaSenha: !!forcarTrocaSenha };
       setUser(loggedUser);
       localStorage.setItem('usuario', JSON.stringify(loggedUser));
       localStorage.setItem('token', token);
@@ -66,6 +66,14 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateUser = (newData) => {
+    if (user) {
+      const updatedUser = { ...user, ...newData };
+      setUser(updatedUser);
+      localStorage.setItem('usuario', JSON.stringify(updatedUser));
+    }
+  };
+
   const logout = () => {
     setUser(null);
     localStorage.removeItem('usuario');
@@ -73,7 +81,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ authenticated: !!user, user, login, register, logout, loading }}>
+    <AuthContext.Provider value={{ authenticated: !!user, user, login, register, logout, updateUser, loading }}>
       {children}
     </AuthContext.Provider>
   );

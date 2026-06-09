@@ -7,7 +7,7 @@ import PasswordInput from './PasswordInput';
 
 const INITIAL = { novaSenha: '', confirmar: '' };
 
-const ResetPasswordModal = ({ isOpen, onClose, usuario, isSelf = false }) => {
+const ResetPasswordModal = ({ isOpen, onClose, usuario, isSelf = false, forced = false, onSuccess }) => {
   const { toast } = useToast();
   const [form, setForm] = useState(INITIAL);
   const [loading, setLoading] = useState(false);
@@ -16,6 +16,7 @@ const ResetPasswordModal = ({ isOpen, onClose, usuario, isSelf = false }) => {
   const set = (field) => (e) => setForm(prev => ({ ...prev, [field]: e.target.value }));
 
   const handleClose = () => {
+    if (forced) return;
     setForm(INITIAL);
     setError('');
     onClose();
@@ -43,7 +44,10 @@ const ResetPasswordModal = ({ isOpen, onClose, usuario, isSelf = false }) => {
       const url = isSelf ? '/usuarios/me/senha' : `/usuarios/${usuario.id}/senha`;
       await api.patch(url, { novaSenha: form.novaSenha });
       toast.success('Senha redefinida com sucesso!');
-      handleClose();
+      setForm(INITIAL);
+      setError('');
+      if (onSuccess) onSuccess();
+      else handleClose();
     } catch (err) {
       const msg = err.response?.data?.erro || err.response?.data?.message || err.response?.data;
       setError(typeof msg === 'string' ? msg : 'Erro ao redefinir senha.');
@@ -53,10 +57,16 @@ const ResetPasswordModal = ({ isOpen, onClose, usuario, isSelf = false }) => {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="Redefinir Senha">
-      {usuario && (
-        <p style={{ fontSize: '0.88rem', color: '#666', marginBottom: '1rem', marginTop: '-0.5rem' }}>
-          Usuário: <strong style={{ color: '#333' }}>{usuario.nome}</strong>
+    <Modal isOpen={isOpen} onClose={handleClose} title="Redefinir Senha" hideClose={forced}>
+      {forced && (
+        <p style={{ fontSize: '0.88rem', color: 'var(--warning-color, #d97706)', marginBottom: '1rem', marginTop: '-0.5rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+          <span>⚠</span>
+          <span>Por segurança, você precisa criar uma nova senha antes de continuar.</span>
+        </p>
+      )}
+      {!forced && usuario && (
+        <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', marginBottom: '1rem', marginTop: '-0.5rem' }}>
+          Usuário: <strong style={{ color: 'var(--text-heading)' }}>{usuario.nome}</strong>
         </p>
       )}
       <form className="modal-form" onSubmit={handleSubmit}>
@@ -87,7 +97,9 @@ const ResetPasswordModal = ({ isOpen, onClose, usuario, isSelf = false }) => {
         {error && <p className="modal-error">{error}</p>}
 
         <div className="modal-footer">
-          <button type="button" className="modal-btn-cancel" onClick={handleClose}>Cancelar</button>
+          {!forced && (
+            <button type="button" className="modal-btn-cancel" onClick={handleClose}>Cancelar</button>
+          )}
           <button type="submit" className="modal-btn-submit" disabled={loading}>
             {loading ? 'Salvando...' : 'Redefinir Senha'}
           </button>
