@@ -1,0 +1,353 @@
+// ═══════════════════════════════════════════════════════
+//  LIFIUM — themes.scss
+//  Fonte única de todos os design tokens.
+//  Componentes usam apenas var(--*); cores mudam só aqui.
+// ═══════════════════════════════════════════════════════
+
+
+// ── LIGHT ───────────────────────────────────────────────
+:root {
+
+  // Brand
+  --primary-color:    #688E80;
+  --primary-hover:    #5a7c6f;
+  --primary-rgb:      104, 142, 128;
+  --secondary-color:  #94AC82;
+  --accent-color:     #CCE3DE;
+  --accent-hover:     #b6d4cc;
+  --teal-color:       #30e3a7;
+  --teal-hover:       #22c993;
+  --teal-rgb:         48, 227, 167;
+  --teal-gradient-end: #1a9e78;
+
+  // Table
+  --table-header-hover: rgba(104, 142, 128, 0.09);
+
+  // Layout
+  --bg-page:           #F1F7F6;
+  --surface-elevated:  #ffffff;
+  --surface-card:      #ffffff;
+  --surface-hover:     #f0f4f2;
+  --surface-subtle:    #f7faf9;
+  --surface-input:     #fafafa;
+  --surface-muted:     #f0f0f0;
+
+  // Components
+  --role-toggle-bg:    #EAF4F4;
+  --card-icon-bg:      #e8f0ec;
+  --input-readonly-bg: #f0f0f0;
+
+  // Borders
+  --border-color:        #dceae7;
+  --border-input:        #e0e0e0;
+  --border-divider:      #f5f5f5;
+  --border-radius-sm:    8px;
+  --border-radius-badge: 2px;
+
+  // Text
+  --text-heading:      #2f3e3a;
+  --text-body:         #2f3e3a;
+  --text-muted:        #7a9490;
+  --text-light:        #ffffff;
+  --text-subtle:       #9aaba7;
+  --text-neutral:      #888888;
+  --text-placeholder:  #aaaaaa;
+  --link-color:        #688E80;
+  --link-hover:        #5a7c6f;
+
+  // Overlays
+  --overlay-bg:        rgba(0, 0, 0, 0.45);
+
+  // Shadows
+  --shadow-soft:       0 4px 12px rgba(104, 142, 128, 0.15);
+  --shadow-sm:         0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md:         0 8px 28px rgba(0, 0, 0, 0.13);
+
+  // Sidebar
+  --sidebar-bg:           #1f2a27;
+  --sidebar-text:         #a0aec0;
+  --sidebar-text-active:  #ffffff;
+  --sidebar-active-bg:    rgba(104, 142, 128, 0.35);
+  --sidebar-hover-bg:     rgba(255, 255, 255, 0.05);
+  --sidebar-toggle-track: rgba(255, 255, 255, 0.20);
+  --sidebar-danger:       #fc8181;
+  --sidebar-danger-bg:    rgba(252, 129, 129, 0.10);
+
+  // Status
+  --color-success:         #047857;
+  --color-success-bg:      #d1fae5;
+  --color-warning:         #b45309;
+  --color-warning-bg:      #fef3c7;
+  --color-medium:          #e08b1a;
+  --color-medium-bg:       #fff0d4;
+  --color-danger:          #b91c1c;
+  --color-danger-bg:       #fee2e2;
+  --color-info:            #0369a1;
+  --color-info-bg:         #e0f2fe;
+  --color-error:           #cf1322;
+  --color-error-bg:        #fff3f3;
+  --color-error-border:    #ff4d4f;
+
+  // Pills de cards
+  --pill-blue-bg:      #e8eef8;
+  --pill-blue-color:   #2a4a80;
+  --pill-orange-bg:    #fff4e5;
+
+  // Badges
+  --badge-admin-bg:            #e8f0ec;   --badge-admin-color:            #3b5f50;
+  --badge-paciente-bg:         #e6f3ff;   --badge-paciente-color:         #0056b3;
+  --badge-medico-bg:           #f3e8ff;   --badge-medico-color:           #6b21a8;
+  --badge-especialidade-bg:    rgba(48, 227, 167, 0.13);
+  --badge-especialidade-color: #0a6b4f;
+  --badge-success-bg:          #d1fae5;   --badge-success-color:          #047857;
+  --badge-warning-bg:          #fef3c7;   --badge-warning-color:          #b45309;
+  --badge-danger-bg:           #fee2e2;   --badge-danger-color:           #b91c1c;
+  --badge-info-bg:             #e0f2fe;   --badge-info-color:             #0369a1;
+  --badge-default-bg:          #f3f4f6;   --badge-default-color:          #4b5563;
+
+  // Icons
+  --icon-bg-green:         #e8f0ec;
+  --icon-bg-blue:          #e6f3ff;
+  --icon-bg-purple:        #f3e8ff;
+  --icon-bg-yellow:        #fef3c7;
+  --icon-bg-red:           #fee2e2;
+  --icon-bg-teal:          rgba(48, 227, 167, 0.15);
+
+  // PDF Download button
+  --btn-pdf-border: #688E80;
+  --btn-pdf-hover:  rgba(104, 142, 128, 0.12);
+  --btn-pdf-color:  #688E80;
+
+  // Toast
+  --toast-success-bg:          #f0fdf6;
+  --toast-success-border:      #bbf0d8;
+  --toast-success-text:        #0d5c36;
+  --toast-success-icon-bg:     #d1fadf;
+  --toast-success-icon-color:  #16a34a;
+  --toast-error-bg:            #fef2f2;
+  --toast-error-border:        #fecaca;
+  --toast-error-text:          #7f1d1d;
+  --toast-error-icon-bg:       #fee2e2;
+  --toast-error-icon-color:    #dc2626;
+
+  // Login Presentation
+  --login-glow-center:         rgba(255, 255, 255, 0.7);
+  --login-ecg-glow:            rgba(149, 226, 194, 0.6);
+  --login-badge-bg:            rgba(255, 255, 255, 0.25);
+  --login-badge-color:         rgba(140, 159, 164, 0.35);
+  --login-badge-active-bg:     rgba(255, 255, 255, 0.45);
+  --login-badge-active-color:  #6b8f85;
+  --login-box-bg:              #ffffff;
+  --login-box-border:          #dceae7;
+
+  // Sidebar Internals
+  --sidebar-btn-bg:            rgba(255, 255, 255, 0.04);
+}
+
+
+// ── DARK ────────────────────────────────────────────────
+[data-theme="dark"] {
+
+  // Brand (primary levemente mais claro para fundos escuros)
+  --primary-color:    #7aA894;
+  --primary-hover:    #8abb9f;
+  --primary-rgb:      122, 168, 148;
+  --secondary-color:  #94AC82;
+  --accent-color:     #1e3b31;
+  --accent-hover:     #264840;
+  --teal-color:       #30e3a7;
+  --teal-hover:       #22c993;
+  --teal-rgb:         48, 227, 167;
+  --teal-gradient-end: #0e7a5a;
+
+  // Table
+  --table-header-hover: rgba(122, 168, 148, 0.11);
+
+  // Layout
+  --bg-page:           #192420;
+  --surface-elevated:  #2d4237;
+  --surface-card:      #2d4237;
+  --surface-hover:     #354d42;
+  --surface-subtle:    #1f2e26;
+  --surface-input:     #1f2e26;
+  --surface-muted:     #263e34;
+
+  // Components
+  --role-toggle-bg:    #2d4237;
+  --card-icon-bg:      #1e3828;
+  --input-readonly-bg: #263e34;
+
+  // Borders
+  --border-color:        #354d42;
+  --border-input:        #354d42;
+  --border-divider:      #2a3f35;
+  --border-radius-sm:    8px;
+  --border-radius-badge: 2px;
+
+  // Text
+  --text-heading:      #d4ede5;
+  --text-body:         #bcd8d0;
+  --text-muted:        #7aada4;
+  --text-light:        #ffffff;
+  --text-subtle:       #537870;
+  --text-neutral:      #6b8c82;
+  --text-placeholder:  #537870;
+  --link-color:        #a8d4c8;
+  --link-hover:        #c5ece4;
+
+  // Overlays
+  --overlay-bg:        rgba(0, 0, 0, 0.65);
+
+  // Shadows
+  --shadow-soft:       0 4px 16px rgba(0, 0, 0, 0.42);
+  --shadow-sm:         0 1px 3px rgba(0, 0, 0, 0.25);
+  --shadow-md:         0 8px 28px rgba(0, 0, 0, 0.55);
+
+  // Sidebar
+  --sidebar-bg:           #2d4237;
+  --sidebar-text:         #a0aec0;
+  --sidebar-text-active:  #ffffff;
+  --sidebar-active-bg:    rgba(122, 168, 148, 0.30);
+  --sidebar-hover-bg:     rgba(255, 255, 255, 0.06);
+  --sidebar-toggle-track: rgba(255, 255, 255, 0.15);
+  --sidebar-danger:       #fc8181;
+  --sidebar-danger-bg:    rgba(252, 129, 129, 0.10);
+
+  // Status
+  --color-success:         #10b981;
+  --color-success-bg:      #063428;
+  --color-warning:         #f59e0b;
+  --color-warning-bg:      #302005;
+  --color-medium:          #e08b1a;
+  --color-medium-bg:       #302005;
+  --color-danger:          #f87171;
+  --color-danger-bg:       #300c0c;
+  --color-info:            #60a5fa;
+  --color-info-bg:         #0c1e36;
+  --color-error:           #f87171;
+  --color-error-bg:        #300c0c;
+  --color-error-border:    #f87171;
+
+  // Pills de cards
+  --pill-blue-bg:      #162b48;
+  --pill-blue-color:   #60a5fa;
+  --pill-orange-bg:    #302005;
+
+  // Badges
+  --badge-admin-bg:            rgba(122, 168, 148, 0.18);  --badge-admin-color:            #7aA894;
+  --badge-paciente-bg:         rgba(59,  130, 246, 0.18);  --badge-paciente-color:         #93c5fd;
+  --badge-medico-bg:           rgba(192, 132, 252, 0.18);  --badge-medico-color:           #c084fc;
+  --badge-especialidade-bg:    rgba(48,  227, 167, 0.15);
+  --badge-especialidade-color: #30e3a7;
+  --badge-success-bg:          rgba(16,  185, 129, 0.18);  --badge-success-color:          #6ee7b7;
+  --badge-warning-bg:          rgba(245, 158, 11,  0.18);  --badge-warning-color:          #fcd34d;
+  --badge-danger-bg:           rgba(248, 113, 113, 0.18);  --badge-danger-color:           #fca5a5;
+  --badge-info-bg:             rgba(14,  165, 233, 0.18);  --badge-info-color:             #7dd3fc;
+  --badge-default-bg:          rgba(160, 174, 192, 0.12);  --badge-default-color:          #9baeb8;
+
+  // Icons
+  --icon-bg-green:         #244535;
+  --icon-bg-blue:          #162b48;
+  --icon-bg-purple:        #38245a;
+  --icon-bg-yellow:        #422b08;
+  --icon-bg-red:           #421212;
+  --icon-bg-teal:          rgba(48, 227, 167, 0.12);
+
+  // PDF Download button
+  --btn-pdf-border: #7aA894;
+  --btn-pdf-hover:  rgba(122, 168, 148, 0.15);
+  --btn-pdf-color:  #7aA894;
+
+  // Toast
+  --toast-success-bg:          #0a2e1f;
+  --toast-success-border:      #0d4433;
+  --toast-success-text:        #6ee7b7;
+  --toast-success-icon-bg:     #063428;
+  --toast-success-icon-color:  #10b981;
+  --toast-error-bg:            #2a0a0a;
+  --toast-error-border:        #5c1a1a;
+  --toast-error-text:          #fca5a5;
+  --toast-error-icon-bg:       #421212;
+  --toast-error-icon-color:    #f87171;
+
+  // Login Presentation
+  --login-glow-center:         rgba(30, 52, 40, 0.3);
+  --login-ecg-glow:            rgba(48, 227, 167, 0.30);
+  --login-badge-bg:            rgba(122, 168, 148, 0.10);
+  --login-badge-color:         rgba(164, 200, 190, 0.40);
+  --login-badge-active-bg:     rgba(122, 168, 148, 0.25);
+  --login-badge-active-color:  #7aada4;
+  --login-box-bg:              #405c50;
+  --login-box-border:          #527a6a;
+}
+
+
+// ── CALENDAR PICKER ICON ────────────────────────────────
+
+[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
+
+// ── TRANSITIONS ─────────────────────────────────────────
+
+.main-layout,
+.main-layout__content,
+body,
+.sidebar,
+.modal-box,
+.modal-footer,
+.modal-field input,
+.modal-field select,
+.modal-field textarea,
+.modal-btn-cancel,
+.profile-dropdown-menu,
+// Patient
+.patient-page__card,
+.patient-page__card-icon,
+.patient-page__card-pill,
+.patient-page__badge,
+.patient-page__table-wrapper,
+.patient-page__prontuario-card,
+.patient-page__prontuario-body-diag-item,
+.patient-page__loading,
+.patient-page__empty,
+.patient-modal,
+// Doctor Dashboard
+.doctor-dashboard__card,
+.doctor-dashboard__card-icon-wrapper,
+.doctor-dashboard__card-pill,
+.doctor-dashboard__table-wrapper,
+.doctor-dashboard__loading,
+.doctor-dashboard__empty,
+// Admin
+.admin-dashboard__card,
+.admin-dashboard__card-icon-wrapper,
+.admin-dashboard__card-pill,
+// Doctor Patients
+.doctor-patients__table-wrapper,
+.doctor-patients__search,
+.doctor-patients__empty,
+.doctor-patients__avatar,
+.doctor-patients__badge,
+// Doctor Exams
+.doctor-exams__empty,
+.doctor-exams__table-wrapper,
+.doctor-exams__tabs,
+// Login
+.login-presentation,
+.login-right-wrapper,
+.login-right,
+.login-box,
+// Inputs / Selects / Modais
+.custom-select__trigger,
+.custom-select__dropdown,
+.edit-profile-modal__input,
+.user-profile-modal__header,
+.user-profile-modal__info-row {
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+}

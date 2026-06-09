@@ -1,22 +1,12 @@
-// Sidebar.scss
-
-$sidebar-bg: #1f2a27; // Um pouco mais escuro que a var(--text-dark) para dar contraste
-$sidebar-text: #a0aec0;
-$sidebar-text-active: #ffffff;
-$sidebar-active-bg: rgba(104, 142, 128, 0.4); // var(--primary-color) com opacidade
-$primary-color: #688E80;
-$hover-bg: rgba(255, 255, 255, 0.05);
-$danger-color: #fc8181;
-
 .sidebar {
   width: 260px;
-  background-color: $sidebar-bg;
-  color: #fff;
+  background-color: var(--sidebar-bg);
+  color: var(--sidebar-text-active);
   display: flex;
   flex-direction: column;
   padding: 1.5rem 0;
-  box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-  transition: all 0.3s ease;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.12);
+  transition: background-color 0.35s ease;
   height: 100vh;
   position: sticky;
   top: 0;
@@ -35,7 +25,7 @@ $danger-color: #fc8181;
       display: flex;
       align-items: center;
       justify-content: flex-start;
-      
+
       img {
         max-width: 100%;
         max-height: 100%;
@@ -51,40 +41,28 @@ $danger-color: #fc8181;
     gap: 8px;
     padding: 0 1rem;
     overflow-y: auto;
-    scrollbar-width: thin;
-
-    &::-webkit-scrollbar {
-      width: 6px;
-    }
-    
-    &::-webkit-scrollbar-thumb {
-      background-color: rgba(255,255,255,0.1);
-      border-radius: 10px;
-    }
 
     .nav-item {
       display: flex;
       align-items: center;
       gap: 12px;
       padding: 12px 16px;
-      color: $sidebar-text;
+      color: var(--sidebar-text);
       text-decoration: none;
       border-radius: 8px;
-      transition: all 0.2s;
       font-size: 0.95rem;
+      transition: background-color 0.2s ease, color 0.2s ease;
 
-      svg {
-        stroke-width: 2;
-      }
+      svg { stroke-width: 2; }
 
       &:hover {
-        background-color: $hover-bg;
-        color: #fff;
+        background-color: var(--sidebar-hover-bg);
+        color: var(--sidebar-text-active);
       }
 
       &.active {
-        background-color: $sidebar-active-bg;
-        color: $sidebar-text-active;
+        background-color: var(--sidebar-active-bg);
+        color: var(--sidebar-text-active);
         font-weight: 500;
       }
     }
@@ -101,10 +79,10 @@ $danger-color: #fc8181;
       align-items: center;
       justify-content: space-between;
       padding: 12px 16px;
-      color: $sidebar-text;
+      color: var(--sidebar-text);
       border-radius: 8px;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: background-color 0.2s ease, color 0.2s ease;
 
       .toggle-label {
         display: flex;
@@ -117,10 +95,10 @@ $danger-color: #fc8181;
         position: relative;
         width: 36px;
         height: 20px;
-        background-color: rgba(255, 255, 255, 0.2);
+        background-color: var(--sidebar-toggle-track);
         border-radius: 20px;
-        transition: 0.3s;
-        
+        transition: background-color 0.35s ease;
+
         &::after {
           content: '';
           position: absolute;
@@ -128,23 +106,21 @@ $danger-color: #fc8181;
           left: 2px;
           width: 16px;
           height: 16px;
-          background-color: white;
+          background-color: var(--text-light);
           border-radius: 50%;
-          transition: 0.3s;
+          transition: transform 0.3s ease;
         }
       }
 
       &:hover {
-        background-color: $hover-bg;
-        color: #fff;
+        background-color: var(--sidebar-hover-bg);
+        color: var(--sidebar-text-active);
       }
 
       &.dark-mode-active {
         .toggle-switch {
-          background-color: $primary-color;
-          &::after {
-            transform: translateX(16px);
-          }
+          background-color: var(--primary-color);
+          &::after { transform: translateX(16px); }
         }
       }
     }
@@ -155,17 +131,17 @@ $danger-color: #fc8181;
       align-items: center;
       gap: 12px;
       padding: 12px 16px;
-      background-color: rgba(255, 255, 255, 0.05);
-      color: $sidebar-text;
+      background-color: var(--sidebar-btn-bg);
+      color: var(--sidebar-text);
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      transition: all 0.2s;
       font-size: 0.95rem;
+      transition: background-color 0.2s ease, color 0.2s ease;
 
       &:hover {
-        background-color: rgba($danger-color, 0.1);
-        color: $danger-color;
+        background-color: var(--sidebar-danger-bg);
+        color: var(--sidebar-danger);
       }
     }
   }

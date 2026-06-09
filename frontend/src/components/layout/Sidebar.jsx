@@ -1,10 +1,11 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import {
-  Home, Users, Calendar, Activity, ClipboardList,
-  Settings, LogOut, FileText, Moon, Sun, Box
+  Home, Users, Calendar, Activity, FlaskConical,
+  Settings, LogOut, FileText, Stethoscope, Moon, Sun, Box, ClipboardList
 } from 'lucide-react';
+import { useTheme } from '../../hooks/useTheme';
 import './Sidebar.scss';
 import logoImg from '../../assets/logo.png';
 
@@ -12,16 +13,11 @@ import logoImg from '../../assets/logo.png';
 const Sidebar = () => {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [isDarkMode, setIsDarkMode] = useState(false); // apenas visual por enquanto
+  const { isDarkMode, toggleTheme } = useTheme();
 
   const handleLogout = () => {
     logout();
     navigate('/login');
-  };
-
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-    // futuramente adicionar logica de temas
   };
 
   const role = user?.role || 'admin'; // Fallback
@@ -60,6 +56,9 @@ const Sidebar = () => {
             <NavLink to="/medico/home" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
               <Home size={20} /> <span>Dashboard Médico</span>
             </NavLink>
+            <NavLink to="/medico/consultas" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
+              <ClipboardList size={20} /> <span>Minhas Consultas</span>
+            </NavLink>
             <NavLink to="/medico/horarios" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
               <Calendar size={20} /> <span>Meus Horários</span>
             </NavLink>
@@ -82,10 +81,10 @@ const Sidebar = () => {
               <Calendar size={20} /> <span>Minhas Consultas</span>
             </NavLink>
             <NavLink to="/paciente/historico-exames" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
-              <ClipboardList size={20} /> <span>Resultados e Exames</span>
+              <FlaskConical size={20} /> <span>Resultados e Exames</span>
             </NavLink>
             <NavLink to="/paciente/diagnostico" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
-              <FileText size={20} /> <span>Meus Diagnósticos</span>
+              <Stethoscope size={20} /> <span>Meus Diagnósticos</span>
             </NavLink>
           </>
         )}

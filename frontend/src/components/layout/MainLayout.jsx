@@ -2,14 +2,15 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import './MainLayout.scss';
 
 const MainLayout = () => {
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#F2F5F4' }}>
+    <div className="main-layout">
       <Sidebar />
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <div className="main-layout__content">
         <Header />
-        <main style={{ flex: 1, padding: '0 3rem 2rem', overflowY: 'auto' }}>
+        <main className="main-layout__main">
           <Outlet />
         </main>
       </div>
