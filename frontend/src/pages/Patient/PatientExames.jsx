@@ -53,7 +53,7 @@ const PatientExames = () => {
       <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.35rem' }}>
         Resultados e Exames
       </h1>
-      <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1.25rem' }}>
+      <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.25rem' }}>
         Acompanhe todos os exames solicitados pelos seus médicos e seus resultados.
       </p>
 
@@ -61,7 +61,7 @@ const PatientExames = () => {
       <h3 className="patient-page__section-title">
         Meus Exames
         {!loading && (
-          <span style={{ fontSize: '1rem', fontWeight: 400, color: '#888', marginLeft: '0.75rem' }}>
+          <span style={{ fontSize: '1rem', fontWeight: 400, color: 'var(--text-neutral)', marginLeft: '0.75rem' }}>
             ({exames.length} {exames.length === 1 ? 'registro' : 'registros'})
           </span>
         )}
@@ -71,7 +71,7 @@ const PatientExames = () => {
         <div className="patient-page__loading">Carregando...</div>
       ) : exames.length === 0 ? (
         <div className="patient-page__empty">
-          <ClipboardList size={36} style={{ color: '#c8d8d2', marginBottom: '0.75rem' }} />
+          <ClipboardList size={36} style={{ color: 'var(--text-subtle)', marginBottom: '0.75rem' }} />
           <p>Nenhum exame registrado ainda.</p>
         </div>
       ) : (
@@ -91,7 +91,7 @@ const PatientExames = () => {
                   <td style={{ fontWeight: 600 }}>{e.tipo || '—'}</td>
                   <td>{e.medicoNome || '—'}</td>
                   <td>{formatData(e.dataExame)}</td>
-                  <td style={{ color: e.resultado ? '#1a2332' : '#aaa', fontStyle: e.resultado ? 'normal' : 'italic' }}>
+                  <td style={{ color: e.resultado ? 'var(--text-body)' : 'var(--text-placeholder)', fontStyle: e.resultado ? 'normal' : 'italic' }}>
                     {e.resultado
                       ? e.resultado.substring(0, 80) + (e.resultado.length > 80 ? '…' : '')
                       : 'Aguardando resultado'}

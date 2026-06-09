@@ -43,7 +43,7 @@ const ProntuarioCard = ({ prontuario, diagnosticos }) => {
       {aberto && (
         <div className="patient-page__prontuario-body">
           <p className="patient-page__prontuario-body-desc">
-            {prontuario.descricao || <em style={{ color: '#aaa' }}>Sem descrição registrada.</em>}
+            {prontuario.descricao || <em style={{ color: 'var(--text-placeholder)' }}>Sem descrição registrada.</em>}
           </p>
 
           {meusDiag.length > 0 && (
@@ -54,7 +54,7 @@ const ProntuarioCard = ({ prontuario, diagnosticos }) => {
                   <div key={d.id} className="patient-page__prontuario-body-diag-item">
                     {d.descricao || <em>Sem descrição.</em>}
                     {d.data && (
-                      <span style={{ float: 'right', fontSize: '0.75rem', color: '#888' }}>
+                      <span style={{ float: 'right', fontSize: '0.75rem', color: 'var(--text-neutral)' }}>
                         {formatData(d.data)}
                       </span>
                     )}
@@ -65,7 +65,7 @@ const ProntuarioCard = ({ prontuario, diagnosticos }) => {
           )}
 
           {meusDiag.length === 0 && (
-            <p style={{ color: '#aaa', fontSize: '0.85rem', fontStyle: 'italic' }}>
+            <p style={{ color: 'var(--text-placeholder)', fontSize: '0.85rem', fontStyle: 'italic' }}>
               Nenhum diagnóstico vinculado a este prontuário.
             </p>
           )}
@@ -124,7 +124,7 @@ const PatientDiagnostico = () => {
       <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.35rem' }}>
         Meus Diagnósticos
       </h1>
-      <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1.25rem' }}>
+      <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.25rem' }}>
         Acesse seus prontuários médicos e os diagnósticos registrados pelos seus médicos.
       </p>
 
@@ -132,7 +132,7 @@ const PatientDiagnostico = () => {
       <h3 className="patient-page__section-title">
         Prontuários
         {!loading && (
-          <span style={{ fontSize: '1rem', fontWeight: 400, color: '#888', marginLeft: '0.75rem' }}>
+          <span style={{ fontSize: '1rem', fontWeight: 400, color: 'var(--text-neutral)', marginLeft: '0.75rem' }}>
             ({prontuarios.length} {prontuarios.length === 1 ? 'registro' : 'registros'})
           </span>
         )}

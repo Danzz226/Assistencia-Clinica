@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Calendar, FileText, ClipboardList, Clock } from 'lucide-react';
+import { Calendar, FileText, FlaskConical, Clock, TrendingUp } from 'lucide-react';
 import { AuthContext } from '../../context/AuthContext';
 import api from '../../services/api';
 import { useToast } from '../../context/ToastContext';
@@ -87,7 +87,7 @@ const PatientHome = () => {
       <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.35rem' }}>
         Painel do Paciente
       </h1>
-      <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1.25rem' }}>
+      <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.25rem' }}>
         {getSaudacao()}, {user?.username || 'Paciente'}. Aqui você acompanha suas consultas, exames e histórico médico.
       </p>
 
@@ -100,15 +100,19 @@ const PatientHome = () => {
           <div className="patient-page__card-title">MINHAS CONSULTAS</div>
           <div className="patient-page__card-subtitle">Total de agendamentos</div>
           <div className="patient-page__card-number">{loading ? '—' : stats.consultas}</div>
-          <div className="patient-page__card-pill patient-page__card-pill--blue">Histórico completo</div>
+          <div className="patient-page__card-pill patient-page__card-pill--blue">
+            <TrendingUp size={14} /> Total acumulado
+          </div>
         </div>
 
         <div className="patient-page__card">
-          <div className="patient-page__card-icon"><ClipboardList size={24} /></div>
+          <div className="patient-page__card-icon"><FlaskConical size={24} /></div>
           <div className="patient-page__card-title">MEUS EXAMES</div>
           <div className="patient-page__card-subtitle">Exames solicitados</div>
           <div className="patient-page__card-number">{loading ? '—' : stats.exames}</div>
-          <div className="patient-page__card-pill patient-page__card-pill--orange">Resultados disponíveis</div>
+          <div className="patient-page__card-pill patient-page__card-pill--orange">
+            <FlaskConical size={14} /> Total acumulado
+          </div>
         </div>
 
         <div className="patient-page__card">
@@ -116,7 +120,9 @@ const PatientHome = () => {
           <div className="patient-page__card-title">PRONTUÁRIOS</div>
           <div className="patient-page__card-subtitle">Registros médicos</div>
           <div className="patient-page__card-number">{loading ? '—' : stats.prontuarios}</div>
-          <div className="patient-page__card-pill patient-page__card-pill--green">Histórico clínico</div>
+          <div className="patient-page__card-pill patient-page__card-pill--green">
+            <TrendingUp size={14} /> Total acumulado
+          </div>
         </div>
       </div>
 
@@ -145,12 +151,12 @@ const PatientHome = () => {
               {proximas.map((a) => (
                 <tr key={a.id}>
                   <td style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                    <Clock size={14} style={{ color: '#7a9c8e' }} />
+                    <Clock size={14} style={{ color: 'var(--text-muted)' }} />
                     {formatData(a.data)}
                   </td>
                   <td>{formatHora(a.data)}</td>
                   <td>{a.medicoNome || '—'}</td>
-                  <td style={{ color: '#555', fontStyle: 'italic' }}>
+                  <td style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>
                     {a.motivoConsulta ? a.motivoConsulta.substring(0, 50) + (a.motivoConsulta.length > 50 ? '…' : '') : '—'}
                   </td>
                   <td>
