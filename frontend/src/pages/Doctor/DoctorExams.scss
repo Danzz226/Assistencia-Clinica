@@ -3,24 +3,33 @@
   margin-top: 1rem;
   padding-bottom: 2rem;
 
+  &__header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 0.25rem;
+  }
+
   &__title {
     font-size: 2rem;
     font-weight: 700;
-    color: #000;
-    margin-bottom: 0.75rem;
+    color: var(--text-heading);
+    margin-bottom: 0.35rem;
+    transition: color 0.25s ease;
   }
 
   &__desc {
-    font-size: 1rem;
-    color: #555;
-    margin-bottom: 2rem;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 1.25rem;
+    transition: color 0.25s ease;
   }
 
   &__tabs {
     display: flex;
     gap: 0.5rem;
     margin-bottom: 1.5rem;
-    border-bottom: 2px solid #e8f0ec;
+    border-bottom: 2px solid var(--border-color);
     padding-bottom: 0;
   }
 
@@ -35,48 +44,50 @@
     margin-bottom: -2px;
     font-size: 0.9rem;
     font-weight: 600;
-    color: #7a9c8e;
+    color: var(--text-muted);
     cursor: pointer;
     border-radius: 6px 6px 0 0;
-    transition: color 0.2s, background 0.2s;
+    font-family: inherit;
+    transition: color 0.2s ease, background-color 0.2s ease;
 
     &:hover {
-      color: #3b5f50;
-      background: #f7faf9;
+      color: var(--primary-color);
+      background-color: var(--surface-hover);
     }
 
     &--active {
-      color: #3b5f50;
-      border-bottom-color: #3b5f50;
-      background: #f7faf9;
+      color: var(--primary-color);
+      border-bottom-color: var(--primary-color);
+      background-color: var(--surface-hover);
     }
   }
 
   &__tab-badge {
-    background: #e8f0ec;
-    color: #3b5f50;
+    background: var(--badge-admin-bg);
+    color: var(--badge-admin-color);
     font-size: 0.75rem;
     font-weight: 700;
-    padding: 0.1rem 0.5rem;
-    border-radius: 20px;
+    padding: 4px 12px;
+    border-radius: 2px;
     min-width: 22px;
     text-align: center;
+    transition: background-color 0.35s ease, color 0.25s ease;
   }
 
   &__empty {
     padding: 2rem;
-    background: #fff;
+    background: var(--surface-elevated);
     border-radius: 16px;
     text-align: center;
-    color: #888;
+    color: var(--text-muted);
     font-size: 0.95rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    box-shadow: var(--shadow-soft);
   }
 
   &__table-wrapper {
-    background: #fff;
+    background: var(--surface-elevated);
     border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    box-shadow: var(--shadow-soft);
     overflow: hidden;
   }
 
@@ -86,8 +97,8 @@
     font-size: 0.9rem;
 
     thead tr {
-      background-color: #f7faf9;
-      border-bottom: 1px solid #e8f0ec;
+      background-color: var(--surface-subtle);
+      border-bottom: 1px solid var(--border-color);
     }
 
     th {
@@ -95,66 +106,77 @@
       text-align: left;
       font-size: 0.75rem;
       font-weight: 700;
-      color: #7a9c8e;
+      color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
 
     td {
       padding: 0.9rem 1.25rem;
-      color: #1a2332;
-      border-bottom: 1px solid #f0f4f2;
+      color: var(--text-body);
+      border-bottom: 1px solid var(--surface-hover);
       vertical-align: middle;
     }
 
-    tbody tr:last-child td {
-      border-bottom: none;
-    }
+    tbody tr:last-child td { border-bottom: none; }
 
     tbody tr {
       transition: background-color 0.15s;
-
-      &:hover {
-        background-color: #f7faf9;
-      }
+      &:hover { background-color: var(--surface-hover); }
     }
   }
 
   &__id {
     font-weight: 700;
-    color: #7a9c8e !important;
+    color: var(--text-muted) !important;
     font-size: 0.8rem !important;
   }
 
-  &__name {
-    font-weight: 600;
-  }
+  &__name { font-weight: 600; }
 
   &__desc-cell {
-    color: #555 !important;
+    color: var(--text-muted) !important;
     font-style: italic;
-
-    em {
-      color: #aaa;
-    }
+    em { opacity: 0.6; }
   }
 
   &__badge {
     display: inline-block;
-    padding: 0.2rem 0.65rem;
-    border-radius: 20px;
+    padding: 4px 12px;
+    border-radius: 2px;
     font-size: 0.8rem;
     font-weight: 600;
+    transition: background-color 0.35s ease, color 0.25s ease;
 
     &--green {
-      background: #e8f0ec;
-      color: #3b5f50;
+      background: var(--badge-success-bg);
+      color: var(--badge-success-color);
     }
 
     &--blue {
-      background: #e8eef8;
-      color: #2a4a80;
+      background: var(--badge-info-bg);
+      color: var(--badge-info-color);
     }
+  }
+
+  &__btn-pdf {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 1rem;
+    border: 1.5px solid var(--btn-pdf-border);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--btn-pdf-color);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    white-space: nowrap;
+    transition: background 0.2s, opacity 0.2s;
+
+    &:hover:not(:disabled) { background: var(--btn-pdf-hover); }
+    &:disabled { opacity: 0.55; cursor: not-allowed; }
   }
 
   &__error {
@@ -164,11 +186,11 @@
     transform: translateX(-50%);
     z-index: 9999;
     padding: 1rem 1.5rem;
-    background-color: #fff3f3;
-    border-left: 4px solid #ff4d4f;
+    background-color: var(--color-error-bg);
+    border-left: 4px solid var(--color-error-border);
     border-radius: 8px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-    color: #cf1322;
+    box-shadow: var(--shadow-md);
+    color: var(--color-error);
     font-size: 0.875rem;
     animation: slideDownToast 0.4s ease-out forwards;
     pointer-events: none;

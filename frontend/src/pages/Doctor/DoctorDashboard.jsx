@@ -50,7 +50,7 @@ const DoctorDashboard = () => {
         setMedicoNome(medicoLogado.nome);
 
         // /pacientes buscado separado para não ser afetado por falha em outras chamadas
-        const pacientesRes = await api.get('/pacientes');
+        const pacientesRes = await api.get('/medicos/me/pacientes');
         setStats(prev => ({ ...prev, pacientes: (pacientesRes.data || []).length }));
 
         try {
@@ -105,7 +105,7 @@ const DoctorDashboard = () => {
       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
         <div>
           <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.35rem' }}>Dashboard Médico</h1>
-          <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1.25rem' }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.25rem' }}>
             {getSaudacao()}, {medicoNome ? `Dr(a). ${medicoNome}` : user?.username}. Aqui você acompanha seus pacientes, prontuários e sua agenda.
           </p>
         </div>

@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { FileText, FlaskConical } from 'lucide-react';
+import { FaFilePdf } from 'react-icons/fa';
 import { AuthContext } from '../../context/AuthContext';
 import api from '../../services/api';
 import { useToast } from '../../context/ToastContext';
+import { downloadProntuarioPDF } from '../../services/downloadPDF';
 import './DoctorExams.scss';
 
 // TODO [BACKEND]: Substituir por endpoints filtrados:
@@ -18,6 +20,8 @@ const DoctorExams = () => {
   const [prontuarios, setProntuarios] = useState([]);
   const [exames, setExames] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const [gerandoPdf, setGerandoPdf] = useState(null);
 
   useEffect(() => {
     const fetchDados = async () => {
@@ -64,12 +68,29 @@ const DoctorExams = () => {
     return new Date(dateStr).toLocaleDateString('pt-BR');
   };
 
+  const baixarPDF = async (prontuario) => {
+    setGerandoPdf(prontuario.id);
+    try {
+      let dados = prontuario;
+      try {
+        const res = await api.get(`/prontuarios/${prontuario.id}`);
+        dados = res.data;
+      } catch { /* usa dados locais se endpoint indisponível */ }
+      await downloadProntuarioPDF(dados);
+      toast.success('PDF baixado com sucesso!');
+    } catch {
+      toast.error('Erro ao gerar o PDF.');
+    } finally {
+      setGerandoPdf(null);
+    }
+  };
+
   return (
     <div className="doctor-exams">
-      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+      <div className="doctor-exams__header">
         <div>
-          <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.35rem' }}>Exames e Prontuários</h1>
-          <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1.25rem' }}>Registros médicos e exames dos seus pacientes.</p>
+          <h1 className="doctor-exams__title">Exames e Prontuários</h1>
+          <p className="doctor-exams__desc">Registros médicos e exames dos seus pacientes.</p>
         </div>
       </div>
 
@@ -111,6 +132,7 @@ const DoctorExams = () => {
                       <th>Paciente</th>
                       <th>Descrição</th>
                       <th>Data de Registro</th>
+                      <th></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -133,6 +155,17 @@ const DoctorExams = () => {
                             <span className="doctor-exams__badge doctor-exams__badge--green">
                               {formatData(p.dataRegistro)}
                             </span>
+                          </td>
+                          <td>
+                            <button
+                              className="doctor-exams__btn-pdf"
+                              onClick={() => baixarPDF(p)}
+                              disabled={gerandoPdf === p.id}
+                              title="Baixar prontuário em PDF"
+                            >
+                              {gerandoPdf === p.id ? 'Gerando...' : 'Download PDF'}
+                              <FaFilePdf size={20} color="#e53e3e" />
+                            </button>
                           </td>
                         </tr>
                       ))}
