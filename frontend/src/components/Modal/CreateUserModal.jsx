@@ -9,6 +9,17 @@ import { ESTADOS_BR } from '../CustomSelect/states';
 import { ESPECIALIDADES_MEDICAS } from '../CustomSelect/specialties';
 
 const PHONE_RE = /^\(\d{2}\) \d{5}-\d{4}$/;
+const CPF_RE = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
+
+const formatCpf = (val) => {
+  if (!val) return '';
+  let num = val.replace(/\D/g, '');
+  if (num.length > 11) num = num.substring(0, 11);
+  if (num.length <= 3) return num;
+  if (num.length <= 6) return `${num.substring(0, 3)}.${num.substring(3)}`;
+  if (num.length <= 9) return `${num.substring(0, 3)}.${num.substring(3, 6)}.${num.substring(6)}`;
+  return `${num.substring(0, 3)}.${num.substring(3, 6)}.${num.substring(6, 9)}-${num.substring(9)}`;
+};
 
 const formatPhone = (val) => {
   if (!val) return '';
@@ -22,13 +33,12 @@ const formatPhone = (val) => {
 const TIPOS = [
   { value: 'paciente', label: 'Paciente' },
   { value: 'medico', label: 'Médico' },
-  { value: 'admin', label: 'Administrador' },
   { value: 'funcionario', label: 'Funcionário' },
 ];
 
 const INITIAL = {
   nome: '', email: '', senha: '', tipo: 'paciente',
-  crm: '', uf: '', especialidade: '', cargo: '',
+  cpf: '', crm: '', uf: '', especialidade: '', cargo: '',
   dataNascimento: '', telefone: '', endereco: '',
 };
 
@@ -60,6 +70,16 @@ const CreateUserModal = ({ isOpen, onClose, onCreated }) => {
       return;
     }
 
+    if (form.tipo === 'paciente' && !form.cpf) {
+      setError('CPF é obrigatório para paciente.');
+      return;
+    }
+
+    if (form.cpf && !CPF_RE.test(form.cpf)) {
+      setError('CPF deve estar no formato: 000.000.000-00');
+      return;
+    }
+
     if (getPasswordStrength(form.senha).level < 2) {
       toast.error('senha muito fraca');
       return;
@@ -74,6 +94,8 @@ const CreateUserModal = ({ isOpen, onClose, onCreated }) => {
         senha: form.senha,
         tipo: form.tipo,
       };
+
+      if (form.cpf) payload.cpf = form.cpf;
 
       if (form.tipo === 'medico') {
         if (form.crm) payload.crm = form.crm;
@@ -117,6 +139,11 @@ const CreateUserModal = ({ isOpen, onClose, onCreated }) => {
         <div className="modal-field">
           <label>E-mail *</label>
           <input type="email" value={form.email} onChange={set('email')} required maxLength={150} placeholder="email@exemplo.com" />
+        </div>
+
+        <div className="modal-field">
+          <label>CPF {form.tipo === 'paciente' ? '*' : '(opcional)'}</label>
+          <input type="text" value={form.cpf} onChange={(e) => setForm(prev => ({ ...prev, cpf: formatCpf(e.target.value) }))} required={form.tipo === 'paciente'} maxLength={14} placeholder="000.000.000-00" />
         </div>
 
         <div className="modal-field">

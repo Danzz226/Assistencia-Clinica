@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { Pencil, Trash2, FileText, User, ChevronDown, Lock, Plus, ClipboardList } from 'lucide-react';
+import { FaFilePdf } from 'react-icons/fa';
+import { downloadProntuarioPDF } from '../../services/downloadPDF';
 import api from '../../services/api';
 import { useToast } from '../../context/ToastContext';
 import GenericTable from '../../components/GenericTable';
@@ -28,6 +30,19 @@ const ManageUsers = () => {
   const [prontuarioUser, setProntuarioUser] = useState(null);
   const [prontuarios, setProntuarios] = useState([]);
   const [loadingProntuarios, setLoadingProntuarios] = useState(false);
+  const [downloadingId, setDownloadingId] = useState(null);
+
+  const handleDownloadPDF = async (pr) => {
+    setDownloadingId(pr.id);
+    try {
+      await downloadProntuarioPDF(pr);
+      toast.success('PDF baixado com sucesso!');
+    } catch {
+      toast.error('Erro ao gerar o PDF.');
+    } finally {
+      setDownloadingId(null);
+    }
+  };
 
   const { user } = useContext(AuthContext);
   const isAdmin = user?.role === 'admin';
@@ -167,6 +182,14 @@ const ManageUsers = () => {
     { header: 'Nome', accessor: 'nome' },
     { header: 'E-mail', accessor: 'email' },
     {
+      header: 'Especialidade',
+      accessor: 'especialidade',
+      hideWhenEmpty: true,
+      render: (row) => row.especialidade
+        ? <Badge variant="especialidade">{row.especialidade}</Badge>
+        : '—',
+    },
+    {
       header: 'Tipo',
       render: (row) => {
         const tipo = row.tipo?.toLowerCase() || '';
@@ -224,7 +247,7 @@ const ManageUsers = () => {
       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
         <div>
           <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.35rem' }}>Gerenciar Usuários</h1>
-          <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1.25rem' }}>Visualize e gerencie os acessos do sistema.</p>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.25rem' }}>Visualize e gerencie os acessos do sistema.</p>
         </div>
         {isAdmin && (
           <button className="btn-create" style={{ flexShrink: 0 }} onClick={() => setCreateModalOpen(true)}>
@@ -343,8 +366,22 @@ const ManageUsers = () => {
             <ul className="mu-prontuario-list">
               {prontuarios.map((pr) => (
                 <li key={pr.id} className="mu-prontuario-item">
-                  <span className="mu-prontuario-date">{formatData(pr.dataRegistro)}</span>
-                  <p className="mu-prontuario-desc">{pr.descricao || 'Sem descrição.'}</p>
+                  <div className="mu-prontuario-item-header">
+                    <span className="mu-prontuario-date">{formatData(pr.dataRegistro)}</span>
+                    <div className="mu-prontuario-item-actions">
+                      <span className="mu-prontuario-medico">{pr.medicoNome || ''}</span>
+                      <button
+                        className="btn-pdf-icon"
+                        title="Baixar PDF"
+                        disabled={downloadingId === pr.id}
+                        onClick={() => handleDownloadPDF(pr)}
+                      >
+                        {downloadingId === pr.id ? 'Gerando...' : 'Download PDF'}
+                        <FaFilePdf size={20} color="#e53e3e" />
+                      </button>
+                    </div>
+                  </div>
+                  <p className="mu-prontuario-desc">{pr.queixaPrincipal || pr.descricao || 'Sem descrição.'}</p>
                 </li>
               ))}
             </ul>

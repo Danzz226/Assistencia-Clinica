@@ -4,8 +4,13 @@ import { Activity, Users, XCircle, CheckCircle } from 'lucide-react';
 import api from '../../services/api';
 import './Reports.scss';
 
-// Cores originais (vibrantes e sem parecer transparentes)
-const PIE_COLORS = ['#30e3a7', '#3b82f6', '#ef4444']; // Verde(Concluida), Azul(Agendada), Vermelho(Cancelada)
+// Cores dos dados do gráfico — vibrantes para ficarem visíveis em light e dark
+const PIE_COLORS = ['#30e3a7', '#3b82f6', '#ef4444']; // Verde(Concluída), Azul(Agendada), Vermelho(Cancelada)
+
+// Lê CSS variables do tema atual para usar nos elementos SVG do Recharts
+function getCSSVar(name) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
 
 const Reports = () => {
   const [data, setData] = useState([]);
@@ -18,7 +23,6 @@ const Reports = () => {
         setData(response.data);
       } catch (error) {
         console.error("Erro na API. Usando mock data.", error);
-        // Fallback visual para caso o Java esteja desligado
         setData([
           { id: 1, medicoNome: 'Dr. Roberto', status: 'realizado' },
           { id: 2, medicoNome: 'Dr. Roberto', status: 'agendado' },
@@ -38,41 +42,44 @@ const Reports = () => {
     fetchData();
   }, []);
 
-  // --- MATEMÁTICA / CÁLCULOS FEITOS PELO REACT ---
-  const total = data.length;
+  const total      = data.length;
   const concluidas = data.filter(c => c.status === 'realizado').length;
   const canceladas = data.filter(c => c.status === 'cancelado').length;
-  const agendadas = data.filter(c => c.status === 'agendado').length;
+  const agendadas  = data.filter(c => c.status === 'agendado').length;
 
   const taxaCancelamento = total > 0 ? Math.round((canceladas / total) * 100) : 0;
 
-  // Dados formatados para o Gráfico de Pizza (Status)
   const pieData = [
     { name: 'Concluídas', value: concluidas },
-    { name: 'Agendadas', value: agendadas },
+    { name: 'Agendadas',  value: agendadas  },
     { name: 'Canceladas', value: canceladas },
   ];
 
-  // Dados formatados para o Gráfico de Barras (Volume por Médico)
   const medicosMap = {};
   data.forEach(c => {
     const nome = c.medicoNome || 'Desconhecido';
     if (!medicosMap[nome]) {
       medicosMap[nome] = { nome, Concluídas: 0, Agendadas: 0, Canceladas: 0 };
     }
-    
     if (c.status === 'realizado') medicosMap[nome].Concluídas++;
     else if (c.status === 'agendado') medicosMap[nome].Agendadas++;
     else if (c.status === 'cancelado') medicosMap[nome].Canceladas++;
   });
   const barData = Object.values(medicosMap);
 
+  // Cores do tema lidas em tempo de render para os elementos SVG do Recharts
+  const tickColor    = getCSSVar('--text-neutral')  || '#888';
+  const gridColor    = getCSSVar('--border-color')  || '#eee';
+  const tooltipBg    = getCSSVar('--surface-card')  || '#fff';
+  const tooltipBorder = getCSSVar('--border-color') || '#eee';
+  const tooltipText  = getCSSVar('--text-main')     || '#333';
+
   return (
     <div className="reports-container">
-      <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.35rem' }}>Relatório de Desempenho</h1>
-      <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1.25rem' }}>Visão geral do desempenho e métricas da clínica.</p>
+      <h1 className="reports-title">Relatório de Desempenho</h1>
+      <p className="reports-desc">Visão geral do desempenho e métricas da clínica.</p>
 
-      {/* Cards Superiores (KPIs) */}
+      {/* Cards KPIs */}
       <div className="reports-kpi-grid">
         <div className="kpi-card">
           <div className="kpi-icon blue"><Activity size={24}/></div>
@@ -99,7 +106,7 @@ const Reports = () => {
 
       {/* Grid de Gráficos */}
       <div className="reports-charts-grid">
-        
+
         {/* Gráfico 1: Pizza */}
         <div className="chart-card">
           <h3>Status Geral das Consultas</h3>
@@ -120,8 +127,16 @@ const Reports = () => {
                     <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip formatter={(value) => [`${value} Consultas`, 'Quantidade']} />
-                <Legend />
+                <Tooltip
+                  formatter={(value) => [`${value} Consultas`, 'Quantidade']}
+                  contentStyle={{
+                    background: tooltipBg,
+                    border: `1px solid ${tooltipBorder}`,
+                    borderRadius: '8px',
+                    color: tooltipText,
+                  }}
+                />
+                <Legend wrapperStyle={{ color: tooltipText }} />
               </PieChart>
             </ResponsiveContainer>
           </div>
@@ -133,13 +148,21 @@ const Reports = () => {
           <div className="chart-wrapper">
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={barData} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eee" />
-                <XAxis dataKey="nome" tick={{ fill: '#666' }} axisLine={false} />
-                <YAxis tick={{ fill: '#666' }} axisLine={false} tickLine={false} />
-                <Tooltip cursor={{fill: 'transparent'}} />
-                <Legend />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={gridColor} />
+                <XAxis dataKey="nome" tick={{ fill: tickColor }} axisLine={false} />
+                <YAxis tick={{ fill: tickColor }} axisLine={false} tickLine={false} />
+                <Tooltip
+                  cursor={{ fill: 'transparent' }}
+                  contentStyle={{
+                    background: tooltipBg,
+                    border: `1px solid ${tooltipBorder}`,
+                    borderRadius: '8px',
+                    color: tooltipText,
+                  }}
+                />
+                <Legend wrapperStyle={{ color: tooltipText }} />
                 <Bar dataKey="Concluídas" stackId="a" fill="#30e3a7" radius={[0, 0, 4, 4]} />
-                <Bar dataKey="Agendadas" stackId="a" fill="#3b82f6" />
+                <Bar dataKey="Agendadas"  stackId="a" fill="#3b82f6" />
                 <Bar dataKey="Canceladas" stackId="a" fill="#ef4444" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>

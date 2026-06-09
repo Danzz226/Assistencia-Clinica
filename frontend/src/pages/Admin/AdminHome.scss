@@ -6,20 +6,20 @@
   &__title {
     font-size: 2rem;
     font-weight: 700;
-    color: #000;
+    color: var(--text-heading);
     margin-bottom: 1.5rem;
   }
 
   &__subtitle {
     font-size: 1.25rem;
     font-weight: 700;
-    color: #000;
+    color: var(--text-heading);
     margin-bottom: 0.75rem;
   }
 
   &__desc {
     font-size: 1rem;
-    color: #333;
+    color: var(--text-body);
     line-height: 1.5;
     margin-bottom: 2rem;
   }
@@ -27,7 +27,7 @@
   &__section-label {
     font-size: 0.75rem;
     font-weight: 700;
-    color: #7a9c8e;
+    color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 1px;
     margin-bottom: 0.5rem;
@@ -36,7 +36,7 @@
   &__section-title {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #000;
+    color: var(--text-heading);
     margin-bottom: 1.5rem;
   }
 
@@ -47,25 +47,25 @@
   }
 
   &__card {
-    background-color: #ffffff;
+    background-color: var(--surface-card);
     border-radius: 16px;
     padding: 1.5rem;
     flex: 1;
     min-width: 250px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    box-shadow: var(--shadow-soft);
     display: flex;
     flex-direction: column;
 
     &-icon-wrapper {
       width: 48px;
       height: 48px;
-      background-color: #e8f0ec;
+      background-color: var(--card-icon-bg);
       border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
       margin-bottom: 1.5rem;
-      color: #3b5f50;
+      color: var(--primary-color);
 
       svg {
         width: 24px;
@@ -76,7 +76,7 @@
     &-title {
       font-size: 0.75rem;
       font-weight: 700;
-      color: #7a9c8e;
+      color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.5px;
       margin-bottom: 0.25rem;
@@ -84,14 +84,14 @@
 
     &-subtitle {
       font-size: 0.75rem;
-      color: #888;
+      color: var(--text-neutral);
       margin-bottom: 1rem;
     }
 
     &-number {
       font-size: 2.5rem;
       font-weight: 800;
-      color: #000;
+      color: var(--text-heading);
       margin-bottom: 1rem;
       line-height: 1;
     }
@@ -106,15 +106,10 @@
       align-items: center;
       gap: 0.25rem;
 
-      &--green {
-        background-color: #e8f0ec;
-        color: #3b5f50;
-      }
-
-      &--neutral {
-        background-color: #f0f0f0;
-        color: #888;
-      }
+      &--green   { background-color: var(--icon-bg-green);   color: var(--badge-admin-color); }
+      &--blue    { background-color: var(--pill-blue-bg);    color: var(--pill-blue-color); }
+      &--orange  { background-color: var(--pill-orange-bg);  color: var(--color-warning); }
+      &--neutral { background-color: var(--surface-muted); color: var(--text-neutral); }
     }
   }
 
@@ -125,36 +120,23 @@
     transform: translateX(-50%);
     z-index: 9999;
     padding: 1rem 1.5rem;
-    background-color: #fff3f3;
-    border-left: 4px solid #ff4d4f;
+    background-color: var(--color-error-bg);
+    border-left: 4px solid var(--color-error-border);
     border-radius: 8px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-    color: #cf1322;
+    box-shadow: var(--shadow-md);
+    color: var(--color-error);
     font-size: 0.875rem;
     animation: slideDownToast 0.4s ease-out forwards;
     pointer-events: none;
     min-width: 300px;
     text-align: left;
 
-    h4 {
-      margin-top: 0;
-      margin-bottom: 0.5rem;
-      font-weight: 600;
-    }
-    
-    p {
-      margin: 0;
-    }
+    h4 { margin-top: 0; margin-bottom: 0.5rem; font-weight: 600; }
+    p  { margin: 0; }
   }
 }
 
 @keyframes slideDownToast {
-  from {
-    top: -50px;
-    opacity: 0;
-  }
-  to {
-    top: 30px;
-    opacity: 1;
-  }
+  from { top: -50px; opacity: 0; }
+  to   { top: 30px;  opacity: 1; }
 }

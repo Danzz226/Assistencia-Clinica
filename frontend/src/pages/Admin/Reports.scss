@@ -6,12 +6,14 @@
   .reports-title {
     font-size: 2rem;
     font-weight: bold;
+    color: var(--text-heading);
     margin-bottom: 0.5rem;
   }
-  
+
   .reports-desc {
     margin-bottom: 2rem;
-    color: #666;
+    color: var(--text-muted);
+    font-size: 0.9rem;
   }
 
   .reports-kpi-grid {
@@ -21,18 +23,21 @@
     margin-bottom: 2rem;
 
     .kpi-card {
-      background: #fff;
+      background: var(--surface-card);
       border-radius: 12px;
       padding: 1.5rem;
       display: flex;
       align-items: center;
       gap: 1rem;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: var(--shadow-soft);
+      transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        background-color 0.35s ease;
 
       &:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+        box-shadow: var(--shadow-md);
       }
 
       .kpi-icon {
@@ -42,26 +47,29 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        transition: background-color 0.35s ease, color 0.25s ease;
 
-        &.blue { background: #e0f2fe; color: #0284c7; }
-        &.green { background: #d1fae5; color: #059669; }
-        &.red { background: #fee2e2; color: #dc2626; }
+        &.blue  { background: var(--icon-bg-blue);  color: var(--color-info); }
+        &.green { background: var(--icon-bg-green); color: var(--color-success); }
+        &.red   { background: var(--icon-bg-red);   color: var(--color-danger); }
       }
 
       .kpi-info {
         h3 {
           margin: 0;
           font-size: 0.875rem;
-          color: #6b7280;
+          color: var(--text-muted);
           text-transform: uppercase;
           letter-spacing: 0.5px;
           font-weight: 700;
+          transition: color 0.25s ease;
         }
         p {
           margin: 0;
           font-size: 1.75rem;
           font-weight: bold;
-          color: #1f2937;
+          color: var(--text-heading);
+          transition: color 0.25s ease;
         }
       }
     }
@@ -77,17 +85,21 @@
     }
 
     .chart-card {
-      background: #fff;
+      background: var(--surface-card);
       border-radius: 12px;
       padding: 1.5rem;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+      box-shadow: var(--shadow-soft);
+      transition:
+        background-color 0.35s ease,
+        box-shadow 0.30s ease;
 
       h3 {
         margin-top: 0;
         margin-bottom: 1.5rem;
         font-size: 1.125rem;
-        color: #374151;
+        color: var(--text-heading);
         font-weight: 700;
+        transition: color 0.25s ease;
       }
 
       .chart-wrapper {

@@ -82,7 +82,7 @@ const AdminHome = () => {
       <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.35rem' }}>
         Dashboard Administrativo
       </h1>
-      <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1.25rem' }}>
+      <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.25rem' }}>
         Gerencie usuários, visualize consultas e acesse relatórios gerenciais da clínica.
       </p>
 
