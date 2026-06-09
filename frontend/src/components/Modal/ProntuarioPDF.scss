@@ -1,0 +1,120 @@
+.pront-pdf {
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 11pt;
+  color: #111111;
+  background: #ffffff;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px 32px;
+
+  &__header {
+    text-align: center;
+    border-bottom: 2px solid #1a1a2e;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+  }
+
+  &__header-title {
+    font-size: 16pt;
+    font-weight: bold;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #1a1a2e;
+  }
+
+  &__header-date { font-size: 9pt; color: #444; margin-top: 4px; }
+
+  &__parties {
+    display: flex;
+    border: 1px solid #ccc;
+    margin-bottom: 14px;
+  }
+
+  &__party        { flex: 1; padding: 10px 14px; }
+  &__party-divider { width: 1px; background: #ccc; flex-shrink: 0; }
+  &__party-label  { font-size: 8pt; font-weight: bold; letter-spacing: 1px; color: #555; text-transform: uppercase; margin-bottom: 4px; }
+  &__party-name   { font-size: 12pt; font-weight: bold; margin-bottom: 3px; color: #111; }
+  &__party-detail { font-size: 9.5pt; color: #333; line-height: 1.5; }
+
+  &__section {
+    margin-bottom: 14px;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  &__section-title {
+    background: #1a1a2e;
+    color: #fff;
+    font-size: 9pt;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 5px 12px;
+  }
+
+  &__vitals-grid {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 10px 12px;
+  }
+
+  &__vital-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 90px;
+    padding: 4px 12px;
+    border-right: 1px solid #eee;
+    &:last-child { border-right: none; }
+  }
+
+  &__vital-label { font-size: 8pt; color: #666; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+  &__vital-value { font-size: 11pt; font-weight: bold; margin-top: 2px; color: #111; }
+
+  &__field {
+    padding: 5px 12px;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    gap: 8px;
+    line-height: 1.5;
+    &:last-child { border-bottom: none; }
+  }
+
+  &__field-label { font-weight: bold; font-size: 9.5pt; white-space: nowrap; flex-shrink: 0; color: #222; }
+  &__field-value { font-size: 9.5pt; color: #111; }
+  &__text-block  { padding: 8px 12px; font-size: 9.5pt; line-height: 1.6; white-space: pre-wrap; color: #111; }
+
+  &__footer { margin-top: 32px; display: flex; justify-content: flex-end; }
+
+  &__signature       { text-align: center; min-width: 220px; }
+  &__signature-line  { border-bottom: 1px solid #333; margin-bottom: 6px; }
+  &__signature-name  { font-size: 10pt; font-weight: bold; color: #111; }
+  &__signature-crm   { font-size: 9pt; color: #444; }
+
+  &--dark {
+    background: var(--bg-page);
+    color: var(--text-heading);
+
+    .pront-pdf__header        { border-bottom-color: var(--primary-color); }
+    .pront-pdf__header-title  { color: var(--primary-color); }
+    .pront-pdf__header-date   { color: var(--text-muted); }
+    .pront-pdf__parties       { border-color: var(--border-color); background: var(--surface-inset); }
+    .pront-pdf__party-divider { background: var(--border-color); }
+    .pront-pdf__party-label   { color: var(--primary-color); }
+    .pront-pdf__party-name    { color: var(--text-heading); }
+    .pront-pdf__party-detail  { color: var(--text-body); }
+    .pront-pdf__section       { border-color: var(--border-color); }
+    .pront-pdf__section-title { background: var(--icon-bg-green); color: var(--primary-color); }
+    .pront-pdf__field         { border-bottom-color: var(--border-divider); }
+    .pront-pdf__field-label   { color: var(--primary-color); }
+    .pront-pdf__field-value   { color: var(--text-heading); }
+    .pront-pdf__text-block    { color: var(--text-heading); }
+    .pront-pdf__vital-label   { color: var(--text-muted); }
+    .pront-pdf__vital-value   { color: var(--text-heading); }
+    .pront-pdf__vital-item    { border-right-color: var(--border-color); }
+    .pront-pdf__signature-line { border-bottom-color: var(--primary-color); }
+    .pront-pdf__signature-name { color: var(--text-heading); }
+    .pront-pdf__signature-crm  { color: var(--text-muted); }
+  }
+}
