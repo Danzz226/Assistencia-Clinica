@@ -1,285 +1,320 @@
-.doctor-schedule {
-  padding: 2rem;
-  height: 100%;
+/* ─── Wrapper da página: trava a altura no <main> para o scroll ficar interno ─── */
+.doctor-schedule-page {
   display: flex;
   flex-direction: column;
-  background-color: #ffffff;
+  height: 100%;
+  overflow: hidden;
+  padding-top: 1.5rem;
+  padding-bottom: 1rem;
+
+  &__heading {
+    flex-shrink: 0;
+    margin-bottom: 1.25rem;
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text-heading);
+      margin-bottom: 0.35rem;
+    }
+
+    p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+  }
+}
+
+/* ─── Loading ─── */
+.schedule-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+/* ─── Calendário ─── */
+.doctor-schedule {
+  flex: 1;
+  min-height: 0;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--surface-elevated);
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  box-shadow: var(--shadow-soft);
   font-family: 'Inter', sans-serif;
   overflow: hidden;
 
-  /* Header Superior */
+  /* Header: navegação do mês + controles */
   &__header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
 
-    .doc-info {
+    .month-nav {
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 0.5rem;
 
-      .avatar {
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        background-color: #639886;
-        /* Cor aproximada da imagem */
-        color: white;
+      .arrows {
         display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
-        font-size: 1.1rem;
-      }
+        gap: 0.25rem;
 
-      .details {
-        h2 {
-          font-size: 1.25rem;
-          font-weight: 700;
-          color: #2c3e50;
-          margin: 0;
+        button {
+          width: 32px;
+          height: 32px;
+          border: 1px solid var(--border-color);
+          background: var(--surface-elevated);
+          border-radius: 6px;
           display: flex;
           align-items: center;
-          gap: 0.5rem;
-        }
+          justify-content: center;
+          color: var(--text-heading);
+          cursor: pointer;
+          transition: background 0.2s;
 
-        p {
-          font-size: 0.85rem;
-          color: #7f8c8d;
-          margin: 0.2rem 0 0 0;
+          &:hover {
+            background: var(--surface-hover);
+          }
         }
+      }
+
+      .btn-today {
+        padding: 0.4rem 0.85rem;
+        border: 1px solid var(--border-color);
+        background: var(--surface-elevated);
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.82rem;
+        color: var(--text-heading);
+        cursor: pointer;
+        transition: background 0.2s;
+
+        &:hover {
+          background: var(--surface-hover);
+        }
+      }
+
+      h3 {
+        margin: 0 0 0 0.25rem;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-heading);
       }
     }
 
     .controls {
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 0.75rem;
 
       .view-toggles {
         display: flex;
-        background: #f8f9fa;
+        background: var(--surface-subtle);
         border-radius: 8px;
         padding: 0.2rem;
-        border: 1px solid #ebedef;
+        border: 1px solid var(--border-color);
 
         button {
           background: transparent;
           border: none;
-          padding: 0.5rem 1rem;
+          padding: 0.4rem 0.9rem;
           border-radius: 6px;
-          font-size: 0.85rem;
+          font-size: 0.82rem;
           font-weight: 600;
-          color: #7f8c8d;
+          color: var(--text-muted);
           cursor: pointer;
           transition: all 0.2s;
 
           &.active {
-            background: white;
-            color: #2c3e50;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            background: var(--surface-elevated);
+            color: var(--text-heading);
+            box-shadow: var(--shadow-sm);
           }
         }
-      }
-
-      .theme-toggle {
-        width: 36px;
-        height: 36px;
-        border-radius: 8px;
-        border: 1px solid #ebedef;
-        background: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #7f8c8d;
-        cursor: pointer;
       }
 
       .btn-new {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
-        background-color: #639886;
-        color: white;
+        gap: 0.4rem;
+        background-color: var(--primary-color);
+        color: var(--text-light);
         border: none;
-        padding: 0.6rem 1.2rem;
+        padding: 0.5rem 1.1rem;
         border-radius: 8px;
         font-weight: 600;
-        font-size: 0.9rem;
+        font-size: 0.85rem;
         cursor: pointer;
         transition: background 0.2s;
 
         &:hover {
-          background-color: #528070;
+          background-color: var(--primary-hover);
         }
       }
     }
   }
 
-
+  /* Subheader: barra de legenda */
   &__subheader {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 1.5rem;
-
-    .month-nav {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-
-      .arrows {
-        display: flex;
-        gap: 0.2rem;
-
-        button {
-          width: 32px;
-          height: 32px;
-          border: 1px solid #ebedef;
-          background: white;
-          border-radius: 6px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: #2c3e50;
-          cursor: pointer;
-
-          &:hover {
-            background: #f8f9fa;
-          }
-        }
-      }
-
-      .btn-today {
-        padding: 0.4rem 1rem;
-        border: 1px solid #ebedef;
-        background: white;
-        border-radius: 6px;
-        font-weight: 600;
-        font-size: 0.85rem;
-        color: #2c3e50;
-        cursor: pointer;
-
-        &:hover {
-          background: #f8f9fa;
-        }
-      }
-
-      h3 {
-        margin: 0 0 0 0.5rem;
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: #2c3e50;
-      }
-    }
+    margin-bottom: 1rem;
+    flex-shrink: 0;
 
     .legends {
       display: flex;
       align-items: center;
-      gap: 0.8rem;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      padding: 0.55rem 0.85rem;
+      background: var(--surface-subtle);
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
 
       .filter-icon {
-        color: #bdc3c7;
-        margin-right: 0.5rem;
+        color: var(--text-muted);
+        opacity: 0.6;
+        flex-shrink: 0;
+      }
+
+      .legends-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        margin-right: 0.15rem;
+        flex-shrink: 0;
       }
 
       .legend-item {
         display: flex;
         align-items: center;
-        gap: 0.4rem;
-        padding: 0.3rem 0.8rem;
-        border-radius: 20px;
-        font-size: 0.75rem;
+        gap: 0.35rem;
+        padding: 4px 12px;
+        border-radius: 2px;
+        font-size: 0.73rem;
         font-weight: 600;
         border: 1px solid transparent;
+        cursor: default;
+        user-select: none;
 
         .dot {
           width: 6px;
           height: 6px;
           border-radius: 50%;
+          flex-shrink: 0;
         }
 
         &.agendado {
-          background-color: #f0f7ff;
-          color: #3b82f6;
-          border-color: #e0f2fe;
-
-          .dot {
-            background-color: #3b82f6;
-          }
+          background-color: var(--color-info-bg);
+          color: var(--color-info);
+          border-color: var(--color-info-bg);
+          .dot { background-color: var(--color-info); }
         }
 
         &.atendimento {
-          background-color: #fffbeb;
-          color: #d97706;
-          border-color: #fef3c7;
-
-          .dot {
-            background-color: #d97706;
-          }
+          background-color: var(--color-warning-bg);
+          color: var(--color-warning);
+          border-color: var(--color-warning-bg);
+          .dot { background-color: var(--color-warning); }
         }
 
         &.finalizado {
-          background-color: #f0fdf4;
-          color: #16a34a;
-          border-color: #dcfce7;
-
-          .dot {
-            background-color: #16a34a;
-          }
+          background-color: var(--color-success-bg);
+          color: var(--color-success);
+          border-color: var(--color-success-bg);
+          .dot { background-color: var(--color-success); }
         }
 
         &.cancelado {
-          background-color: #fef2f2;
-          color: #ef4444;
-          border-color: #fee2e2;
+          background-color: var(--color-danger-bg);
+          color: var(--color-danger);
+          border-color: var(--color-danger-bg);
+          .dot { background-color: var(--color-danger); }
+        }
 
-          .dot {
-            background-color: #ef4444;
-          }
+        &.exame {
+          background-color: var(--badge-medico-bg);
+          color: var(--badge-medico-color);
+          border-color: var(--badge-medico-bg);
+          .dot { background-color: var(--badge-medico-color); }
         }
 
         &.disponivel {
-          background-color: #f8f9fa;
-          color: #64748b;
-          border-color: #f1f5f9;
-
-          .dot {
-            background-color: #64748b;
-          }
+          background-color: var(--badge-default-bg);
+          color: var(--badge-default-color);
+          border-color: var(--badge-default-bg);
+          .dot { background-color: var(--badge-default-color); }
         }
       }
     }
   }
 
+  /* Badge — compartilhado pelas três views */
+  .badge {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 4px 12px;
+    border-radius: 2px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    overflow: hidden;
+    cursor: default;
 
+    .time          { opacity: 0.8; flex-shrink: 0; }
+    .dot-separator {
+      width: 3px; height: 3px; border-radius: 50%;
+      background: currentColor; opacity: 0.5; flex-shrink: 0;
+    }
+    .name          { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    &.agendado    { background: var(--color-info-bg);    color: var(--color-info); }
+    &.atendimento { background: var(--color-warning-bg); color: var(--color-warning); }
+    &.finalizado  { background: var(--color-success-bg); color: var(--color-success); }
+    &.cancelado   { background: var(--color-danger-bg);  color: var(--color-danger);}
+    &.exame       { background: var(--badge-medico-bg);  color: var(--badge-medico-color); }
+    &.disponivel  { background: var(--badge-default-bg); color: var(--badge-default-color); }
+
+    &.badge--clickable {
+      cursor: pointer;
+      &:hover { filter: brightness(0.93); transform: translateX(1px); }
+    }
+  }
+
+  /* Grid wrapper: flex: 1 + min-height: 0 libera o scroll interno */
   &__grid-wrapper {
     flex: 1;
+    min-height: 0;
     display: flex;
     flex-direction: column;
-    border: 1px solid #ebedef;
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     overflow: hidden;
   }
 
+  /* Cabeçalho dos dias da semana — fixo, não rola */
   &__grid-header {
+    flex-shrink: 0;
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    background: #fdfdfd;
-    border-bottom: 1px solid #ebedef;
+    background: var(--surface-subtle);
+    border-bottom: 1px solid var(--border-color);
 
     .day-name {
-      padding: 1rem 0;
+      padding: 0.85rem 0;
       text-align: center;
-      font-size: 0.75rem;
+      font-size: 0.73rem;
       font-weight: 700;
-      color: #95a5a6;
+      color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      border-right: 1px solid #ebedef;
+      border-right: 1px solid var(--border-color);
 
       &:last-child {
         border-right: none;
@@ -287,36 +322,47 @@
     }
   }
 
+  /* Corpo do grid — rola internamente */
   &__grid-body {
-    flex: 1;
+    overflow-y: auto;
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    grid-auto-rows: minmax(110px, 1fr);
+    grid-auto-rows: 115px;
 
     .cell {
-      border-right: 1px solid #ebedef;
-      border-bottom: 1px solid #ebedef;
+      border-right: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
       padding: 0.6rem;
       display: flex;
       flex-direction: column;
-      background: white;
+      background: var(--surface-elevated);
+      transition: background 0.15s;
+
+      &:hover {
+        background: var(--surface-hover);
+      }
 
       &:nth-child(7n) {
         border-right: none;
       }
 
       &.outside-month {
-        background: #fafbfc;
+        background: var(--surface-subtle);
 
         .date-number {
-          color: #bdc3c7;
+          color: var(--text-muted);
+          opacity: 0.45;
+        }
+
+        &:hover {
+          background: var(--surface-hover);
         }
       }
 
       .date-number {
-        font-size: 0.85rem;
+        font-size: 0.82rem;
         font-weight: 600;
-        color: #34495e;
+        color: var(--text-heading);
         margin-bottom: 0.5rem;
         width: 24px;
         height: 24px;
@@ -324,10 +370,11 @@
         align-items: center;
         justify-content: center;
         border-radius: 50%;
+        flex-shrink: 0;
 
         &.today {
-          background-color: #639886;
-          color: white;
+          background-color: var(--primary-color);
+          color: var(--text-light);
         }
       }
 
@@ -336,72 +383,200 @@
         flex-direction: column;
         gap: 0.3rem;
         flex: 1;
-
-        .badge {
-          display: flex;
-          align-items: center;
-          gap: 0.4rem;
-          padding: 0.25rem 0.5rem;
-          border-radius: 4px;
-          font-size: 0.7rem;
-          font-weight: 600;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-
-          .time {
-            opacity: 0.8;
-          }
-
-          .dot-separator {
-            width: 3px;
-            height: 3px;
-            border-radius: 50%;
-            background: currentColor;
-            opacity: 0.5;
-          }
-
-          .name {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-          }
-
-          &.agendado {
-            background: #f0f7ff;
-            color: #2563eb;
-          }
-
-          &.atendimento {
-            background: #fffbeb;
-            color: #d97706;
-          }
-
-          &.finalizado {
-            background: #f0fdf4;
-            color: #16a34a;
-          }
-
-          &.cancelado {
-            background: #fef2f2;
-            color: #ef4444;
-            text-decoration: line-through;
-          }
-
-          &.disponivel {
-            background: #f8f9fa;
-            color: #64748b;
-          }
-        }
       }
 
       .more-indicator {
-        font-size: 0.7rem;
-        color: #95a5a6;
+        font-size: 0.68rem;
+        color: var(--text-muted);
         font-weight: 600;
-        margin-top: 0.4rem;
+        margin-top: 0.3rem;
         padding-left: 0.2rem;
       }
+    }
+  }
+
+  /* ── VIEW SEMANA ───────────────────────────────────────────────────────── */
+  .week-view {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+
+    &__header {
+      flex-shrink: 0;
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      background: var(--surface-subtle);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    &__col-header {
+      padding: 0.75rem 0.5rem;
+      text-align: center;
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+
+      &:last-child { border-right: none; }
+
+      &--today .week-view__day-number--today {
+        background: var(--primary-color);
+        color: var(--text-light);
+      }
+    }
+
+    &__day-name {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    &__day-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text-heading);
+
+      &--today {
+        background: var(--primary-color);
+        color: var(--text-light);
+      }
+    }
+
+    &__body {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+    }
+
+    &__col {
+      border-right: 1px solid var(--border-color);
+      padding: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      background: var(--surface-elevated);
+      min-height: 220px;
+
+      &:last-child { border-right: none; }
+
+      &--today { background: rgba(var(--primary-rgb), 0.04); }
+
+      .badge { padding: 3px 8px; font-size: 0.65rem; }
+    }
+
+    &__empty {
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      text-align: center;
+      padding: 1.5rem 0;
+      opacity: 0.4;
+    }
+  }
+
+  /* ── VIEW DIA ──────────────────────────────────────────────────────────── */
+  .day-view {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+
+    &__empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      min-height: 200px;
+      gap: 0.75rem;
+      color: var(--text-muted);
+
+      p { font-size: 0.9rem; }
+    }
+
+    &__list { display: flex; flex-direction: column; }
+
+    &__item {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      cursor: default;
+      transition: background 0.15s;
+
+      &:last-child { border-bottom: none; }
+      &:hover      { background: var(--surface-hover); }
+
+      &--clickable { cursor: pointer; }
+    }
+
+    &__time {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      min-width: 48px;
+      flex-shrink: 0;
+      font-variant-numeric: tabular-nums;
+    }
+
+    &__indicator {
+      width: 4px;
+      align-self: stretch;
+      border-radius: 2px;
+      flex-shrink: 0;
+
+      &.agendado    { background: var(--color-info); }
+      &.atendimento { background: var(--color-warning); }
+      &.finalizado  { background: var(--color-success); }
+      &.cancelado   { background: var(--color-danger); }
+      &.exame       { background: var(--badge-medico-color); }
+      &.disponivel  { background: var(--badge-default-color); }
+    }
+
+    &__info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      flex: 1;
+    }
+
+    &__label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-heading);
+    }
+
+    &__status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      width: fit-content;
+
+      &.agendado    { background: var(--color-info-bg);    color: var(--color-info); }
+      &.atendimento { background: var(--color-warning-bg); color: var(--color-warning); }
+      &.finalizado  { background: var(--color-success-bg); color: var(--color-success); }
+      &.cancelado   { background: var(--color-danger-bg);  color: var(--color-danger); }
+      &.exame       { background: var(--badge-medico-bg);  color: var(--badge-medico-color); }
+      &.disponivel  { background: var(--badge-default-bg); color: var(--badge-default-color); }
     }
   }
 }
