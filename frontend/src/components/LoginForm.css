@@ -14,7 +14,7 @@
 .form-group label {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--text-dark);
+  color: var(--text-heading);
   margin-bottom: 0.5rem;
 }
 
@@ -24,7 +24,7 @@
   border: 1px solid var(--border-color);
   background-color: white;
   font-size: 0.95rem;
-  color: var(--text-dark);
+  color: var(--text-heading);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -87,7 +87,7 @@ button.role-toggle-btn.active  {
   text-align: center;
   font-size: 1rem;
   font-weight: 600;
-  color: var(--text-dark);
+  color: var(--text-heading);
   transition: color 0.2s ease;
 }
 

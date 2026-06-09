@@ -13,14 +13,14 @@
     align-items: center;
     justify-content: space-between;
     gap: 0.5rem;
-    border: 1.5px solid #e0e0e0;
+    border: 1.5px solid var(--border-input);
     border-radius: 8px;
     padding: 0.6rem 0.8rem;
     font-size: 0.9rem;
-    background: #fafafa;
+    background: var(--surface-elevated);
     cursor: pointer;
     font-family: inherit;
-    color: #333;
+    color: var(--text-body);
     text-align: left;
     transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s;
 
@@ -28,14 +28,14 @@
       outline: none;
       border-color: var(--primary-color);
       box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
-      background: var(--white);
+      background: var(--surface-elevated);
     }
   }
 
   &--open &__trigger {
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
-    background: var(--white);
+    background: var(--surface-elevated);
   }
 
   &__placeholder {
@@ -43,12 +43,12 @@
   }
 
   &__value {
-    color: #333;
+    color: var(--text-body);
   }
 
   &__arrow {
     flex-shrink: 0;
-    color: #888;
+    color: var(--text-neutral);
     transition: transform 0.2s;
   }
 
@@ -61,7 +61,7 @@
     top: calc(100% + 4px);
     left: 0;
     right: 0;
-    background: #fff;
+    background: var(--surface-card);
     border: 1.5px solid var(--border-color);
     border-radius: 8px;
     box-shadow: var(--shadow-md);
@@ -80,27 +80,27 @@
   &__search {
     position: relative;
     padding: 0.45rem 0.6rem;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--border-divider);
 
     input {
       width: 100%;
       box-sizing: border-box;
-      border: 1.5px solid #e8e8e8;
+      border: 1.5px solid var(--border-input);
       border-radius: 6px;
       padding: 0.35rem 1.75rem 0.35rem 0.6rem;
       font-size: 0.85rem;
       font-family: inherit;
-      color: #333;
-      background: #fafafa;
+      color: var(--text-body);
+      background: var(--surface-input);
       outline: none;
 
       &::placeholder {
-        color: #bbb;
+        color: var(--text-placeholder);
       }
 
       &:focus {
         border-color: var(--primary-color);
-        background: #fff;
+        background: var(--surface-elevated);
       }
     }
   }
@@ -110,14 +110,14 @@
     right: calc(0.6rem + 0.45rem);
     top: 50%;
     transform: translateY(-50%);
-    color: #bbb;
+    color: var(--text-placeholder);
     pointer-events: none;
   }
 
   &__empty {
     padding: 0.6rem 0.75rem;
     font-size: 0.85rem;
-    color: #aaa;
+    color: var(--text-placeholder);
     text-align: center;
   }
 
@@ -129,7 +129,7 @@
     font-size: 0.88rem;
     border-radius: 6px;
     cursor: pointer;
-    color: #333;
+    color: var(--text-body);
     transition: background 0.1s;
 
     &:hover {

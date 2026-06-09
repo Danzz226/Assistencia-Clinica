@@ -2,8 +2,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 2px 8px;
-  border-radius: 4px;
+  padding: 4px 12px;
+  border-radius: var(--border-radius-badge);
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.5px;
@@ -48,6 +48,13 @@
   &.badge-info {
     background-color: var(--badge-info-bg);
     color: var(--badge-info-color);
+  }
+
+  &.badge-especialidade {
+    background-color: var(--badge-especialidade-bg);
+    color: var(--badge-especialidade-color);
+    text-transform: none;
+    letter-spacing: 0;
   }
 
   &.badge-default {

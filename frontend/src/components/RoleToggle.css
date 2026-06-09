@@ -1,6 +1,6 @@
 .role-toggle-container {
   display: flex;
-  background-color: var(--light-color)  ;
+  background-color: var(--role-toggle-bg);
   border-radius: 8px;
   padding: 4px;
   width: 100%;
@@ -45,4 +45,21 @@
 
 .role-toggle-container.is-patient .role-toggle-slider {
   transform: translateX(100%);
+}
+
+@media (max-width: 768px) {
+  .role-toggle-container {
+    margin-bottom: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .role-toggle-container {
+    margin-bottom: 1.25rem;
+  }
+
+  .role-toggle-btn {
+    padding: 8px 0;
+    font-size: 0.8rem;
+  }
 }
