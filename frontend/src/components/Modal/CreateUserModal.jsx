@@ -109,7 +109,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreated }) => {
       }
 
       if (form.tipo === 'paciente') {
-        if (form.dataNascimento) payload.dataNascimento = form.dataNascimento;
+        payload.dataNascimento = form.dataNascimento;
         if (form.telefone) payload.telefone = form.telefone;
         if (form.endereco) payload.endereco = form.endereco;
       }
@@ -203,7 +203,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreated }) => {
           <>
             <div className="modal-field">
               <label>Data de nascimento</label>
-              <input type="date" value={form.dataNascimento} onChange={set('dataNascimento')} />
+              <input type="date" value={form.dataNascimento} onChange={set('dataNascimento')} required />
             </div>
             <div className="modal-field">
               <label>Telefone</label>

@@ -53,7 +53,11 @@
     align-items: flex-start;
     gap: 0.65rem;
     padding: 0.6rem 0;
-    border-bottom: 1px solid var(--border-divider);
+    border-bottom: 1.5px solid var(--border-divider);
+
+    &:last-child {
+      border-bottom: none;
+    }
 
     &-icon {
       color: var(--primary-color);
@@ -83,7 +87,7 @@
     gap: 0.75rem;
     margin-top: 1.5rem;
     padding-top: 1rem;
-    border-top: 1px solid var(--border-divider);
+    border-top: 1.5px solid var(--border-divider);
   }
 
   &__btn-icon {
@@ -96,5 +100,16 @@
     background: var(--surface-elevated) !important;
     border: 1.5px solid var(--border-input) !important;
     color: var(--text-body) !important;
+    transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+
+    &:hover {
+      background: var(--surface-hover) !important;
+      border-color: var(--border-color) !important;
+      color: var(--text-heading) !important;
+    }
   }
+}
+
+[data-theme="dark"] .user-profile-modal__header {
+  background: var(--surface-hover);
 }

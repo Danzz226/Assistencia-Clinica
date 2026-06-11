@@ -1,6 +1,15 @@
 import React, { useState, useMemo } from 'react';
-import { ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
+import { ChevronUp, ChevronDown } from 'lucide-react';
 import './GenericTable.scss';
+
+export const renderDateBadge = (dateStr, { withTime = false, emptyLabel = '—' } = {}) => {
+  if (!dateStr) return <span className="date-badge date-badge--empty">{emptyLabel}</span>;
+  const d = new Date(dateStr);
+  const formatted = withTime
+    ? d.toLocaleDateString('pt-BR') + ' às ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+    : d.toLocaleDateString('pt-BR');
+  return <span className="date-badge">{formatted}</span>;
+};
 
 const GenericTable = ({ columns, data }) => {
   const [sortKey, setSortKey] = useState(null);
@@ -53,12 +62,9 @@ const GenericTable = ({ columns, data }) => {
                 >
                   <span className="th-content">
                     {col.header}
-                    {isSortable && (
-                      <span className={`sort-icon${isActive ? ' sort-icon--active' : ''}`}>
-                        {isActive
-                          ? sortDir === 'asc' ? <ChevronUp size={13} /> : <ChevronDown size={13} />
-                          : <ChevronsUpDown size={13} />
-                        }
+                    {isSortable && isActive && (
+                      <span className="sort-icon sort-icon--active">
+                        {sortDir === 'asc' ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
                       </span>
                     )}
                   </span>

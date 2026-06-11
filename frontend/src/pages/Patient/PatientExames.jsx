@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { ClipboardList } from 'lucide-react';
+import { useTableSort, SortIcon } from '../../hooks/useTableSort';
 import { AuthContext } from '../../context/AuthContext';
 import api from '../../services/api';
 import { useToast } from '../../context/ToastContext';
@@ -14,6 +15,8 @@ const PatientExames = () => {
 
   const [exames, setExames]   = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const { sortKey, sortDir, handleSort, sortedData: sortedExames } = useTableSort(exames);
 
   useEffect(() => {
     const fetchDados = async () => {
@@ -79,18 +82,30 @@ const PatientExames = () => {
           <table className="patient-page__table">
             <thead>
               <tr>
-                <th>Tipo de Exame</th>
-                <th>Médico Solicitante</th>
-                <th>Data do Exame</th>
-                <th>Resultado</th>
+                <th className="sortable" onClick={() => handleSort('tipo')}>
+                  <span className="th-content">Tipo de Exame <SortIcon sortKey={sortKey} columnKey="tipo" sortDir={sortDir} /></span>
+                </th>
+                <th className="sortable" onClick={() => handleSort('medicoNome')}>
+                  <span className="th-content">Médico Solicitante <SortIcon sortKey={sortKey} columnKey="medicoNome" sortDir={sortDir} /></span>
+                </th>
+                <th className="sortable" onClick={() => handleSort('dataExame')}>
+                  <span className="th-content">Data do Exame <SortIcon sortKey={sortKey} columnKey="dataExame" sortDir={sortDir} /></span>
+                </th>
+                <th className="sortable" onClick={() => handleSort('resultado')}>
+                  <span className="th-content">Resultado <SortIcon sortKey={sortKey} columnKey="resultado" sortDir={sortDir} /></span>
+                </th>
               </tr>
             </thead>
             <tbody>
-              {exames.map((e) => (
+              {sortedExames.map((e) => (
                 <tr key={e.id}>
-                  <td style={{ fontWeight: 600 }}>{e.tipo || '—'}</td>
+                  <td>
+                    <span className="patient-page__badge patient-page__badge--info">{e.tipo || '—'}</span>
+                  </td>
                   <td>{e.medicoNome || '—'}</td>
-                  <td>{formatData(e.dataExame)}</td>
+                  <td>
+                    <span className="patient-page__badge patient-page__badge--success">{formatData(e.dataExame)}</span>
+                  </td>
                   <td style={{ color: e.resultado ? 'var(--text-body)' : 'var(--text-placeholder)', fontStyle: e.resultado ? 'normal' : 'italic' }}>
                     {e.resultado
                       ? e.resultado.substring(0, 80) + (e.resultado.length > 80 ? '…' : '')

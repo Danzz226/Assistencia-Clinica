@@ -148,13 +148,28 @@ public class UsuarioService {
             throw new IllegalArgumentException("E-mail ou senha inválidos");
         }
 
-        if (usuario.isMfaEnabled()) {
-            if (dto.mfaCode == null || dto.mfaCode.isBlank()) {
-                return new AuthResponseDTO(null, usuario.getNome(), usuario.getEmail(), usuario.getTipo(), true, true);
-            } else if (!totpService.verificar(usuario.getMfaSecret(), dto.mfaCode)) {
-                throw new IllegalArgumentException("Código MFA inválido");
-            }
-        }
+        // TODO: reativar MFA obrigatório após testes
+        // boolean mfaObrigatorio = usuario.getTipo() == TipoUsuario.admin || usuario.getTipo() == TipoUsuario.medico;
+        //
+        // if (usuario.isMfaEnabled()) {
+        //     if (dto.mfaCode == null || dto.mfaCode.isBlank()) {
+        //         return new AuthResponseDTO(null, usuario.getNome(), usuario.getEmail(), usuario.getTipo(), true, true);
+        //     } else if (!totpService.verificar(usuario.getMfaSecret(), dto.mfaCode)) {
+        //         throw new IllegalArgumentException("Código MFA inválido");
+        //     }
+        // } else if (mfaObrigatorio) {
+        //     String secret = prepararSecret(usuario);
+        //     if (dto.mfaSetupCode != null && !dto.mfaSetupCode.isBlank()) {
+        //         if (!totpService.verificar(secret, dto.mfaSetupCode)) {
+        //             throw new IllegalArgumentException("Código MFA inválido");
+        //         }
+        //         usuario.setMfaEnabled(true);
+        //         usuarioRepository.save(usuario);
+        //     } else {
+        //         String otpauthUrl = totpService.otpauthUrl("Assistencia Clinica", usuario.getEmail(), secret);
+        //         return new AuthResponseDTO(null, null, usuario.getNome(), usuario.getEmail(), usuario.getTipo(), false, true, false, secret, otpauthUrl, null, false);
+        //     }
+        // }
 
         String token = jwtService.gerarToken(usuario);
         return new AuthResponseDTO(usuario.getId(), token, usuario.getNome(), usuario.getEmail(), usuario.getTipo(), usuario.isMfaEnabled(), usuario.getCpf(), usuario.isForcarTrocaSenha());
@@ -322,12 +337,25 @@ public class UsuarioService {
     @Transactional
     public void desabilitarMfa(String email, String code) {
         Usuario usuario = buscarPorEmailAutenticado(email);
+        if (usuario.getTipo() == TipoUsuario.admin || usuario.getTipo() == TipoUsuario.medico) {
+            throw new IllegalArgumentException("MFA não pode ser desativado para este perfil");
+        }
         if (!totpService.verificar(usuario.getMfaSecret(), code)) {
             throw new IllegalArgumentException("Codigo MFA invalido");
         }
         usuario.setMfaEnabled(false);
         usuario.setMfaSecret(null);
         usuarioRepository.save(usuario);
+    }
+
+    private String prepararSecret(Usuario usuario) {
+        String secret = usuario.getMfaSecret();
+        if (secret == null || secret.isBlank()) {
+            secret = totpService.gerarSecret();
+            usuario.setMfaSecret(secret);
+            usuarioRepository.save(usuario);
+        }
+        return secret;
     }
 
     private static String normalizarEmail(String email) {

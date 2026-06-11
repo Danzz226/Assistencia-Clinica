@@ -5,8 +5,8 @@ import jsPDF from 'jspdf';
 import ProntuarioPDF from '../components/Modal/ProntuarioPDF';
 
 export async function downloadProntuarioPDF(prontuario) {
-  const tema = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
-  const bgColor = tema === 'dark' ? '#1a2820' : '#ffffff';
+  const tema = 'light';
+  const bgColor = '#ffffff';
 
   // Overlay que cobre a tela enquanto o PDF renderiza (esconde do usuário)
   const cover = document.createElement('div');

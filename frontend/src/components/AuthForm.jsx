@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import MfaLoginModal from './Modal/MfaLoginModal';
+import MfaSetupLoginModal from './Modal/MfaSetupLoginModal';
 import PasswordStrengthMeter, { getPasswordStrength } from './Modal/PasswordStrengthMeter';
 import PasswordInput from './Modal/PasswordInput';
 import CustomSelect from './CustomSelect/CustomSelect';
@@ -42,6 +43,7 @@ const AuthForm = ({ mode = 'login', role = 'doctor' }) => {
     uf: '',
     especialidade: '',
     cpf: '',
+    dataNascimento: '',
     password: '',
     confirmPassword: '',
   });
@@ -56,6 +58,7 @@ const AuthForm = ({ mode = 'login', role = 'doctor' }) => {
       uf: '',
       especialidade: '',
       cpf: '',
+      dataNascimento: '',
       password: '',
       confirmPassword: '',
     });
@@ -63,6 +66,8 @@ const AuthForm = ({ mode = 'login', role = 'doctor' }) => {
 
   const { toast } = useToast();
   const [mfaRequired, setMfaRequired] = useState(false);
+  const [mfaSetupRequired, setMfaSetupRequired] = useState(false);
+  const [setupData, setSetupData] = useState(null);
   const [pendingCredentials, setPendingCredentials] = useState(null);
 
   const { login, register, logout } = useContext(AuthContext);
@@ -110,6 +115,7 @@ const AuthForm = ({ mode = 'login', role = 'doctor' }) => {
 
         if (tipo === 'paciente') {
           payload.cpf = formData.cpf;
+          payload.dataNascimento = formData.dataNascimento;
           if (formData.phone) payload.telefone = formData.phone;
         }
 
@@ -140,6 +146,13 @@ const AuthForm = ({ mode = 'login', role = 'doctor' }) => {
     if (result.mfaRequired) {
       setPendingCredentials({ email: formData.identifier, password: formData.password, role: systemRole });
       setMfaRequired(true);
+      return;
+    }
+
+    if (result.mfaSetupRequired) {
+      setPendingCredentials({ email: formData.identifier, password: formData.password, role: systemRole });
+      setSetupData({ secret: result.setupSecret, otpauthUrl: result.setupOtpauthUrl });
+      setMfaSetupRequired(true);
       return;
     }
 
@@ -185,13 +198,41 @@ const AuthForm = ({ mode = 'login', role = 'doctor' }) => {
     setPendingCredentials(null);
   };
 
+  const handleMfaSetupConfirm = async (code) => {
+    const result = await login(
+      pendingCredentials.email,
+      pendingCredentials.password,
+      pendingCredentials.role,
+      null,
+      code
+    );
+    if (result.success) {
+      if (result.role === 'admin') navigate('/admin/home');
+      else if (result.role === 'medico') navigate('/medico/home');
+      else navigate('/paciente/home');
+    }
+    return result;
+  };
+
+  const handleMfaSetupClose = () => {
+    setMfaSetupRequired(false);
+    setSetupData(null);
+    setPendingCredentials(null);
+  };
+
   return (
     <>
       <MfaLoginModal
-      isOpen={mfaRequired}
-      onClose={handleMfaClose}
-      onVerify={handleMfaVerify}
-    />
+        isOpen={mfaRequired}
+        onClose={handleMfaClose}
+        onVerify={handleMfaVerify}
+      />
+      <MfaSetupLoginModal
+        isOpen={mfaSetupRequired}
+        onClose={handleMfaSetupClose}
+        setupData={setupData}
+        onConfirm={handleMfaSetupConfirm}
+      />
       <form className="auth-form" onSubmit={handleSubmit}>
       {isSignup && (
         <div className="form-group">
@@ -279,19 +320,30 @@ const AuthForm = ({ mode = 'login', role = 'doctor' }) => {
       )}
 
       {isSignup && role !== 'doctor' && (
-        <div className="form-group">
-          <label>CPF</label>
-
-          <input
-            type="text"
-            name="cpf"
-            placeholder="000.000.000-00"
-            value={formData.cpf}
-            onChange={(e) => setFormData(prev => ({ ...prev, cpf: formatCpf(e.target.value) }))}
-            maxLength={14}
-            required
-          />
-        </div>
+        <>
+          <div className="form-group">
+            <label>CPF</label>
+            <input
+              type="text"
+              name="cpf"
+              placeholder="000.000.000-00"
+              value={formData.cpf}
+              onChange={(e) => setFormData(prev => ({ ...prev, cpf: formatCpf(e.target.value) }))}
+              maxLength={14}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Data de Nascimento</label>
+            <input
+              type="date"
+              name="dataNascimento"
+              value={formData.dataNascimento}
+              onChange={handleChange}
+              required
+            />
+          </div>
+        </>
       )}
 
       <div className="form-group">

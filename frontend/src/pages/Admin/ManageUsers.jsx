@@ -191,6 +191,7 @@ const ManageUsers = () => {
     },
     {
       header: 'Tipo',
+      accessor: 'tipo',
       render: (row) => {
         const tipo = row.tipo?.toLowerCase() || '';
         const variantMap = { admin: 'admin', medico: 'medico', paciente: 'paciente', funcionario: 'default' };

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Plus } from 'lucide-react';
+import { useTableSort, SortIcon } from '../../hooks/useTableSort';
 import { AuthContext } from '../../context/AuthContext';
 import api from '../../services/api';
 import { useToast } from '../../context/ToastContext';
@@ -253,6 +254,8 @@ const PatientConsultas = () => {
   const [loading, setLoading]       = useState(true);
   const [showModal, setShowModal]   = useState(false);
 
+  const { sortKey, sortDir, handleSort, sortedData: sortedConsultas } = useTableSort(consultas);
+
   const carregar = async () => {
     try {
       const [agendRes, pacientesRes] = await Promise.all([
@@ -318,15 +321,23 @@ const PatientConsultas = () => {
           <table className="patient-page__table">
             <thead>
               <tr>
-                <th>Data</th>
+                <th className="sortable" onClick={() => handleSort('data')}>
+                  <span className="th-content">Data <SortIcon sortKey={sortKey} columnKey="data" sortDir={sortDir} /></span>
+                </th>
                 <th>Horário</th>
-                <th>Médico</th>
-                <th>Motivo</th>
-                <th>Status</th>
+                <th className="sortable" onClick={() => handleSort('medicoNome')}>
+                  <span className="th-content">Médico <SortIcon sortKey={sortKey} columnKey="medicoNome" sortDir={sortDir} /></span>
+                </th>
+                <th className="sortable" onClick={() => handleSort('motivoConsulta')}>
+                  <span className="th-content">Motivo <SortIcon sortKey={sortKey} columnKey="motivoConsulta" sortDir={sortDir} /></span>
+                </th>
+                <th className="sortable" onClick={() => handleSort('status')}>
+                  <span className="th-content">Status <SortIcon sortKey={sortKey} columnKey="status" sortDir={sortDir} /></span>
+                </th>
               </tr>
             </thead>
             <tbody>
-              {consultas.map((c) => (
+              {sortedConsultas.map((c) => (
                 <tr key={c.id}>
                   <td>{formatData(c.data)}</td>
                   <td>{formatHora(c.data)}</td>

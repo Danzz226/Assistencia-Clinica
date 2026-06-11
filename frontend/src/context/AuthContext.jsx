@@ -19,19 +19,21 @@ export const AuthProvider = ({ children }) => {
    * Login real via backend.
    * Se o backend retornar mfaRequired: true, retorna { mfaRequired: true } para o formulário.
    */
-  const login = async (email, password, selectedRole, mfaCode) => {
+  const login = async (email, password, selectedRole, mfaCode, mfaSetupCode) => {
     try {
       const payload = { email, senha: password };
-      if (mfaCode) {
-        payload.mfaCode = mfaCode;
-      }
+      if (mfaCode) payload.mfaCode = mfaCode;
+      if (mfaSetupCode) payload.mfaSetupCode = mfaSetupCode;
 
       const response = await api.post('/auth/login', payload);
-      const { id, token, nome, email: responseEmail, tipo, mfaRequired, mfaEnabled, forcarTrocaSenha } = response.data;
+      const { id, token, nome, email: responseEmail, tipo, mfaRequired, mfaSetupRequired, mfaEnabled, mfaSetupSecret, mfaSetupOtpauthUrl, forcarTrocaSenha } = response.data;
 
-      // Backend pede código MFA
       if (mfaRequired && !token) {
         return { success: false, mfaRequired: true };
+      }
+
+      if (mfaSetupRequired && !token) {
+        return { success: false, mfaSetupRequired: true, setupSecret: mfaSetupSecret, setupOtpauthUrl: mfaSetupOtpauthUrl };
       }
 
       const loggedUser = { id, username: nome, email: responseEmail || email, role: tipo, mfaEnabled: !!mfaEnabled, cpf: response.data.cpf ?? null, forcarTrocaSenha: !!forcarTrocaSenha };

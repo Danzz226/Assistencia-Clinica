@@ -54,7 +54,7 @@ const Sidebar = () => {
         {role === 'medico' && (
           <>
             <NavLink to="/medico/home" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
-              <Home size={20} /> <span>Dashboard Médico</span>
+              <Home size={20} /> <span>Dashboard</span>
             </NavLink>
             <NavLink to="/medico/consultas" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
               <ClipboardList size={20} /> <span>Minhas Consultas</span>
@@ -66,7 +66,7 @@ const Sidebar = () => {
               <Users size={20} /> <span>Meus Pacientes</span>
             </NavLink>
             <NavLink to="/medico/exames" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
-              <Activity size={20} /> <span>Exames</span>
+              <FlaskConical size={20} /> <span>Exames e Prontuários</span>
             </NavLink>
           </>
         )}
@@ -75,7 +75,7 @@ const Sidebar = () => {
         {role === 'paciente' && (
           <>
             <NavLink to="/paciente/home" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
-              <Home size={20} /> <span>Dashboard Paciente</span>
+              <Home size={20} /> <span>Dashboard</span>
             </NavLink>
             <NavLink to="/paciente/consultas" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
               <Calendar size={20} /> <span>Minhas Consultas</span>

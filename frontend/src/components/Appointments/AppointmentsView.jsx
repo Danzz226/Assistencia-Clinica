@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { Plus } from 'lucide-react';
 import api from '../../services/api';
 import { useToast } from '../../context/ToastContext';
-import GenericTable from '../GenericTable';
+import GenericTable, { renderDateBadge } from '../GenericTable';
 import { AuthContext } from '../../context/AuthContext';
 import Badge from '../Badge/Badge';
 import CreateAppointmentModal from '../Modal/CreateAppointmentModal';
@@ -57,10 +57,12 @@ const AppointmentsView = ({ viewRole }) => {
   const columns = [
     {
       header: 'Data e Hora',
-      render: (row) => <strong>{formatData(row.data)}</strong>,
+      accessor: 'data',
+      render: (row) => renderDateBadge(row.data, { withTime: true }),
     },
     {
       header: 'Paciente',
+      accessor: 'pacienteNome',
       render: (row) => (
         <div>
           <div style={{ fontWeight: '600', color: 'var(--text-body)' }}>{row.pacienteNome}</div>
@@ -70,6 +72,7 @@ const AppointmentsView = ({ viewRole }) => {
     ...(viewRole === 'admin' ? [{ header: 'Médico', accessor: 'medicoNome' }] : []),
     {
       header: 'Status',
+      accessor: 'status',
       render: (row) => (
         <Badge variant={STATUS_VARIANT[row.status] || 'default'}>
           {STATUS_LABEL[row.status] || row.status}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Calendar, FileText, FlaskConical, Clock, TrendingUp } from 'lucide-react';
+import { useTableSort, SortIcon } from '../../hooks/useTableSort';
 import { AuthContext } from '../../context/AuthContext';
 import api from '../../services/api';
 import { useToast } from '../../context/ToastContext';
@@ -82,6 +83,8 @@ const PatientHome = () => {
     if (user) fetchDados();
   }, [user]);
 
+  const { sortKey, sortDir, handleSort, sortedData: sortedProximas } = useTableSort(proximas);
+
   return (
     <div className="patient-page">
       <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.35rem' }}>
@@ -140,15 +143,23 @@ const PatientHome = () => {
           <table className="patient-page__table">
             <thead>
               <tr>
-                <th>Data</th>
+                <th className="sortable" onClick={() => handleSort('data')}>
+                  <span className="th-content">Data <SortIcon sortKey={sortKey} columnKey="data" sortDir={sortDir} /></span>
+                </th>
                 <th>Horário</th>
-                <th>Médico</th>
-                <th>Motivo</th>
-                <th>Status</th>
+                <th className="sortable" onClick={() => handleSort('medicoNome')}>
+                  <span className="th-content">Médico <SortIcon sortKey={sortKey} columnKey="medicoNome" sortDir={sortDir} /></span>
+                </th>
+                <th className="sortable" onClick={() => handleSort('motivoConsulta')}>
+                  <span className="th-content">Motivo <SortIcon sortKey={sortKey} columnKey="motivoConsulta" sortDir={sortDir} /></span>
+                </th>
+                <th className="sortable" onClick={() => handleSort('status')}>
+                  <span className="th-content">Status <SortIcon sortKey={sortKey} columnKey="status" sortDir={sortDir} /></span>
+                </th>
               </tr>
             </thead>
             <tbody>
-              {proximas.map((a) => (
+              {sortedProximas.map((a) => (
                 <tr key={a.id}>
                   <td style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                     <Clock size={14} style={{ color: 'var(--text-muted)' }} />

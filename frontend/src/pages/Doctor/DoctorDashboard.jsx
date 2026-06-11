@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Users, FileText, TrendingUp, Clock, Calendar } from 'lucide-react';
+import { useTableSort, SortIcon } from '../../hooks/useTableSort';
 import { AuthContext } from '../../context/AuthContext';
 import api from '../../services/api';
 import { useToast } from '../../context/ToastContext';
@@ -93,6 +94,8 @@ const DoctorDashboard = () => {
     return new Date(dateStr).toLocaleDateString('pt-BR');
   };
 
+  const { sortKey, sortDir, handleSort, sortedData: sortedProntuarios } = useTableSort(prontuariosRecentes);
+
   const getSaudacao = () => {
     const hora = new Date().getHours();
     if (hora < 12) return 'Bom dia';
@@ -104,7 +107,7 @@ const DoctorDashboard = () => {
     <div className="doctor-dashboard">
       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
         <div>
-          <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.35rem' }}>Dashboard Médico</h1>
+          <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.35rem' }}>Dashboard</h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.25rem' }}>
             {getSaudacao()}, {medicoNome ? `Dr(a). ${medicoNome}` : user?.username}. Aqui você acompanha seus pacientes, prontuários e sua agenda.
           </p>
@@ -185,14 +188,22 @@ const DoctorDashboard = () => {
           <table className="doctor-dashboard__table">
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Paciente</th>
-                <th>Descrição</th>
-                <th>Data</th>
+                <th className="sortable" onClick={() => handleSort('id')}>
+                  <span className="th-content">ID <SortIcon sortKey={sortKey} columnKey="id" sortDir={sortDir} /></span>
+                </th>
+                <th className="sortable" onClick={() => handleSort('pacienteNome')}>
+                  <span className="th-content">Paciente <SortIcon sortKey={sortKey} columnKey="pacienteNome" sortDir={sortDir} /></span>
+                </th>
+                <th className="sortable" onClick={() => handleSort('descricao')}>
+                  <span className="th-content">Descrição <SortIcon sortKey={sortKey} columnKey="descricao" sortDir={sortDir} /></span>
+                </th>
+                <th className="sortable" onClick={() => handleSort('dataRegistro')}>
+                  <span className="th-content">Data <SortIcon sortKey={sortKey} columnKey="dataRegistro" sortDir={sortDir} /></span>
+                </th>
               </tr>
             </thead>
             <tbody>
-              {prontuariosRecentes.map((p) => (
+              {sortedProntuarios.map((p) => (
                 <tr key={p.id}>
                   <td className="doctor-dashboard__table-id">{p.id}</td>
                   <td>{p.pacienteNome || `Paciente ${p.pacienteId}`}</td>

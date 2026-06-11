@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Search, User, Pencil, Trash2, ClipboardList, Plus, UserRound, Mail, Phone, MapPin, Cake, CreditCard } from 'lucide-react';
+import { useTableSort, SortIcon } from '../../hooks/useTableSort';
 import { FaFilePdf } from 'react-icons/fa';
 import { AuthContext } from '../../context/AuthContext';
 import api from '../../services/api';
@@ -209,6 +210,8 @@ const DoctorPatients = () => {
     (p) => p.nome?.toLowerCase().includes(filtro.toLowerCase()) || p.email?.toLowerCase().includes(filtro.toLowerCase())
   );
 
+  const { sortKey, sortDir, handleSort, sortedData: sortedPacientes } = useTableSort(pacientesFiltrados);
+
   const formatPhone = (val) => {
     if (!val) return '';
     let num = val.replace(/\D/g, '');
@@ -250,16 +253,26 @@ const DoctorPatients = () => {
           <table className="doctor-patients__table">
             <thead>
               <tr>
-                <th>Paciente</th>
-                <th>Email</th>
-                <th>Telefone</th>
-                <th>Data Nasc.</th>
-                <th>Último Prontuário</th>
+                <th className="sortable" onClick={() => handleSort('nome')}>
+                  <span className="th-content">Paciente <SortIcon sortKey={sortKey} columnKey="nome" sortDir={sortDir} /></span>
+                </th>
+                <th className="sortable" onClick={() => handleSort('email')}>
+                  <span className="th-content">Email <SortIcon sortKey={sortKey} columnKey="email" sortDir={sortDir} /></span>
+                </th>
+                <th className="sortable" onClick={() => handleSort('telefone')}>
+                  <span className="th-content">Telefone <SortIcon sortKey={sortKey} columnKey="telefone" sortDir={sortDir} /></span>
+                </th>
+                <th className="sortable" onClick={() => handleSort('dataNascimento')}>
+                  <span className="th-content">Data Nasc. <SortIcon sortKey={sortKey} columnKey="dataNascimento" sortDir={sortDir} /></span>
+                </th>
+                <th className="sortable" onClick={() => handleSort('ultimoProntuario')}>
+                  <span className="th-content">Último Prontuário <SortIcon sortKey={sortKey} columnKey="ultimoProntuario" sortDir={sortDir} /></span>
+                </th>
                 <th>Ações</th>
               </tr>
             </thead>
             <tbody>
-              {pacientesFiltrados.map((p) => (
+              {sortedPacientes.map((p) => (
                 <tr key={p.id}>
                   <td>
                     <div className="doctor-patients__patient-cell">

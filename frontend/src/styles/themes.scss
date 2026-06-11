@@ -21,7 +21,7 @@
   --teal-gradient-end: #1a9e78;
 
   // Table
-  --table-header-hover: rgba(104, 142, 128, 0.09);
+  --table-header-hover: rgba(104, 142, 128, 0.22);
 
   // Layout
   --bg-page:           #F1F7F6;
@@ -40,7 +40,7 @@
   // Borders
   --border-color:        #dceae7;
   --border-input:        #e0e0e0;
-  --border-divider:      #f5f5f5;
+  --border-divider:      #d0ddd9;
   --border-radius-sm:    8px;
   --border-radius-badge: 2px;
 
@@ -89,9 +89,9 @@
   --color-error-border:    #ff4d4f;
 
   // Pills de cards
-  --pill-blue-bg:      #e8eef8;
-  --pill-blue-color:   #2a4a80;
-  --pill-orange-bg:    #fff4e5;
+  --pill-blue-bg:      #ccd8f5;
+  --pill-blue-color:   #1d3f80;
+  --pill-orange-bg:    #fde3b5;
 
   // Badges
   --badge-admin-bg:            #e8f0ec;   --badge-admin-color:            #3b5f50;
@@ -106,7 +106,7 @@
   --badge-default-bg:          #f3f4f6;   --badge-default-color:          #4b5563;
 
   // Icons
-  --icon-bg-green:         #e8f0ec;
+  --icon-bg-green:         #c2e0cf;
   --icon-bg-blue:          #e6f3ff;
   --icon-bg-purple:        #f3e8ff;
   --icon-bg-yellow:        #fef3c7;
@@ -161,7 +161,7 @@
   --teal-gradient-end: #0e7a5a;
 
   // Table
-  --table-header-hover: rgba(122, 168, 148, 0.11);
+  --table-header-hover: rgba(122, 168, 148, 0.24);
 
   // Layout
   --bg-page:           #192420;
@@ -180,7 +180,7 @@
   // Borders
   --border-color:        #354d42;
   --border-input:        #354d42;
-  --border-divider:      #2a3f35;
+  --border-divider:      #4d6e61;
   --border-radius-sm:    8px;
   --border-radius-badge: 2px;
 
@@ -229,9 +229,9 @@
   --color-error-border:    #f87171;
 
   // Pills de cards
-  --pill-blue-bg:      #162b48;
-  --pill-blue-color:   #60a5fa;
-  --pill-orange-bg:    #302005;
+  --pill-blue-bg:      rgba(96, 165, 250, 0.16);
+  --pill-blue-color:   #93c5fd;
+  --pill-orange-bg:    rgba(251, 191, 36, 0.14);
 
   // Badges
   --badge-admin-bg:            rgba(122, 168, 148, 0.18);  --badge-admin-color:            #7aA894;
@@ -246,7 +246,7 @@
   --badge-default-bg:          rgba(160, 174, 192, 0.12);  --badge-default-color:          #9baeb8;
 
   // Icons
-  --icon-bg-green:         #244535;
+  --icon-bg-green:         rgba(52, 211, 153, 0.14);
   --icon-bg-blue:          #162b48;
   --icon-bg-purple:        #38245a;
   --icon-bg-yellow:        #422b08;
@@ -282,9 +282,26 @@
 }
 
 
+// ── NUMBER INPUT SPINNERS ───────────────────────────────
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+
 // ── CALENDAR PICKER ICON ────────────────────────────────
 
-[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator {
+[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator,
+[data-theme="dark"] input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+[data-theme="dark"] input[type="time"]::-webkit-calendar-picker-indicator,
+[data-theme="dark"] input[type="month"]::-webkit-calendar-picker-indicator,
+[data-theme="dark"] input[type="week"]::-webkit-calendar-picker-indicator {
   filter: invert(1);
 }
 

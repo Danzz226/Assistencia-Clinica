@@ -106,7 +106,7 @@ const DoctorConsultas = () => {
             >
               {t.label}
               {contagens[t.key] > 0 && (
-                <span className={`doctor-consultas__tab-badge${t.key === 'hoje' ? ' doctor-consultas__tab-badge--hoje' : ''}`}>
+                <span className={`doctor-consultas__tab-badge${tab === t.key ? ' doctor-consultas__tab-badge--active' : ''}`}>
                   {contagens[t.key]}
                 </span>
               )}

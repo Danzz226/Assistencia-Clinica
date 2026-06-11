@@ -13,4 +13,6 @@ public class LoginDTO {
     public String senha;
 
     public String mfaCode;
+
+    public String mfaSetupCode;
 }

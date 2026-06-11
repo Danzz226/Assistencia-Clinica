@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { FileText, FlaskConical } from 'lucide-react';
 import { FaFilePdf } from 'react-icons/fa';
+import { useTableSort, SortIcon } from '../../hooks/useTableSort';
 import { AuthContext } from '../../context/AuthContext';
 import api from '../../services/api';
 import { useToast } from '../../context/ToastContext';
@@ -22,6 +23,9 @@ const DoctorExams = () => {
   const [loading, setLoading] = useState(true);
 
   const [gerandoPdf, setGerandoPdf] = useState(null);
+
+  const { sortKey: pSortKey, sortDir: pSortDir, handleSort: pHandleSort, sortedData: sortedProntuarios } = useTableSort(prontuarios, 'dataRegistro', 'desc');
+  const { sortKey: eSortKey, sortDir: eSortDir, handleSort: eHandleSort, sortedData: sortedExames } = useTableSort(exames, 'dataExame', 'desc');
 
   useEffect(() => {
     const fetchDados = async () => {
@@ -128,22 +132,28 @@ const DoctorExams = () => {
                 <table className="doctor-exams__table">
                   <thead>
                     <tr>
-                      <th>#</th>
-                      <th>Paciente</th>
-                      <th>Descrição</th>
-                      <th>Data de Registro</th>
-                      <th></th>
+                      <th className="sortable" onClick={() => pHandleSort('id')}>
+                        <span className="th-content">ID <SortIcon sortKey={pSortKey} columnKey="id" sortDir={pSortDir} /></span>
+                      </th>
+                      <th className="sortable" onClick={() => pHandleSort('pacienteNome')}>
+                        <span className="th-content">Paciente <SortIcon sortKey={pSortKey} columnKey="pacienteNome" sortDir={pSortDir} /></span>
+                      </th>
+                      <th className="sortable" onClick={() => pHandleSort('descricao')}>
+                        <span className="th-content">Descrição <SortIcon sortKey={pSortKey} columnKey="descricao" sortDir={pSortDir} /></span>
+                      </th>
+                      <th className="sortable" onClick={() => pHandleSort('dataRegistro')}>
+                        <span className="th-content">Data de Registro <SortIcon sortKey={pSortKey} columnKey="dataRegistro" sortDir={pSortDir} /></span>
+                      </th>
+                      <th>Ações</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {prontuarios
-                      .sort((a, b) => new Date(b.dataRegistro) - new Date(a.dataRegistro))
-                      .map((p) => (
+                    {sortedProntuarios.map((p) => (
                         <tr key={p.id}>
-                          <td className="doctor-exams__id">#{p.id}</td>
+                          <td className="doctor-exams__id">{p.id}</td>
                           <td>
                             <span className="doctor-exams__name">
-                              {p.pacienteNome || `Paciente #${p.pacienteId}`}
+                              {p.pacienteNome || `Paciente ${p.pacienteId}`}
                             </span>
                           </td>
                           <td className="doctor-exams__desc-cell">
@@ -184,22 +194,30 @@ const DoctorExams = () => {
                 <table className="doctor-exams__table">
                   <thead>
                     <tr>
-                      <th>#</th>
-                      <th>Paciente</th>
-                      <th>Tipo</th>
-                      <th>Resultado</th>
-                      <th>Data do Exame</th>
+                      <th className="sortable" onClick={() => eHandleSort('id')}>
+                        <span className="th-content">ID <SortIcon sortKey={eSortKey} columnKey="id" sortDir={eSortDir} /></span>
+                      </th>
+                      <th className="sortable" onClick={() => eHandleSort('pacienteNome')}>
+                        <span className="th-content">Paciente <SortIcon sortKey={eSortKey} columnKey="pacienteNome" sortDir={eSortDir} /></span>
+                      </th>
+                      <th className="sortable" onClick={() => eHandleSort('tipo')}>
+                        <span className="th-content">Tipo <SortIcon sortKey={eSortKey} columnKey="tipo" sortDir={eSortDir} /></span>
+                      </th>
+                      <th className="sortable" onClick={() => eHandleSort('resultado')}>
+                        <span className="th-content">Resultado <SortIcon sortKey={eSortKey} columnKey="resultado" sortDir={eSortDir} /></span>
+                      </th>
+                      <th className="sortable" onClick={() => eHandleSort('dataExame')}>
+                        <span className="th-content">Data do Exame <SortIcon sortKey={eSortKey} columnKey="dataExame" sortDir={eSortDir} /></span>
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
-                    {exames
-                      .sort((a, b) => new Date(b.dataExame) - new Date(a.dataExame))
-                      .map((e) => (
+                    {sortedExames.map((e) => (
                         <tr key={e.id}>
-                          <td className="doctor-exams__id">#{e.id}</td>
+                          <td className="doctor-exams__id">{e.id}</td>
                           <td>
                             <span className="doctor-exams__name">
-                              {e.pacienteNome || `Paciente #${e.pacienteId}`}
+                              {e.pacienteNome || `Paciente ${e.pacienteId}`}
                             </span>
                           </td>
                           <td>

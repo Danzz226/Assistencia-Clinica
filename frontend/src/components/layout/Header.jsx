@@ -102,22 +102,24 @@ const Header = () => {
                 <Lock size={16} />
                 Redefinir Senha
               </button>
-              {mfaEnabled ? (
-                <button
-                  className="dropdown-item"
-                  onClick={handleDisableMfa}
-                >
-                  <ShieldOff size={16} />
-                  Desativar MFA
-                </button>
-              ) : (
-                <button
-                  className="dropdown-item"
-                  onClick={() => { setMfaModalOpen(true); setDropdownOpen(false); }}
-                >
-                  <ShieldCheck size={16} />
-                  Ativar MFA
-                </button>
+              {role !== 'admin' && role !== 'medico' && (
+                mfaEnabled ? (
+                  <button
+                    className="dropdown-item"
+                    onClick={handleDisableMfa}
+                  >
+                    <ShieldOff size={16} />
+                    Desativar MFA
+                  </button>
+                ) : (
+                  <button
+                    className="dropdown-item"
+                    onClick={() => { setMfaModalOpen(true); setDropdownOpen(false); }}
+                  >
+                    <ShieldCheck size={16} />
+                    Ativar MFA
+                  </button>
+                )
               )}
               <div className="dropdown-divider" />
               <button
